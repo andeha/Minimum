@@ -1,0 +1,9 @@
+module ClibTwinbeam [system] {
+  header "ClibTwinbeam.h"
+  link "Twinbeam"
+  link "Additions"
+  export *
+} /* ⬷ note 'ClibTwinbeam' is often defined twice: one time in '🗿' and once 
+ in --<Minimum>--<*>--<module.modulemap>. */
+
+
