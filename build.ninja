@@ -1,0 +1,94 @@
+# build.ninja | artwork is the 'Minimum' application.
+# ⬷ formerly 'Blackhat.app' and 'Vt99'.
+
+appname = Minimum
+twinbeamroot = /<User- or project name>/Monitor/Apps
+libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
+libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
+
+cpp-optflags = -g -I ../Apps/
+swift-flags = -g -I .
+# ⬷ the -I directory flag to tell 'swiftc' where to find a file named 
+# 'module.modulemap' file and its c-only-functions to be used in Swift.
+objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
+gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
+ -fno-signed-char -fno-builtin -Wno-c++20-designator -Wno-c99-designator     $
+ -Wincomplete-umbrella -Wmodule-conflict -Wno-nullability-completeness
+moduleflags = -fmodules-ts -fimplicit-modules -fmodule-map-file=../Apps/🗿.modules
+commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+tmacr-version = -mmacosx-version-min=11.4
+macoscflags_commandline = -isysroot $commandline-sdkpath $tmacr-version
+macoscflags = $macoscflags_commandline
+sha1git = `git log -1 '--pretty=format:%h'`
+cflags = $cpp-optflags -DSHA1GIT=\"$sha1git\" $macoscflags
+macos-compiler-c = xcrun clang $gencdflags $moduleflags
+macos-compiler-swift = xcrun swiftc
+librarian-mac = xcrun ar
+
+rule cc
+  command = $macos-compiler-c -std=c++20 -MD -MF $out.d $cflags -c $in -o $out
+  description = C++20 $out
+  depfile = $out.d
+  deps = gcc
+
+rule ccms
+  command = $macos-compiler-c -std=c++20 -MD -MF $out.d $cflags -o $out      $
+   -fms-extensions -c $in
+  description = C++20 $out
+  depfile = $out.d
+  deps = gcc
+
+rule c
+  command = $macos-compiler-c -std=c18 -MD -MF $out.d $cflags -c $in -o $out
+  description = C18 $out
+  depfile = $out.d
+  deps = gcc
+
+rule objc
+  command = $macos-compiler-c -MD -MF $out.d $cflags -c $in -o $out
+  description = Obj-C $out
+  depfile = $out.d
+  deps = gcc
+
+rule compile-macswift
+  command = $macos-compiler-swift $swift-flags -c $in -o $out
+  description = SWIFT5 $out
+
+rule link-macswift
+  command = $macos-compiler-swift -o $out $in ./Releases/libClibTwinbeam.a
+  description = SWIFT5 $out
+
+rule assemble-macapp
+  command = rm -rf Minimum.app                                             ; $
+   mkdir $appname.app                                                      ; $
+   mkdir $appname.app/Contents                                             ; $
+   mkdir $appname.app/Contents/MacOS                                       ; $
+   mkdir $appname.app/Contents/Resources                                   ; $
+   cp macos-content/Info.plist $appname.app/Contents/                      ; $
+   cp macos-content/PkgInfo $appname.app/Contents/                         ; $
+   cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
+   cp Minimum $appname.app/Contents/MacOS/$appname
+# ⬷ to convert .png to .icns see for example https://cloudconvert.com/png-to-icns.
+
+rule library
+  command = $librarian-mac rcs Releases/$out\_$sha1git.a $in               ; $
+  ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
+  printf $sha1git
+
+# default-target 1
+
+build libClibTwinbeam: library $objs/ClibTwinbeam.o
+build $objs/ClibTwinbeam.o:             cc ClibTwinbeam/ClibTwinbeam.cpp
+
+# default-target 2
+
+build $appname:                         link-macswift $objs/test-tblib.o
+build $objs/test-tblib.o:               compile-macswift test-tblib.swift
+
+# default-target 3
+
+build Minimum.app: assemble-macapp
+
+default libClibTwinbeam $appname Minimum.app
+
+
