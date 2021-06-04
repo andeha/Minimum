@@ -1,5 +1,4 @@
 # build.ninja | artwork is the 'Minimum' application.
-# ⬷ formerly 'Blackhat.app' and 'Vt99'.
 
 appname = Minimum
 twinbeamroot = /<User- or project name>/Monitor/Apps
@@ -68,7 +67,7 @@ rule assemble-macapp
    cp macos-content/PkgInfo $appname.app/Contents/                         ; $
    cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
    cp Minimum $appname.app/Contents/MacOS/$appname
-# ⬷ to convert .png to .icns see for example https://cloudconvert.com/png-to-icns.
+# ⬷ to convert .png to .icns see for example http://cloudconvert.com/png-to-icns.
 
 rule library
   command = $librarian-mac rcs Releases/$out\_$sha1git.a $in               ; $
