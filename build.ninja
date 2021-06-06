@@ -66,7 +66,7 @@ rule assemble-macapp
    cp macos-content/Info.plist $appname.app/Contents/                      ; $
    cp macos-content/PkgInfo $appname.app/Contents/                         ; $
    cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
-   cp Minimum $appname.app/Contents/MacOS/$appname
+   mv Minimum $appname.app/Contents/MacOS/$appname
 # ⬷ to convert .png to .icns see for example http://cloudconvert.com/png-to-icns.
 
 rule library
@@ -74,20 +74,16 @@ rule library
   ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
   printf $sha1git
 
-# default-target 1
-
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o:             cc ClibTwinbeam/ClibTwinbeam.cpp
 
-# default-target 2
+build $appname:                         link-macswift $objs/start.o          $
+ $objs/extensions.o
+build $objs/extensions.o:               compile-macswift Extensions.swift
+build $objs/start.o:                    compile-macswift Start.swift
 
-build $appname:                         link-macswift $objs/test-tblib.o
-build $objs/test-tblib.o:               compile-macswift test-tblib.swift
+build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
-# default-target 3
-
-build Minimum.app: assemble-macapp
-
-default libClibTwinbeam $appname Minimum.app
+default Minimum.app
 
 
