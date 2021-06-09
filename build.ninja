@@ -1,4 +1,4 @@
-#  􀻒 build.ninja | artwork is the 'Minimum' application.
+#  􀻒􀥎 build.ninja | artwork is the 'Minimum' application.
 
 appname = Minimum
 twinbeamroot = /<User- or project name>/Monitor/Apps
@@ -50,12 +50,7 @@ rule objc
   deps = gcc
 
 rule compile-macswift
-  command = $macos-compiler-swift $swift-flags -parse-as-library             $
-   -emit-object $in -o $out
-  description = SWIFT5 $out
-
-rule link-macswift
-  command = $macos-compiler-swift -emit-executable -o $out $in               $
+  command = $macos-compiler-swift $swift-flags -o $out $in                   $
    ./Releases/libClibTwinbeam.a
   description = SWIFT5 $out
 
@@ -78,11 +73,7 @@ rule library
 
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o: cc ClibTwinbeam/ClibTwinbeam.cpp
-
-build $appname: link-macswift $objs/start.o $objs/extensions.o
-build $objs/extensions.o: compile-macswift Extensions.swift
-build $objs/start.o: compile-macswift Start.swift
-
+build $appname: compile-macswift Start.swift Extensions.swift
 build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
 default Minimum.app
