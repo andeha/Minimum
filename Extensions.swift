@@ -1,6 +1,6 @@
 /* 􀻒 Extensions.swift | conveniences for stable built-ins. */
 
-import Foundation
+import AppKit
 
 extension NotificationCenter {
   

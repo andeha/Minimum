@@ -6,7 +6,7 @@ libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
 libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
 
 cpp-optflags = -g -I ../Apps/
-swift-flags = -g -I .
+swift-flags = -g -D DEBUG -I .
 # ⬷ the -I directory flag to tell 'swiftc' where to find a file named 
 # 'module.modulemap' file and its c-only-functions to be used in Swift.
 objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
@@ -49,10 +49,9 @@ rule objc
   depfile = $out.d
   deps = gcc
 
-rule compile-macswift
+rule primary-compile-macswift
   command = $macos-compiler-swift $swift-flags -o $out $in                   $
    ./Releases/libClibTwinbeam.a
-  description = SWIFT5 $out
 
 rule assemble-macapp
   command = rm -rf Minimum.app                                             ; $
@@ -73,7 +72,7 @@ rule library
 
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o: cc ClibTwinbeam/ClibTwinbeam.cpp
-build $appname: compile-macswift Start.swift Extensions.swift
+build $appname: primary-compile-macswift main.swift Extensions.swift
 build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
 default Minimum.app
