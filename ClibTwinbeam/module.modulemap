@@ -1,3 +1,5 @@
+/*  module.modulemap | for Swift. */
+
 module ClibTwinbeam [system] {
   header "ClibTwinbeam.h"
   link "Twinbeam"

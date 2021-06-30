@@ -21,7 +21,9 @@ macoscflags = $macoscflags_commandline
 sha1git = `git log -1 '--pretty=format:%h'`
 cflags = $cpp-optflags -DSHA1GIT=\"$sha1git\" $macoscflags
 macos-compiler-c = xcrun clang $gencdflags $moduleflags
-macos-compiler-swift = xcrun swiftc
+macos-compiler-swift = xcrun swiftc 
+# -DSHA1GIT=\"$sha1git\" 
+#  swiftc -module-name <value> -enable-experimental-cxx-interop
 librarian-mac = xcrun ar
 
 rule cc
@@ -71,8 +73,8 @@ rule library
   printf $sha1git
 
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
-build $objs/ClibTwinbeam.o: cc ClibTwinbeam/ClibTwinbeam.cpp
-build $appname: primary-compile-macswift main.swift Extensions.swift
+build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
+build $appname: primary-compile-macswift Mose.swift main.swift misc.swift
 build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
 default Minimum.app
