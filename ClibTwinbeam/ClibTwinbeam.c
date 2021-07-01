@@ -1,7 +1,7 @@
 /*  ClibTwinbeam.cpp | bridging Swift and Twinbeam. */
 
 /* #include <Twinbeam.h> */
-#include "ClibTwinbeam.h"
+#include "ClibTwinbeam.h" /* ⬷ a․𝘬․a Twinbeam₋C.h. */
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -10,7 +10,7 @@
 import Unistd;
 import Stdio; */ /* ⬷ rename later to 'std.io'. */
 /* ⬷ enter 'import std.core;' to include the standard C++ library. */
-/* todo: add -enable-experimental-cxx-interop. */
+/* todo: add -enable-experimental-cxx-interop and base-16 mangling. */
 
 /* extern "C" */
 #if defined 𝟷𝟸𝟾₋bit₋integers
