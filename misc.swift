@@ -39,9 +39,9 @@ func Start(execute command: String, parameters: [String], path₋exe: String,
 
 class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread? 
   
-  var output: ((Data) -> Void)?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ a․𝘬․a Fifo. */
   /* var p2c₋input, c2p₋output, c2p₋error, p2c₋ctrl, c2p₋dicipline : Pipe */
+  var output: ((Data) -> Void)?
   
   func slow₋write₋to₋child(fifo: Pipe, text: String) {
     if let symbols = text.data(using: String.Encoding.utf8) {
