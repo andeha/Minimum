@@ -1,7 +1,7 @@
 #  􀻒􀬭 build.ninja | artwork is the 'Minimum' application.
 
 appname = Minimum
-twinbeamroot = /<User- or project name>/Monitor/Apps
+twinbeamroot = /Users/<User- or project name>/Monitor/Apps
 libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
 libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
 
@@ -74,7 +74,8 @@ rule library
 
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
-build $appname: primary-compile-macswift Mose.swift main.swift misc.swift
+build $appname: primary-compile-macswift terms.swift fork.swift main.swift   $
+ heritage.swift misc.swift
 build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
 default Minimum.app
