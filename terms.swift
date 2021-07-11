@@ -131,7 +131,7 @@ class Minimumview: NSView {
      bitsPerComponent: 8, bytesPerRow: 0, 
      space: CGColorSpace(name: CGColorSpace.sRGB)!, 
      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true)
+    let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true) /* cf. 'on-giving'. */
     NSGraphicsContext.current = ns₋omgivning; do {
       let path = NSBezierPath()
       path.move(to: .init(x: 10.5, y: 10.5))
@@ -441,7 +441,7 @@ class Viewcontroller: NSViewController {
        modifier: [NSEvent.ModifierFlags.shift, NSEvent.ModifierFlags.command]
       viewmenu.submenu?.items.insert(item), at: 2)
     }
-    if yes == false && viewmenu.submenu.action != #selector(addScribblelayer(_:)) {
+    if yes == false && viewmenu.submenu.action == #selector(addScribblelayer(_:)) {
       viewmenu.submenu?.items.remove(at: 2)
     }
   }
