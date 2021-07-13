@@ -1,4 +1,22 @@
-/*  􀪿􀪾􀆪 | modern and useful. */
+/*  􀪿􀪾􀆪 | modern and widely recognized. */
+
+/* func Radio₋capture₋assistance() {
+for context menu: func menuForEvent(event: NSEvent) -> NSMenu? {
+ let popover = NSMenu(title: "")
+ let item = NSMenuItem(title: "hello", action: "somethingelse:", keyEquivalent: "")
+ item.target = self
+ popover.addItem(item)
+ return menu } with func somethingelse(menuItem: NSMenuItem) { } and not:
+ popover.popUpMenuPositioningItem(nil, atLocation: NSMakePoint(), inView: sender)
+} */
+
+extension NSView {
+  func init₋for₋dropping(args: NSPasteboardType...) { 
+    var types = Array<NSPasteboardType>()
+    for arg in args { types.append(arg) }
+    register(forDraggedTypes: types)
+  }
+}
 
 extension Minimumview: NSDrag {
   override func beginDraggingSession(with: [NSDraggingItem], event: NSEvent, 
@@ -8,6 +26,10 @@ extension Minimumview: NSDrag {
 } /* ⬷ a․𝘬․a 'export'. */
 
 /* and a complementary import a․𝘬․a 'drag and drop onto a view': */
+
+protocol Minviewdelegate {
+  func didDropFile(_ Minimumview: Minimumview, location: NSPoint, original: URL) -> Bool
+}
 
 extension NSViewController /* ⬷ drag and drop. */ {
   func didDropFile(_ minimumView: Minimumview, location: NSPoint, original: URL) -> Bool {
@@ -66,10 +88,6 @@ extension Minimumview /* ⬷ drag and drop as described in NSDraggingDestination
       }
      }
    } catch { debugPrint("Unable to embed or use dropped files: \(error)") } }
-}
-
-protocol Minviewdelegate {
-  func didDropFile(_ Minimumview: Minimumview, location: NSPoint, original: URL) -> Bool
 }
 
 extension Minimumview: NSPrinting

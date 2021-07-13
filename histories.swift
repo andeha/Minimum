@@ -1,4 +1,4 @@
-/*  􀴓􀲎 terms.swift | histories logged. */
+/*  􀴓􀲎 histories.swift | logged. */
 
 import AppKit
 import Metal
@@ -8,16 +8,15 @@ class Minimumview: NSView {
   override init(frame frameRect: NSRect) {
     print("minimumview-init")
     super.init(frame: frameRect)
-    self.wantsLayer = true
-    self.layerContentsRedrawPolicy = .onSetNeedsDisplay
-    self.layerContentsPlacement = .scaleAxesIndependently
+    init₋for₋layerbacking()
     self.composition.name = "Composition"
-    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+    let future: DispatchTime = .now() + .seconds(1)
+    DispatchQueue.main.asyncAfter(deadline: future) {
       let update = NSRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
       print("setNeedsDisplay \(update)")
       self.setNeedsDisplay(update)
     }
-    /* register(forDraggedTypes: [ NSFilenamesPboardType ]) */
+    /* init₋for₋dropping(NSFilenamesPboardType) */
   }
   
   required init?(coder: NSCoder) {
@@ -32,107 +31,59 @@ class Minimumview: NSView {
   static let systemfont = NSFont.systemFont(ofSize: 30.0)
   static let textcolor = NSColor(named: NSColor.Name("primaryControlColor"))
   static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
-  let text₋attrs: [NSAttributedString.Key: Any] = [
+  let default₋text₋attrs: [NSAttributedString.Key: Any] = [
     .foregroundColor: NSColor.orange.cgColor, 
-    .font: NSFont(name: "Menlo", size: 14)!
+    .font: NSFont(name: "Menlo", size: 14)! /* ⬷ see 'Church Of Saint Francis of Assisi'. */
   ]
-  var rendered₋images = Dictionary<String, CGImage>()
   
-  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
-  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+  var rendered₋images = Dictionary<String, CGImage>()
   
   let Operations₁ = DispatchQueue(label: "myops", attributes: .concurrent) /* ⬷ for visible work. */
   let Operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */) /* ⬷ for non-visible work. */
-  /* ⬷ samgörande alt․ schemalaggda (▚). */
+  /* ⬷ samgörande alt․ schemalaggda (▚) also four-queues for bolted 'gammalt-and-nytt': 
+   mypresentation and myevaluation. */
   
-  var mouseIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
-  var hasMouseEntered: Bool = false /* ⬷ you should hit₋test this on init. */
-  /* for context menu: func menuForEvent(event: NSEvent) -> NSMenu? {
-   let popover = NSMenu(title: "")
-   let item = NSMenuItem(title: "hello", action: "somethingelse:", keyEquivalent: "")
-   item.target = self
-   popover.addItem(item)
-   return menu } with func somethingelse(menuItem: NSMenuItem) { } and not:
-   popover.popUpMenuPositioningItem(nil, atLocation: NSMakePoint(), inView: sender) */
-  
-  func twopass₋and₋total₋height() -> CGFloat { return 100.0 }
-  func twopass₋and₋O₍n₎₋total₋width() -> CGFloat { return 100.0 }
-  
-  func loupe₋pressed(points: [CGPoint]) { } /* ⬷ 􀤎. */
-  func perspective₋pressed(point: [CGPoint]) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
-  
-  class Inexplanat { var explained = CAShapeLayer(); var symbols = CATextLayer() }
-  typealias SEImageLayer = CALayer
   let textlayer = CATextLayer()
   var layers₋with₋images = Array<SEImageLayer>()
   var layers₋with₋realtime = Array<CAMetalLayer>()
   var vector₋layers = Array<CAShapeLayer>()
-  var scribble₋layers = Array<Inexplanat>()
   let composition₋delegate = default₋Layerdelegate()
   let composition = CALayer() /* ⬷ alt․ CATransformLayer. */
+  
+  func total₋twopass₋and₋height() -> CGFloat { return 100.0 }
+  func total₋twopass₋and₋width₋in₋O₍n₎() -> CGFloat { return 100.0 }
+  
+  class Inexplanat { var explained = CAShapeLayer(); var symbols = CATextLayer() }
+  typealias SEImageLayer = CALayer
+  var scribble₋layers = Array<Inexplanat>()
+  let composition₋with₋scribble = CALayer()
+  
+  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
+  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+  
+  func loupe₋pressed(_ sender: AnyObject) { points: [CGPoint] } /* ⬷ 􀤎. */
+  func perspective₋pressed(_ sender: AnyObject) { point: [CGPoint] } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
+  
+  var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
+  var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
   
   enum type₋of₋layer { case image; case simulation; case vector }
   enum anchor { case middle; case ul; case ll; case ur; case lr }
   
-  func add₋rendition(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
-   NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
-    var ancestor: CALayer? = nil
-    let identifier = UUID()
-    switch layer₋type {
-    case .image:
-     let layer = SEImageLayer()
-     layers₋with₋images.append(layer)
-     ancestor = layer
-    case .simulation:
-     let layer = CAMetalLayer()
-     layers₋with₋realtime.append(layer)
-     ancestor = layer
-    case .vector:
-     let layer = CAShapeLayer()
-     vector₋layers.append(layer)
-     ancestor = layer
-    } /* ⬷ note 'doublesided' defaults to true. */
-    if let layer = ancestor {
-      layer.frame = CGRect(x: 0, y: 0, width: canvas₋size.width, height: canvas₋size.height)
-      switch origo₋relative₋superlayer {
-      case .middle:
-        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-      case .ul:
-        layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      case .ll:
-        layer.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-      case .ur:
-        layer.anchorPoint = CGPoint(x: 1.0, y: 1.0)
-      case .lr:
-        layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      }
-      layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
-      layer.name = name
-      layer.isGeometryFlipped = true
-      /* layer.shouldRasterize = false */
-      /* layer.rasterizationScale = 2.0 */
-      /* layer.autoresizingMask: CAAutoresizingMask = 
-       [.kCALayerWidthSizable, .kCALayerHeightSizable] */
-      composition.addSublayer(layer)
-    }
-    
-    return identifier
-    
-  }
-  
-  enum instruction { case place; case base₋16₋encode; case utf₋8; case bezier; 
-   case fill; case color₋select }
-  typealias parameter₋tuple = (String, String, String, String)
-  func assemble(_ op: instruction, params arguments: parameter₋tuple) {
-  } /* 􀈍 */
-  
-  func render₋image() -> CGImage? {
-    let omgivning = CGContext(data: nil, width: 20, height: 20, 
+  func render₋image(width: Double, height: Double, 
+ process: (context: NSGraphicsContext) -> Void) -> CGImage? 
+  {
+    let omgivning = CGContext(data: nil, width: width, height: height, 
      bitsPerComponent: 8, bytesPerRow: 0, 
      space: CGColorSpace(name: CGColorSpace.sRGB)!, 
      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true) /* cf. 'on-giving'. */
-    NSGraphicsContext.current = ns₋omgivning; do {
+    let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true) /* ⬷ c𝘧․ /on-giving/. */
+    NSGraphicsContext.current = ns₋omgivning; do { process(context: ns₋omgivning) }
+    NSGraphicsContext.current = nil
+    return omgivning.makeImage()
+  }
+  func render₋image₁() -> CGImage? {
+    let output = {
       let path = NSBezierPath()
       path.move(to: .init(x: 10.5, y: 10.5))
       path.line(to: .init(x: 10.5, y: 10.5))
@@ -140,22 +91,20 @@ class Minimumview: NSView {
       path.lineCapStyle = .round
       NSColor.blue.set()
       path.stroke()
-      
       let string = "```\nlet x = 5\nprint(x)\n```"
       let text = NSAttributedString(string: string, attributes: text₋attrs)
       let framesetter = CTFramesetterCreateWithAttributedString(text)
-      let textRange = CFRangeMake(0, text.length)
+      let textrange = CFRangeMake(0, text.length)
       let box = bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
-      let textContainerPath =  CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-      let frame = CTFramesetterCreateFrame(framesetter, textRange, textContainerPath, nil)
+      let textContainerPath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
+      let frame = CTFramesetterCreateFrame(framesetter, textrange, textContainerPath, nil)
       omgivning.textPosition = CGPoint(x: 8, y: 24)
       CTFrameDraw(frame,omgivning)
     }
-    NSGraphicsContext.current = nil
-    return omgivning.makeImage()
+    return render₋image(width: 200, height: 200, output)
   }
   func reassign₋static₋rendition(_ layer: CALayer, static₋image: CGImage) {
-    layer.contents = static₋image; /* ⬷ CGImageRef alternatively NSImage. */
+    layer.contents = static₋image /* ⬷ CGImageRef alternatively NSImage. */
     /* See 'CGImageSource.h'. */
   }
   func snapshot₋rendition() { let rect = NSRect()
@@ -314,6 +263,52 @@ class Minimumview: NSView {
   func viewGlobalFrameDidChange() { } /* NSViewGlobalFrameDidChangeNotification */
   func viewBoundsDidChange() { } /* NSViewBoundsDidChangeNotification */
   func viewFrameDidChange() { } /* NSViewFrameDidChangeNotification */
+  
+}
+
+func Add₋rendition(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
+ NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
+  var ancestor: CALayer? = nil
+  let identifier = UUID()
+  switch layer₋type {
+  case .image:
+   let layer = SEImageLayer()
+   layers₋with₋images.append(layer)
+   ancestor = layer
+  case .simulation:
+   let layer = CAMetalLayer()
+   layers₋with₋realtime.append(layer)
+   ancestor = layer
+  case .vector:
+   let layer = CAShapeLayer()
+   vector₋layers.append(layer)
+   ancestor = layer
+  } /* ⬷ note 'doublesided' defaults to true. */
+  if let layer = ancestor {
+    layer.frame = CGRect(x: 0, y: 0, width: canvas₋size.width, height: canvas₋size.height)
+    switch origo₋relative₋superlayer {
+    case .middle:
+      layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+    case .ul:
+      layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+    case .ll:
+      layer.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+    case .ur:
+      layer.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+    case .lr:
+      layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+    }
+    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
+    layer.name = name
+    layer.isGeometryFlipped = true
+    /* layer.shouldRasterize = false */
+    /* layer.rasterizationScale = 2.0 */
+    /* layer.autoresizingMask: CAAutoresizingMask = 
+     [.kCALayerWidthSizable, .kCALayerHeightSizable] */
+    composition.addSublayer(layer)
+  }
+  
+  return identifier
   
 }
 

@@ -1,4 +1,4 @@
-/*  􀻒􀓐 misc.swift a․𝘬․a Miscell | conveniences for built stable. */
+/*  􀻒􀓐 enriching.swift a․𝘬․a Miscell | conveniences for built stable. */
 
 import AppKit
 import Darwin.C /* as 'Posix₋fraktal' alt․ 'Posix'. */
@@ -139,8 +139,9 @@ extension NSView {
     addTrackingArea(trackingArea)
   }
   
-  func enable₋layerbacking() { self.wantsLayer = true 
+  func init₋for₋layerbacking() { self.wantsLayer = true 
     self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.duringViewResize
+    self.layerContentsPlacement = .scaleAxesIndependently
   }
   
 }
@@ -217,7 +218,7 @@ class default₋Windowdelegate: NSObject, NSWindowDelegate {
 class default₋Layerdelegate: NSObject, CALayerDelegate {
   class Action: CAAction {
     func run(forKey event: String, object anObject: Any, 
-     arguments: [AnyHashable : Any]?) { }
+     arguments: [AnyHashable : Any]?) { print("run \(event)") }
   }
   func display(_ layer: CALayer) { print("display \(layer.name)") }
   func draw(_ layer: CALayer, in ctx: CGContext) { print("draw \(layer.name)") }
