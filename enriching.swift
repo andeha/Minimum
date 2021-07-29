@@ -1,4 +1,4 @@
-/*  􀻒􀓐 enriching.swift a․𝘬․a Miscell | conveniences for built stable. */
+/*  􀻒􀓐 enriching.swift | conveniences for built stable. */
 
 import AppKit
 import Darwin.C /* as 'Posix₋fraktal' alt․ 'Posix'. */
@@ -35,13 +35,42 @@ func Start(execute command: String, parameters: [String], path₋exe: String,
    argv + [nil], envir) != 0 { return -1 } / * ⬷ a․𝘬․a 'fork' and 'execlp'. */
   if pid < 0 { return -1 }
   return 0
+} /* ⬷ unstructurered 'konkurrens'. */
+
+func Periodictimer(is timer: inout DispatchSourceTimer, 
+  initial₋delay seconds₁: Double, reissue₋delay seconds₂: Double, 
+  fire observe: @escaping () -> Void) {
+   let due₋initial = dispatch_time(DISPATCH_TIME_NOW,seconds₁*NSEC_PER_SEC)
+   let reissue₋operation = seconds₂ * NSEC_PER_SEC
+   dispatch_source_set_timer(timer,due₋initial,reissue₋operation,0.0)
+   dispatch_source_set_event_handler(timer,observe)
+   let timer₋found = { print("timer available") }
+   dispatch_source_set_registration_handler(timer,timer₋found)
+   dispatch_resume(timer)
 }
+
+func Periodic(unresumed timer: inout DispatchSourceTimer?, 
+  initial₋delay seconds₁: Double, 
+  reissue₋delay milliseconds: Int, 
+  fire observe: @escaping () -> Void
+)
+{
+   let due₋initial = DispatchTime.now() + seconds₁
+   timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+   timer?.schedule(deadline: due₋initial, repeating: .milliseconds(milliseconds), leeway: .milliseconds(0))
+   timer?.setEventHandler(handler: observe)
+   let timer₋found = { print("timer available") }
+   timer?.setRegistrationHandler(handler: timer₋found)
+   timer?.resume()
+}
+
+/* play-and-listen-i --<Pigments>--<Antares>--<1 left = 2SINE SWEEPS>--<A D G>. */
 
 class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread? 
   
   var output: ((Data) -> Void)?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ a․𝘬․a Fifo. */
-  /* var p2c₋input, c2p₋output, c2p₋error, p2c₋ctrl, c2p₋dicipline : Pipe */
+ /* var p2c₋input, c2p₋output, c2p₋error, p2c₋ctrl, c2p₋dicipline : Pipe */
   
   func slow₋write₋to₋child(fifo: Pipe, text: String) {
     if let symbols = text.data(using: String.Encoding.utf8) {
@@ -71,7 +100,7 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
     child = Thread(target: self, selector: #selector(print₋child₋output(reader:)), 
      object: c2p₋pipe.fileHandleForReading)
     if let child = child { child.start() }
-    slow₋write₋to₋child(fifo: p2c₋pipe, text: "Hello world")
+    /* slow₋write₋to₋child(fifo: p2c₋pipe, text: "Hello world") */
     return 0 /* Thread.sleep(forTimeInterval: 2.0) */
   }
   
@@ -95,7 +124,7 @@ extension NSBezierPath {
       let g = layoutManager.glyph(at: i, isValidIndex: nil)
       self.append(withCGGlyph: CGGlyph(g), in: font)
     }
-  } /* ⬷ not 'anfang: Character'. */
+  } /* ⬷ for bear from 'anfang: Character'. */
   
   var cgPath: CGPath
   {
@@ -126,28 +155,95 @@ extension NSView {
   
   struct Trek : Hashable { var guid: UUID 
     var ident: NSObject & NSCopying
-    func hash(into hasher: inout Hasher) { }
-    static func == (lhs: Trek, rhs: Trek) -> Bool { return false }
+    init(hashable₋identity: UUID, ident: NSObject & NSCopying) {
+     self.ident = ident; guid = hashable₋identity }
+    func hash(into hasher: inout Hasher) { return guid.hash() }
+    static func == (lhs: Trek, rhs: Trek) -> Bool { return lhs.guid == rhs.guid }
   }
   
-  func setup₋tracking() {
-    let trackingArea: NSTrackingArea = NSTrackingArea(rect: bounds, 
+  func setup₋tracking(tracking₋bounds: NSRect) {
+    let trackingarea: NSTrackingArea = NSTrackingArea(rect: tracking₋bounds, 
       options: [ NSTrackingArea.Options.activeAlways, 
         NSTrackingArea.Options.mouseMoved, 
         NSTrackingArea.Options.mouseEnteredAndExited ], 
        owner: self, userInfo: nil)
-    addTrackingArea(trackingArea)
-  }
-  
-  func init₋for₋layerbacking() { self.wantsLayer = true 
-    self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.duringViewResize
-    self.layerContentsPlacement = .scaleAxesIndependently
+    addTrackingArea(trackingarea)
   }
   
 }
 
-extension NSMenuItem {
+class Trackpad {
   
+  struct Spatial { var instant: TimeInterval 
+    var proximity₋spatial: NSPoint; var pressure: Double }
+  struct Pressure { var instant: TimeInterval; var pressure: Double }
+  struct Skiss₁ { var ended: Bool; var tracklines: Array<Spatial> }
+  struct Skiss₂ { var pressures: Array<Pressure> }
+  var tracklines = Dictionary<NSView.Trek, Skiss₁>()
+  var pressures = Dictionary<NSView.Trek, Skiss₂>()
+  
+  var log₋rectangle = { (with event: NSEvent, initial: Bool) in 
+    let instant: TimeInterval = event.timestamp
+    /* let location₁ = event.locationInWindow
+    let location₂ = self.superview.convertPoint(location₁, fromView: nil) */
+    let pressure = event.pressure
+    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: minimumview)
+    for oval in ovals {
+      let identity = oval.identity
+      let normalized = oval.normalizedPosition
+      let spatiala = tracklines[]
+      let initial₋alt₋suffix : Array<Spatial> = [
+       Spatial(instant: instant, proximity₋spatial: normalized, pressure: pressure)
+      ]
+      let synthesized = NSView.Trek(hashable₋identity: UUID())
+      if let old = tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized) {
+        // old value exists: does not happed
+      }
+      if initial { print("interaction-began") }
+      else { print("interaction-moved at \(normalized)") }
+    }
+    
+  }
+  
+  func cancelled(with event: NSEvent) {
+    let synthesized = NSView.Trek(hashable₋identity: UUID())
+    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
+    print("\(instant): must-cancel.") }
+  func ended(with event: NSEvent) {
+    let synthesized = NSView.Trek(hashable₋identity: UUID())
+    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
+    print("\(instant): not-ended.") }
+  func pressure(with event: NSEvent) {
+    let instant: TimeInterval = event.timestamp
+    let pressure = event.pressure
+    if let existing = tracklines[] { print("existing old") 
+     
+    } else { print("non-existing old") 
+     
+    }
+    print("\(instant): pressure is \(pressure)")
+  }
+} /* ⬷ 'sak är som skojigt-roligt-intressant såsom ...'. */
+
+func Renderimage(width: Double, height: Double, 
+ process: (NSGraphicsContext) -> Void) -> CGImage?
+{
+  let omgivning = CGContext(data: nil, width: width, height: height, 
+    bitsPerComponent: 8, bytesPerRow: 0, 
+    space: CGColorSpace(name: CGColorSpace.sRGB)!, 
+    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+  let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true)
+  let previous = NSGraphicsContext.current
+  CGContextSaveGState(previous); NSGraphicsContext.current = ns₋omgivning
+  CGContextBeginTransparencyLayer(ns₋omgivning, nil)
+  do { process(context: ns₋omgivning) }
+  CGContextEndTransparencyLayer(ns₋omgivning)
+  /* NSGraphicsContext.current = nil */
+  CGContextRestoreGState(previous)
+  return omgivning.makeImage()
+} /* ⬷ c𝘧․ /on-giving/ selected items. */
+
+extension NSMenuItem {
   convenience init(title string: String, target: AnyObject = self as AnyObject, 
     action selector: Selector?, keyEquivalent charCode: String, 
     modifier: NSEvent.ModifierFlags = .command) {
@@ -155,79 +251,54 @@ extension NSMenuItem {
    keyEquivalentModifierMask = modifier
    self.target = target
   }
-  
   convenience init(title string: String, submenuItems: [NSMenuItem]) {
     self.init(title: string, action: nil, keyEquivalent: "")
     self.submenu = NSMenu()
     self.submenu?.items = submenuItems
   }
-  
 }
 
 extension NotificationCenter {
-  
   static func send(_ key: Notification.Name, object: Any?) {
-    self.default.post(name: key, object: object)
-  }
-  
-  static func receive(_ key: Notification.Name, 
-   instance: Any, selector: Selector) { self.default.addObserver(instance, 
+   self.default.post(name: key, object: object) }
+  static func receive(_ key: Notification.Name, instance: Any, 
+ selector: Selector) { self.default.addObserver(instance, 
    selector: selector, name: key, object: nil) }
-  
-   /* for await note in NotificationCenter.default.notifications(
-     named: ProcessInfo.thermalStateDidChangeNotification) {
-      // use note.
-    } */
-}
+} /* depricated-psssibly-maybe, see async-await. */
 
 class default₋Windowdelegate: NSObject, NSWindowDelegate {
-  func windowDidEndLiveResize(_ notification: Notification) { print("windowDidEndLiveResize") }
-  /* func windowWillClose(_ notification: Notification) { print("window will close") } */
-  func windowWillClose(_ notification: Notification) { print("terminate"); NSApplication.shared.terminate(0) }
-  func windowShouldClose(_ sender: NSWindow) -> Bool { print("windowShouldClose"); return true }
-  func windowWillStartLiveResize(_ notification: Notification) { print("windowWillStartLiveResize") }
-  func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize { return frameSize }
-  func windowDidResize(_ notification: Notification) { print("window resize") }
-  func windowWillMiniaturize(_ notification: Notification) { print("windowWillMiniaturize") }
-  func windowDidDeminiaturize(_ notification: Notification) { print("windowDidDeminiaturize") }
-  func windowDidMiniaturize(_ notification: Notification) { print("window miniaturize") }
-  func windowWillUseStandardFrame(_ window: NSWindow, defaultFrame newFrame: NSRect) -> NSRect { return newFrame }
-  func windowShouldZoom(_ window: NSWindow, toFrame newFrame: NSRect) -> Bool { return true }
-  func windowDidChangeScreen(_ notification: Notification) { print("windowDidChangeScreen") }
-  func windowDidChangeScreenProfile(_ notification: Notification) { print("windowDidChangeScreenProfile") }
-  func windowDidChangeBackingProperties(_ notification: Notification) { print("windowDidChangeBackingProperties") }
-  func windowDidBecomeKey(_ notification: Notification) { print("windowDidBecomeKey") }
-  func windowDidResignKey(_ notification: Notification) { print("windowDidResignKey") }
-  func windowDidBecomeMain(_ notification: Notification) { print("windowDidBecomeMain") }
-  func windowDidResignMain(_ notification: Notification) { print("windowDidResignMain") }
-  func windowWillReturnFieldEditor(_ sender: NSWindow, to client: Any?) -> Any? { return client }
-  func windowDidUpdate(_ notification: Notification) { print("windowDidUpdate") }
-  func windowDidExpose(_ notification: Notification) { print("windowDidExpose") }
-  func windowDidChangeOcclusionState(_ notification: Notification) { print("windowDidChangeOcclusionState") } /* ⬷ app-nap. */
-  func window(_ window: NSWindow, shouldDragDocumentWith event: NSEvent, from dragImageLocation: NSPoint, with pasteboard: NSPasteboard) -> Bool { return false }
-  func window(_ window: NSWindow, shouldPopUpDocumentPathMenu menu: NSMenu) -> Bool { return false }
-  func window(_ window: NSWindow, willEncodeRestorableState state: NSCoder) { print("willEncodeRestorableState") }
-  func window(_ window: NSWindow, didDecodeRestorableState state: NSCoder) { print("didDecodeRestorableState") }
-  func window(_ window: NSWindow, willResizeForVersionBrowserWithMaxPreferredSize maxPreferredFrameSize: NSSize, maxAllowedSize maxAllowedFrameSize: NSSize) -> NSSize { return maxAllowedFrameSize }
-  func windowWillEnterVersionBrowser(_ notification: Notification) { print("windowWillEnterVersionBrowser") }
-  func windowDidEnterVersionBrowser(_ notification: Notification) { print("windowDidEnterVersionBrowser") }
-  func windowWillExitVersionBrowser(_ notification: Notification) { print("windowWillExitVersionBrowser") }
-  func windowDidExitVersionBrowser(_ notification: Notification) { print("windowDidExitVersionBrowser") }
+func windowDidEndLiveResize(_ notification: Notification) { print("windowDidEndLiveResize") }
+/* func windowWillClose(_ notification: Notification) { print("window will close") } */
+func windowWillClose(_ notification: Notification) { print("terminate"); NSApplication.shared.terminate(0) }
+func windowShouldClose(_ sender: NSWindow) -> Bool { print("windowShouldClose"); return true }
+func windowWillStartLiveResize(_ notification: Notification) { print("windowWillStartLiveResize") }
+func windowWillResize(_ sender: NSWindow, to frameSize: NSSize) -> NSSize { return frameSize }
+func windowDidResize(_ notification: Notification) { print("window resize") }
+func windowWillMiniaturize(_ notification: Notification) { print("windowWillMiniaturize") }
+func windowDidDeminiaturize(_ notification: Notification) { print("windowDidDeminiaturize") }
+func windowDidMiniaturize(_ notification: Notification) { print("window miniaturize") }
+func windowWillUseStandardFrame(_ window: NSWindow, defaultFrame newFrame: NSRect) -> NSRect { return newFrame }
+func windowShouldZoom(_ window: NSWindow, toFrame newFrame: NSRect) -> Bool { return true }
+func windowDidChangeScreen(_ notification: Notification) { print("windowDidChangeScreen") }
+func windowDidChangeScreenProfile(_ notification: Notification) { print("windowDidChangeScreenProfile") }
+func windowDidChangeBackingProperties(_ notification: Notification) { print("windowDidChangeBackingProperties") }
+func windowDidBecomeKey(_ notification: Notification) { print("windowDidBecomeKey") }
+func windowDidResignKey(_ notification: Notification) { print("windowDidResignKey") }
+func windowDidBecomeMain(_ notification: Notification) { print("windowDidBecomeMain") }
+func windowDidResignMain(_ notification: Notification) { print("windowDidResignMain") }
+func windowWillReturnFieldEditor(_ sender: NSWindow, to client: Any?) -> Any? { return client }
+func windowDidUpdate(_ notification: Notification) { print("windowDidUpdate") }
+func windowDidExpose(_ notification: Notification) { print("windowDidExpose") }
+func windowDidChangeOcclusionState(_ notification: Notification) { print("windowDidChangeOcclusionState") } /* ⬷ app-nap. */
+func window(_ window: NSWindow, shouldDragDocumentWith event: NSEvent, from dragImageLocation: NSPoint, with pasteboard: NSPasteboard) -> Bool { return false }
+func window(_ window: NSWindow, shouldPopUpDocumentPathMenu menu: NSMenu) -> Bool { return false }
+func window(_ window: NSWindow, willEncodeRestorableState state: NSCoder) { print("willEncodeRestorableState") }
+func window(_ window: NSWindow, didDecodeRestorableState state: NSCoder) { print("didDecodeRestorableState") }
+func window(_ window: NSWindow, willResizeForVersionBrowserWithMaxPreferredSize maxPreferredFrameSize: NSSize, maxAllowedSize maxAllowedFrameSize: NSSize) -> NSSize { return maxAllowedFrameSize }
+func windowWillEnterVersionBrowser(_ notification: Notification) { print("windowWillEnterVersionBrowser") }
+func windowDidEnterVersionBrowser(_ notification: Notification) { print("windowDidEnterVersionBrowser") }
+func windowWillExitVersionBrowser(_ notification: Notification) { print("windowWillExitVersionBrowser") }
+func windowDidExitVersionBrowser(_ notification: Notification) { print("windowDidExitVersionBrowser") }
 }
-
-class default₋Layerdelegate: NSObject, CALayerDelegate {
-  class Action: CAAction {
-    func run(forKey event: String, object anObject: Any, 
-     arguments: [AnyHashable : Any]?) { print("run \(event)") }
-  }
-  func display(_ layer: CALayer) { print("display \(layer.name)") }
-  func draw(_ layer: CALayer, in ctx: CGContext) { print("draw \(layer.name)") }
-  func layerWillDraw(_ layer: CALayer) { print("layerWillDraw \(layer.name)") }
-  func layoutSublayers(of layer: CALayer) { print("layoutSublayers \(layer.name)") }
-  func action(for layer: CALayer, forKey event: String) -> CAAction? {
-    print("action \(layer.name)")
-    return Action() }
-}
-
 
 

@@ -1,7 +1,7 @@
 /*  ClibTwinbeam.cpp | bridging Swift and Twinbeam. */
 
 /* #include <Twinbeam.h> */
-#include "ClibTwinbeam.h" /* ⬷ a․𝘬․a Twinbeam₋C.h. */
+#include "ClibTwinbeam.h" /* ⬷ a․𝘬․a Twinbeam₋C.h and C-Twinbeam.h. */
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -51,3 +51,14 @@ pid_t Twinbeam₋spawn(const char * utf8₋command, int * fd_p2c, int * fd_c2p /
    }
    return pid;
 }
+
+int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
+  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
+  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
+  void * outcome)
+{
+   void * material = mapfileʳᵚ(canonicalUtf8RegularOrLinkpath, 
+     bytesOffset, pages𝘖rZero, bytesAugment, bytesActual);
+   if (material) { return 1; } else { return 0; }
+}
+

@@ -75,7 +75,7 @@ rule library
 build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
 build $appname: primary-compile-macswift histories.swift ensemble.swift      $
- main.swift machine.swift heritage.swift enriching.swift
+ main.swift machine.swift heritage.swift enriching.swift Data+Base16.swift
 build Minimum.app: assemble-macapp libClibTwinbeam $appname
 
 default Minimum.app

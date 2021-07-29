@@ -1,5 +1,11 @@
 /*  􀪿􀪾􀆪 | modern and widely recognized. */
 
+func perclude(status₋response response: URLResponse, mime type: inout String?) -> Bool {
+  guard let correspond = response as? HTTPURLResponse else { return false }
+  type = nil; if let mimetype = correspond.mimeType { type = mimetype }
+  return (200...299).contains(correspond.statusCode)
+} /* enum Materialtype { case text; case binary } */
+
 /* func Radio₋capture₋assistance() {
 for context menu: func menuForEvent(event: NSEvent) -> NSMenu? {
  let popover = NSMenu(title: "")
@@ -11,7 +17,7 @@ for context menu: func menuForEvent(event: NSEvent) -> NSMenu? {
 } */
 
 extension NSView {
-  func init₋for₋dropping(args: NSPasteboardType...) { 
+  func init₋for₋dropping(args: NSPasteboardType...) { /* ⬷ one variadic. */
     var types = Array<NSPasteboardType>()
     for arg in args { types.append(arg) }
     register(forDraggedTypes: types)
@@ -68,18 +74,18 @@ extension Minimumview /* ⬷ drag and drop as described in NSDraggingDestination
    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
     return NSDragOperation.link }
    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-     var res = false /* ⬷ a․𝘬․a 'y'. */
+     var didRes = false /* ⬷ a․𝘬․a 'y'. */
      let pboard: NSPasteboard = sender.draggingPasteboard()
      if let data = pboard.data(forType: PasteboardType.fileURL) {
        let loc = sender.draggingLocation()
-       place(data: data, location: loc, &res)
+       place(data: data, location: loc, at₋least₋one: &didRes)
      }
-     return res
+     return didRes
    }
-   private func place(data: Data, location loc: NSPoint, _ result: inout Bool) { do {
-     typealias text₋Tree = PropertyListSerialization
-     if let filepaths = try text₋Tree.propertyList(from: data, 
-    options: text₋Tree.MutabilityOptions(rawValue: 0), format: nil) as? NSArray {
+   private func place(data: Data, location loc: NSPoint, at₋least₋one result: inout Bool) { do { 
+     typealias textTree = PropertyListSerialization
+     if let filepaths = try textTree.propertyList(from: data, 
+    options: textTree.MutabilityOptions(rawValue: 0), format: nil) as? NSArray {
       for filepath as! String in filepaths {
         let url = URL(fileURLWithFileSystemRepresentation: filepath, isDirectory: false, relativeTo: nil)
         if let partial = delegate?.didDropFile(self, location: loc, original: url) {

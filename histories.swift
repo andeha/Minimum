@@ -1,20 +1,20 @@
-/*  􀴓􀲎 histories.swift | logged. */
+/*  􀴓􀲎 terms.swift | histories logged. */
 
 import AppKit
-import Metal
+import Metal /* ⬷ alt․ AppKit + Metal. */
 
 class Minimumview: NSView {
   
   override init(frame frameRect: NSRect) {
     print("minimumview-init")
     super.init(frame: frameRect)
-    init₋for₋layerbacking()
-    self.composition.name = "Composition"
-    let future: DispatchTime = .now() + .seconds(1)
-    DispatchQueue.main.asyncAfter(deadline: future) {
-      let update = NSRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
-      print("setNeedsDisplay \(update)")
-      self.setNeedsDisplay(update)
+    self.wantsLayer = true
+    let later₋future: DispatchTime = .now() + .seconds(1)
+    DispatchQueue.main.asyncAfter(deadline: later₋future) {
+      let frame₋update = NSRect(x: 0, y: 0, width: self.frame.width, 
+       height: self.frame.height)
+      print("setNeedsDisplay \(frame₋update)")
+      self.setNeedsDisplay(frame₋update)
     }
     /* init₋for₋dropping(NSFilenamesPboardType) */
   }
@@ -28,143 +28,181 @@ class Minimumview: NSView {
   static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
   static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
    coarse₋grid = NSColor(calibratedWhite: 0.88, alpha: 1.0)
-  static let systemfont = NSFont.systemFont(ofSize: 30.0)
+  static let systemfont = NSFont.systemFont(ofSize: 30.0), 
+   textfont = NSFont(name: "SF Mono", size: 9)
   static let textcolor = NSColor(named: NSColor.Name("primaryControlColor"))
   static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
-  let default₋text₋attrs: [NSAttributedString.Key: Any] = [
-    .foregroundColor: NSColor.orange.cgColor, 
-    .font: NSFont(name: "Menlo", size: 14)! /* ⬷ see 'Church Of Saint Francis of Assisi'. */
-  ]
   
-  var rendered₋images = Dictionary<String, CGImage>()
+  var default₋text₋attrs: [NSAttributedString.Key: Any] {
+    get {
+      guard let font = Minimum.textfont else { return [:] }
+      guard let fg₋color = Minimum.textcolor else { return [:] }
+      return [.font: font, .foregroundColor: fg₋color.cgColor]
+    }
+  }
   
   let Operations₁ = DispatchQueue(label: "myops", attributes: .concurrent) /* ⬷ for visible work. */
   let Operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */) /* ⬷ for non-visible work. */
   /* ⬷ samgörande alt․ schemalaggda (▚) also four-queues for bolted 'gammalt-and-nytt': 
    mypresentation and myevaluation. */
   
-  let textlayer = CATextLayer()
-  var layers₋with₋images = Array<SEImageLayer>()
-  var layers₋with₋realtime = Array<CAMetalLayer>()
-  var vector₋layers = Array<CAShapeLayer>()
-  let composition₋delegate = default₋Layerdelegate()
-  let composition = CALayer() /* ⬷ alt․ CATransformLayer. */
+  var rendered₋named₋images = Dictionary<UUID,CGImage>()
+  
+  struct minimum₋collection {
+    let text = CATextLayer()
+    var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
+    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
+    var scribbles = Dictionary<UUID,Feedback>()
+    let composition = CALayer() /* ⬷ a․𝘬․a composition₋with₋scribble. */
+  }
+  
+  var collection = minimum₋collection()
+  let composition₋delegate = Compositiondelegate()
+  class Feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() } /* ⬷ a․𝘬․a Inexplanat. */
   
   func total₋twopass₋and₋height() -> CGFloat { return 100.0 }
   func total₋twopass₋and₋width₋in₋O₍n₎() -> CGFloat { return 100.0 }
   
-  class Inexplanat { var explained = CAShapeLayer(); var symbols = CATextLayer() }
-  typealias SEImageLayer = CALayer
-  var scribble₋layers = Array<Inexplanat>()
-  let composition₋with₋scribble = CALayer()
-  
   var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
   var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
-  
-  func loupe₋pressed(_ sender: AnyObject) { points: [CGPoint] } /* ⬷ 􀤎. */
-  func perspective₋pressed(_ sender: AnyObject) { point: [CGPoint] } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
   
   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
   
-  enum type₋of₋layer { case image; case simulation; case vector }
+  enum type₋of₋layer { case simulation; case illustration }
   enum anchor { case middle; case ul; case ll; case ur; case lr }
   
-  func render₋image(width: Double, height: Double, 
- process: (context: NSGraphicsContext) -> Void) -> CGImage? 
-  {
-    let omgivning = CGContext(data: nil, width: width, height: height, 
-     bitsPerComponent: 8, bytesPerRow: 0, 
-     space: CGColorSpace(name: CGColorSpace.sRGB)!, 
-     bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-    let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true) /* ⬷ c𝘧․ /on-giving/. */
-    NSGraphicsContext.current = ns₋omgivning; do { process(context: ns₋omgivning) }
-    NSGraphicsContext.current = nil
-    return omgivning.makeImage()
-  }
-  func render₋image₁() -> CGImage? {
-    let output = {
-      let path = NSBezierPath()
-      path.move(to: .init(x: 10.5, y: 10.5))
-      path.line(to: .init(x: 10.5, y: 10.5))
-      path.lineWidth = 1
-      path.lineCapStyle = .round
-      NSColor.blue.set()
-      path.stroke()
-      let string = "```\nlet x = 5\nprint(x)\n```"
-      let text = NSAttributedString(string: string, attributes: text₋attrs)
-      let framesetter = CTFramesetterCreateWithAttributedString(text)
-      let textrange = CFRangeMake(0, text.length)
-      let box = bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
-      let textContainerPath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-      let frame = CTFramesetterCreateFrame(framesetter, textrange, textContainerPath, nil)
-      omgivning.textPosition = CGPoint(x: 8, y: 24)
-      CTFrameDraw(frame,omgivning)
-    }
-    return render₋image(width: 200, height: 200, output)
-  }
-  func reassign₋static₋rendition(_ layer: CALayer, static₋image: CGImage) {
-    layer.contents = static₋image /* ⬷ CGImageRef alternatively NSImage. */
-    /* See 'CGImageSource.h'. */
-  }
-  func snapshot₋rendition() { let rect = NSRect()
-    let repres: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rect)
-    print("repres \(repres)")
-  }
-  func incorp₋rendition(layer₋type: type₋of₋layer, name: String, canvas₋initial: NSPoint, 
-   canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
-    return UUID()
-  }
-  func apply₋ornaments() { let rect = NSRect() 
-    let owner: Any = self
-    let userdata: UnsafeMutableRawPointer? = nil
-    let flag: Bool = true
-    let tag: NSView.TrackingRectTag = self.addTrackingRect(rect, owner: self, 
-     userData: userdata, assumeInside: flag)
+  func hit₋test(point: CGPoint) -> CALayer? { return composition.hitTest(point) }
+  
+  func letgo₋all₋ornaments() { for area in trackingAreas { self.removeTrackingArea(area) } }
+  
+  func apply₋ornaments() {
+    self.letgo₋ornaments()
+    let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
     let local₋cursor: NSCursor = NSCursor.dragCopy
     self.addCursorRect(rect, cursor: local₋cursor)
-    let trackingareas = {
-      self.letgo₋ornaments()
+    let strategy₁ = {
+      let userdata: UnsafeMutableRawPointer? = nil
+      let tag: NSView.TrackingRectTag = self.addTrackingRect(rect, owner: self, 
+       userData: userdata, assumeInside: true)
+       self.updateTrackingAreas()
+    }
+    let strategy₂ = {
       let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
       let area = NSTrackingArea(rect: self.bounds, options: opts, owner: self, userInfo: nil)
       self.addTrackingArea(area)
     }
+    let strategy₃ = {
+      self.setup₋tracking(tracking₋bounds: self.bounds)
+    }
+    strategy₁()
   }
-  func letgo₋ornaments() { for area in trackingAreas { self.removeTrackingArea(area) } }
-  func hit₋test(point: CGPoint) -> CALayer? { return composition.hitTest(point) }
   
-  /* translateRectsNeedingDisplayInRect */
+  let post₋init₋layer = { (layer: inout CALayer) -> Void is 
+    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
+    layer.contentsScale = 2.0 /* for retina. */
+    layer.backgroundColor = NSColor.clear.cgColor
+    layer.contentsGravity = .center
+    layer.contentsCenter = CGPoint
+    layer.contentsFormat = kCAContentsFormatRGBA8Uint
+    layer.opaque = false
+    layer.needsDisplayOnBoundsChange = true
+    layer.drawsAsynchronously = true
+  }
+  
+  func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
+   NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
+    var sublayer: CALayer? = nil
+    let ident = UUID()
+    switch layer₋type {
+    case .simulation:
+     let layer = CAMetalLayer()
+     collection.layers₋with₋realtime.updateValue(layer, forKey: ident)
+     sublayer = layer
+    case .illustration: /* ₋and₋photography. */
+     let layer = CALayer()
+     collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+     sublayer = layer
+    } /* ⬷ note 'doublesided' defaults to true. */
+    if let addition = sublayer {
+      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, width: canvas₋size.width, height: canvas₋size.height)
+      switch origo₋relative₋superlayer {
+      case .middle:
+        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+      case .ul:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      case .ll:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+      case .ur:
+        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+      case .lr:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      }
+      addition.name = name
+      post₋init₋layer(addition)
+      addition.isGeometryFlipped = true
+      composition.addSublayer(addition)
+      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
+    }
+    return ident
+  } /* ⬷ a․𝘬․a incorp₋rendition. */
   
   override var isOpaque: Bool { false }
   override var isFlipped: Bool { true }
   override var wantsUpdateLayer: Bool { true }
   override var preservesContentDuringLiveResize: Bool { true }
-  /* override func setFrameSize() { super.setFrameSize(); if self.inLiveResize { 
-     self.rectPreservedDuringLiveResize()
-     var exposed₋rects: NSRect[4] var count: Int
-     self.getRectsExposedDuringLiveResize:(&exposed₋rects, count: &count)
-     for (int i=0; i<count; ++i) { NSRect r = rects[i]; [self setNeedsDisplayInRect:r]; }
-   } else { self.setNeedDisplay(true) } */
+  override func setFrameSize() { super.setFrameSize() 
+    if self.inLiveResize {
+      self.rectPreservedDuringLiveResize()
+      typealias PR = UnsafeMutablePointer<NSRect>
+      var exposed₋rects: PR?; var count: Int
+      self.getRectsExposedDuringLiveResize(&exposed₋rects, count: &count)
+      typealias RA = [UnsafeMutablePointer<NSRect>]
+      let rects: NSRect = unsafeBitCast(exposed₋rects, to: RA.self)
+      for rect in rects { self.setNeedsDisplayInRect(rect) }
+     } else { self.setNeedDisplay(true) }
+   }
+  
+  /* 􀑆 */ /* 𐤟𐤟𐤟 */
   /* override var wantsDefaultClipping: Bool { false } */
   /* override var canDrawSubviewsIntoLayer: Bool { true } */
   /* override var layerUsesCoreImageFilters: Bool { true } */
   /* backgroundFilters, composingFilters and contentFilters. */
+  /* 􀞷 */
   
   override func makeBackingLayer() -> CALayer {
+    composition.name = "Composition"
     composition.delegate = self.composition₋delegate
+    self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.duringViewResize
+    self.layerContentsPlacement = .scaleAxesIndependently
+    self.layoutmanager = CAConstraintLayoutManager()
     composition.needsDisplayOnBoundsChange = true
-    
-    /* 􀑆 */
-    /* 𐤟𐤟𐤟 */
-    /* 􀞷 */
-    
-    return composition } /* ⬷ 𝘤𝘧․ against var layer: NSView.CALayer. */
+   /* self.composition.autoresizingMask: CAAutoresizingMask = 
+     [.kCALayerWidthSizable, .kCALayerHeightSizable] */
+    self.composition.backgroundColor = Minimumview.paper.cgColor
+    self.composition.borderColor = Minimumview.paper₋border.cgColor
+    self.composition.borderWidth = 0.5
+    return self.composition }
   override func viewWillMove(toWindow: NSWindow?) {
     print("viewWillMoveToWindow")
     super.viewWillMove(toWindow: window) }
   override func viewWillMove(toSuperview: NSView?) {
     print("viewWillMoveToSuperview")
     super.viewWillMove(toSuperview: toSuperview) }
+  override func viewWillStartLiveResize() { print("viewWillStartLiveResize") 
+    super.viewWillStartLiveResize() }
+  override func viewDidEndLiveResize() { print("viewDidEndLiveResize") 
+    super.viewDidEndLiveResize() }
+  override func viewDidChangeEffectiveAppearance() { print("viewDidChangeEffectiveAppearance") 
+    let all = NSRect(x: 0, y: 0, width: frame.width, height: frame.height)
+    self.setNeedsDisplay(all) /* ⬷ c𝘧․ NSView.visibleRect. */ }
+  override func enterFullScreenMode(_ screen: NSScreen, withOptions options: 
+      [NSView.FullScreenModeOptionKey : Any]? = nil) -> Bool { return false }
+  override func exitFullScreenMode(options: [NSView.FullScreenModeOptionKey : Any]? = nil) { }
+    func viewDidUpdateTrackingAreas() { } /* NSViewDidUpdateTrackingAreasNotification */
+    func viewGlobalFrameDidChange() { } /* NSViewGlobalFrameDidChangeNotification */
+  func viewBoundsDidChange() { } /* NSViewBoundsDidChangeNotification */
+  func viewFrameDidChange() { } /* NSViewFrameDidChangeNotification */
   override func updateLayer() {
     print("updateLayer")
     super.updateLayer()
@@ -174,6 +212,105 @@ class Minimumview: NSView {
     path.line(to: NSPoint(x: 10, y: 10))
     path.stroke()
   }
+}
+
+extension Minimumview { /* ⬷ minimum and illustrations. */
+  
+  func render(illusts: Artwork₋swift..., topLeftNextBottom: NSEdgeInsets, colums: Int) {
+    
+    print("render \(colums) columns, inset \(topLeftNextBottom) with \(illusts)")
+    
+    let machine = the₋Drawingmachine₁()
+    var collection = Vector<CALayer>()
+    
+    var parent₋cursor₋X=topLeftNextBottom.left, parent₋cursor₋Y=topLeftNextBottom.top
+    var column=0; max₋height=0.0
+    
+    for (idx,figure) in illusts.enumerate() {
+      var width, height: CGPoint; var name: String = ""
+      var layer: CALayer = try await machine.interpret(figure,&width,&height,&name)
+      layer.frame.width = width
+      layer.frame.height = height
+      layer.name = name
+      layer.frame.x = parent₋cursor₋X
+      layer.frame.y = parent₋cursor₋Y
+      max₋height = max(layer.frame.height,max₋height)
+      column = (column + 1) % columns
+      if column == 0 {
+        parent₋cursor₋X = topLeftNextBottom.left
+        parent₋cursor₋Y += max₋height
+        max₋height = 0.0
+      }
+      else { parent₋cursor₋X = width + topLeftNextBottom.right }
+      
+      let ident = UUID()
+      collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+      composition.addSublayer(layer)
+    }
+    
+  }
+  
+  func rasterize(width: Double, height: Double, artwork: Artwork) -> CGImage {
+    guard artwork.instructions.count == artwork.parameters.count else { throw Anomality.Unbalaced }
+    if let image₁: CGImage = Renderimage(width: width, height: height, process: { 
+      (context: NSGraphicsContext) -> Void in 
+        let machine = the₋Drawingmachine₁()
+  //      let low₋level = { (instruction: ²instruction, parameters: parameter₋tuple) -> machine₋ctrl as 
+  //        machine.assemble₋rendition(op: instruction: parameters: parameter₋tuple, context: context)
+  //        return .ok
+  //      }
+   //     var idx=0; while idx < artwork.parameters.count {
+  //        machine.interpret₋rendition(instruction: artwork.instructions[idx], 
+   //        params: artwork.parameters[idx], low₋level)
+  //        i += 1
+  machine.interpret₋rendition(instruction: .width₋and₋height, params: (200.0, 200.0, 0.0, 0.0, 0.0, 0.0, low₋level)
+  machine.interpret₋rendition(instruction: .place₋center, params: (100.0, 100.0, 0.0, 0.0, 0.0, 0.0, low₋level)
+  machine.interpret₋rendition(instruction: .bezier₂₋initial, params: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, low₋level)
+        }) { }
+		return image₁
+    }
+  }
+  
+  func render₋an₋illustration(width: Double, height: Double, artwork: Artwork) -> CGImage {
+    guard let image₂: CGImage = Renderimage(width: width, height: height) { 
+      (context: NSGraphicsContext) -> Void in 
+        let path = NSBezierPath()
+        path.move(to: .init(x: 10.5, y: 10.5))
+        path.line(to: .init(x: 10.5, y: 10.5))
+        path.lineWidth = 1
+        path.lineCapStyle = .round
+        NSColor.blue.set()
+        path.stroke()
+    } else { return nil }
+  }
+  func render₋attractive₋frame₁(width: Double, height: Double) -> CGImage? {
+    let output = {
+      let path = NSBezierPath()
+      path.move(to: .init(x: 10.5, y: 10.5))
+      path.line(to: .init(x: 10.5, y: 10.5))
+      path.lineWidth = 1
+      path.lineCapStyle = .round
+      NSColor.blue.set()
+      path.stroke()
+      let string = "```\nlet x = 5\nprint(x)\n```"
+      self.render(text: string, width: width, height: height) }
+    return Renderimage(width: width, height: height, process: output)
+  }
+  
+  func render(text: String, width: Double, height: Double) {
+    let text₋attrs = default₋text₋attrs
+    let attrtext = NSAttributedString(string: text, attributes: text₋attrs)
+    let framesetter = CTFramesetterCreateWithAttributedString(text)
+    let symbols = CFRangeMake(0, text.length)
+    let box = bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
+    let textpath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
+    let frame = CTFramesetterCreateFrame(framesetter,symbols,textpath,nil)
+    omgivning.textPosition = CGPoint(x: 8, y: 24)
+    CTFrameDraw(frame,omgivning)
+  }
+}
+
+extension Minimumview {
   
   override func draw(_ dirty: CGRect) { print("draw-rect: \(dirty)") 
     
@@ -244,72 +381,64 @@ class Minimumview: NSView {
     
     super.draw(dirty)
   }
-  
-  override func enterFullScreenMode(_ screen: NSScreen, withOptions options: 
-    [NSView.FullScreenModeOptionKey : Any]? = nil) -> Bool { return false }
-  override func exitFullScreenMode(options: [NSView.FullScreenModeOptionKey : Any]? = nil) { }
-  
-  override func viewWillStartLiveResize() { print("viewWillStartLiveResize") 
-    super.viewWillStartLiveResize() }
-  override func viewDidEndLiveResize() { print("viewDidEndLiveResize") 
-    super.viewDidEndLiveResize() }
-  override func viewDidChangeEffectiveAppearance() {
-    print("viewDidChangeEffectiveAppearance")
-    let all = NSRect(x: 0, y: 0, width: frame.width, height: frame.height)
-    self.setNeedsDisplay(all) /* ⬷ c𝘧․ NSView.visibleRect. */
-  }
-  
-  func viewDidUpdateTrackingAreas() { } /* NSViewDidUpdateTrackingAreasNotification */
-  func viewGlobalFrameDidChange() { } /* NSViewGlobalFrameDidChangeNotification */
-  func viewBoundsDidChange() { } /* NSViewBoundsDidChangeNotification */
-  func viewFrameDidChange() { } /* NSViewFrameDidChangeNotification */
-  
 }
 
-func Add₋rendition(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
- NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
-  var ancestor: CALayer? = nil
-  let identifier = UUID()
-  switch layer₋type {
-  case .image:
-   let layer = SEImageLayer()
-   layers₋with₋images.append(layer)
-   ancestor = layer
-  case .simulation:
-   let layer = CAMetalLayer()
-   layers₋with₋realtime.append(layer)
-   ancestor = layer
-  case .vector:
-   let layer = CAShapeLayer()
-   vector₋layers.append(layer)
-   ancestor = layer
-  } /* ⬷ note 'doublesided' defaults to true. */
-  if let layer = ancestor {
-    layer.frame = CGRect(x: 0, y: 0, width: canvas₋size.width, height: canvas₋size.height)
-    switch origo₋relative₋superlayer {
-    case .middle:
-      layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-    case .ul:
-      layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-    case .ll:
-      layer.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-    case .ur:
-      layer.anchorPoint = CGPoint(x: 1.0, y: 1.0)
-    case .lr:
-      layer.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-    }
-    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
-    layer.name = name
-    layer.isGeometryFlipped = true
-    /* layer.shouldRasterize = false */
-    /* layer.rasterizationScale = 2.0 */
-    /* layer.autoresizingMask: CAAutoresizingMask = 
-     [.kCALayerWidthSizable, .kCALayerHeightSizable] */
-    composition.addSublayer(layer)
+extension Minimumview {
+  func snapshot₋rendition() -> NSBitmapImageRep? { let rect = textlayer.frame 
+    let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rect)
+    return bitmap } /* bitmap.planar, bitmap.samplesPerPixels, ... */
+}
+
+class Compositiondelegate: NSObject, CALayerDelegate {
+  class Action: CAAction {
+    func run(forKey event: String, object anObject: Any, 
+     arguments: [AnyHashable : Any]?) { print("run \(event)") }
   }
-  
-  return identifier
-  
+  func display(_ layer: CALayer) { print("display \(layer.name)") }
+  func draw(_ layer: CALayer, in ctx: CGContext) { print("draw \(layer.name)") 
+    CGContextBeginTransparencyLayer(ns₋omgivning, nil)
+    CGContextEndTransparencyLayer(ns₋omgivning)
+  }
+  func layerWillDraw(_ layer: CALayer) { print("layerWillDraw \(layer.name)") }
+  func layoutSublayers(of layer: CALayer) { print("layoutSublayers \(layer.name)") }
+  func action(for layer: CALayer, forKey event: String) -> CAAction? {
+    print("action \(layer.name)")
+    return Action() }
+}
+
+extension Viewcontroller { /* ⬷ trackpad. */
+  override func touchesBegan(with event: NSEvent) {
+    log₋rectangle(with: event, inital: true)
+    super.touchesBegan(with: event) }
+  override func touchesMoved(with event: NSEvent) {
+    log₋rectangle(with: event, inital: false)
+    /* self.translateRectsNeedingDisplayInRect(NSRect(), by: NSSize()) */
+    super.touchesMoved(with: event) }
+  override func touchesEnded(with event: NSEvent) {
+    let synthesized = NSView.Trek(hashable₋identity: UUID())
+    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
+    print("\(instant): not-ended.")
+    super.touchesEnded(with: event) }
+  override func touchesCancelled(with event: NSEvent) {
+    let synthesized = NSView.Trek(hashable₋identity: UUID())
+    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
+    print("\(instant): must-cancel.")
+    super.touchesCancelled(with: event) }
+  override func pressureChanged(with event: NSEvent) {
+    pressure(with: event)
+    super.pressureChanged(with: event)
+  }
+}
+
+extension Minimumview {
+  func loupe₋overlayed(_ sender: AnyObject) {
+    /* let bounds = CGContextConvertRectToDeviceSpace() */
+    /* composition.minificationFilter = CALayer.trilinear 
+    composition.magnificationFilter = CALayer.trilinear */
+    /* CALayerContentsFilter */
+  } /* ⬷ protocol-􀤎. */
+  enum Perspective { case undo; case redo; case hidden₋detailed }
+  func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
 }
 
 class Viewcontroller: NSViewController {
@@ -370,44 +499,6 @@ class Viewcontroller: NSViewController {
   
   override var acceptsFirstResponder: Bool { true }
   
-  override func touchesBegan(with event: NSEvent) {
-    let ovals: Set<NSTouch> = event.touches(matching: .began, in: minimumview)
-    for oval in ovals {
-      let identity = oval.identity
-      print("tip-start \(identity)")
-    }
-  }
-  override func touchesMoved(with event: NSEvent) {
-    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: minimumview)
-    for oval in ovals {
-      let identity = oval.identity
-      let normalized = oval.normalizedPosition
-      /* composition₋delegates.updateValue(base₋delegate, forKey: base₋identifier)  */
-      print("tip-moved at \(normalized)")
-    }
-  }
-  override func touchesEnded(with event: NSEvent) {
-    let ovals: Set<NSTouch> = event.touches(matching: .ended, in: minimumview)
-    for oval in ovals {
-      let identity = oval.identity
-      print("tip-ended \(identity)")
-    }
-  }
-  override func touchesCancelled(with event: NSEvent) {
-    let ovals: Set<NSTouch> = event.touches(matching: .cancelled, in: minimumview)
-    for oval in ovals {
-      let identity = oval.identity
-      print("tip-cancelled \(identity)")
-    }
-  }
-  
-  override func pressureChange(with event: NSEvent) {
-    let pressure = event.pressure
-    let location₁ = event.locationInWindow
-    /* let location₂ = self.superview.convertPoint(location₁, fromView: nil) */
-    print("pressure is \(pressure) at \(location₁)")
-  }
-  
   override func cursorUpdate(with event: NSEvent) { print("cursorUpdate") 
     /* NSCursor.arrowCursor.set */
     super.cursorUpdate(with: event)
@@ -433,8 +524,8 @@ class Viewcontroller: NSViewController {
     if yes == true && viewmenu.submenu.action != #selector(addScribblelayer(_:)) {
       let item = NSMenuItem(title: "Add Scribble...", target: self, 
        action: #selector(addScribblelayer(_:)), keyEquivalent: "n", 
-       modifier: [NSEvent.ModifierFlags.shift, NSEvent.ModifierFlags.command]
-      viewmenu.submenu?.items.insert(item), at: 2)
+       modifier: [NSEvent.ModifierFlags.shift, NSEvent.ModifierFlags.command])
+      viewmenu.submenu?.items.insert(item, at: 2)
     }
     if yes == false && viewmenu.submenu.action == #selector(addScribblelayer(_:)) {
       viewmenu.submenu?.items.remove(at: 2)
@@ -454,7 +545,10 @@ class Windowcontroller: NSWindowController {
    
    let viewctrl = Viewcontroller()
    var shell = Inter₋act₋and₋inte₋r₋u₋p₋t()
-   var recorder = UndoManager() /* ⬷ duplicate undoManager in NSResponder. */
+   var recorder = UndoManager() /* ⬷ duplicate undo-manager in NSResponder. */
+   
+   CAAction: func run(forKey event: String, object anObject: Any, 
+    arguments dict: [AnyHashable : Any]?) { }
    
    convenience init() { print("windowcontroller-convenience-init") 
      self.init(window: nil)
@@ -562,6 +656,7 @@ class Minimumwindow: NSWindow {
      super.keyDown(with: event)
      print("keydown \(event.keyCode)")
      print("keydown \(String(describing: event.characters))")
+     /* let absorb₋sponge = event.pressure */
      let description = event.modifierFlags.rawValue.description
      print("modifier \(String(describing: description))")
      let view = controller.view.subviews[0]
@@ -571,10 +666,10 @@ class Minimumwindow: NSWindow {
          print("utf8 (\(symbol.utf8)): ", terminator: "")
          symbol.utf8.forEach { byte in print("\(byte) ", terminator: "") }
          print("\nunicodes \(symbol.unicodeScalars)")
-         for possibly₋canonical in symbol.unicodeScalars { /* ⬷ UInt32. */
-           let possibly₋canonical₂ = 
-  Int(truncatingIfNeeded: possibly₋canonical.value)
-           switch possibly₋canonical₂ {
+         for possibly₋canonic in symbol.unicodeScalars { /* ⬷ UInt32. */
+           let possibly₋canonic₂ = 
+  Int(truncatingIfNeeded: possibly₋canonic.value)
+           switch possibly₋canonic₂ {
            case NSDeleteFunctionKey:
              print("deleteKeyDown")
            case NSInsertFunctionKey:
