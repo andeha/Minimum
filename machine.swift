@@ -62,7 +62,7 @@ class the₋Drawingmachine₁ {
         /* further details written in 'CGImageSource.h'. */
       }
       catch Base16EncodingError { print("error when decoding base-16 material") }
-     }
+     } /* ⬷ nowdays as agreed, not strict, bezier=spaghetti-letters however are. */
   }
   
   static func encode(image: NSImage) -> String {
