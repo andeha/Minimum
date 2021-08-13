@@ -85,10 +85,10 @@ extension Appdelegate { /* ⬷ Heritage */
        NSMenuItem(title: "Redo", target: self, action: Selector(("redo:")), keyEquivalent: "z", 
         modifier: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.shift]), 
        NSMenuItem.separator(), 
-       NSMenuItem(title: "Cut", action: Selector(("cut:")), keyEquivalent: "x"), 
-       NSMenuItem(title: "Copy", action: Selector(("copy:")), keyEquivalent: "c"), 
-       NSMenuItem(title: "Paste", action: Selector(("paste:")), keyEquivalent: "v"), 
-       NSMenuItem(title: "Select All", action: Selector(("select-all:")), keyEquivalent: "a"), 
+       NSMenuItem(title: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x"), 
+       NSMenuItem(title: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c"), 
+       NSMenuItem(title: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v"), 
+       NSMenuItem(title: "Select All", action: Selector(("selectall:")), keyEquivalent: "a"), 
      ]
     
      let viewmenu = NSMenuItem()

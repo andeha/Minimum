@@ -76,7 +76,7 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
     if let symbols = text.data(using: String.Encoding.utf8) {
       fifo.fileHandleForWriting.write(symbols)
     } else { fatalError("Unable to unwrap material") }
-  }
+  } /* ⬷ see --<machine.swift>{parse} for correct suffixial possibly-maybe. */
   
   @objc func print₋child₋output(reader: FileHandle) {
     /* NotificationCenter:send(command₋at₋rest) */
@@ -151,60 +151,50 @@ extension NSBezierPath {
   
 }
 
-extension NSView {
-  
-  struct Trek : Hashable { var guid: UUID 
-    var ident: NSObject & NSCopying
-    init(hashable₋identity: UUID, ident: NSObject & NSCopying) {
-     self.ident = ident; guid = hashable₋identity }
-    func hash(into hasher: inout Hasher) { return guid.hash() }
-    static func == (lhs: Trek, rhs: Trek) -> Bool { return lhs.guid == rhs.guid }
-  }
-  
-  func setup₋tracking(tracking₋bounds: NSRect) {
-    let trackingarea: NSTrackingArea = NSTrackingArea(rect: tracking₋bounds, 
-      options: [ NSTrackingArea.Options.activeAlways, 
-        NSTrackingArea.Options.mouseMoved, 
-        NSTrackingArea.Options.mouseEnteredAndExited ], 
-       owner: self, userInfo: nil)
-    addTrackingArea(trackingarea)
-  }
-  
-}
-
 class Trackpad {
-  
-  struct Spatial { var instant: TimeInterval 
-    var proximity₋spatial: NSPoint; var pressure: Double }
+  struct Spatial { var instant: TimeInterval; var proximity₋spatial: NSPoint }
   struct Pressure { var instant: TimeInterval; var pressure: Double }
-  struct Skiss₁ { var ended: Bool; var tracklines: Array<Spatial> }
-  struct Skiss₂ { var pressures: Array<Pressure> }
-  var tracklines = Dictionary<NSView.Trek, Skiss₁>()
-  var pressures = Dictionary<NSView.Trek, Skiss₂>()
+  struct Segment { var ended: Bool; var samples: Array<Spatial> }
+  struct Point { var samples: Array<Pressure> }
+  var tracklines = Dictionary<NSView.Trek,Segment>() /* ⬷ c𝘧․ preskriptionstid. */
+  var pressures = Dictionary<NSView.Trek,Point>()
   
-  var log₋rectangle = { (with event: NSEvent, initial: Bool) in 
-    let instant: TimeInterval = event.timestamp
-    /* let location₁ = event.locationInWindow
-    let location₂ = self.superview.convertPoint(location₁, fromView: nil) */
+  func log₋rectangle(with: NSEvent, view: NSView, initial: Bool) { 
+    let event = with; let instant: TimeInterval = event.timestamp
     let pressure = event.pressure
-    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: minimumview)
+    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
     for oval in ovals {
-      let identity = oval.identity
-      let normalized = oval.normalizedPosition
-      let spatiala = tracklines[]
+      let identity = NSView.Trek(ident: oval.identity)
+     /* let location₁ = event.locationInWindow
+     let location₂ = self.superview.convertPoint(location₁, fromView: nil) */
+      let location₃ = oval.normalizedPosition
+      let sample = Spatial(instant: instant, proximity₋spatial: location₃)
+      if let spatiala = self.tracklines[identity] {
+        spatiala.samples.append(sample)
+        /* ⬷ found occurrence in dictionary. */
+      } else {
+        let initial = Spatial(instant: instant, proximity₋spatial: location₃)
+        let array = [ initial ]
+        let initial₋alt₋suffix = Segment(ended: false, samples: array)
+        self.tracklines[identity] = initial₋alt₋suffix
+        /* ⬷ first occurrence added. */
+      }
+      let spatiala: Skiss₁ = tracklines[identity]
       let initial₋alt₋suffix : Array<Spatial> = [
        Spatial(instant: instant, proximity₋spatial: normalized, pressure: pressure)
       ]
-      let synthesized = NSView.Trek(hashable₋identity: UUID())
-      if let old = tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized) {
-        // old value exists: does not happed
-      }
+      
       if initial { print("interaction-began") }
       else { print("interaction-moved at \(normalized)") }
     }
-    
   }
   
+  func hapticFeedback() { var prepared = [NSAlignmentFeedbackToken]() 
+    if let token = self.feedbackFilter.alignmentFeedbackTokenForHorizontalMovement(in: 
+     self.view, previousX: 0.0, alignedX: 1.0, defaultX: 2.0) { prepared += [token] }
+    self.feedbackFilter.performFeedback(perpared, performeranceTime: .now) }
+  func entered(with event: NSEvent) { self.hapticFeedback(); print("entered") }
+  func exited(with event: NSEvent) { self.hapticFeedback(); print("exited") }
   func cancelled(with event: NSEvent) {
     let synthesized = NSView.Trek(hashable₋identity: UUID())
     tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
@@ -216,7 +206,7 @@ class Trackpad {
   func pressure(with event: NSEvent) {
     let instant: TimeInterval = event.timestamp
     let pressure = event.pressure
-    if let existing = tracklines[] { print("existing old") 
+    if let existing = pressures[] { print("existing old") 
      
     } else { print("non-existing old") 
      
@@ -224,6 +214,14 @@ class Trackpad {
     print("\(instant): pressure is \(pressure)")
   }
 } /* ⬷ 'sak är som skojigt-roligt-intressant såsom ...'. */
+
+extension NSView {
+  struct Trek : Hashable { var ident: NSObjectProtocol & NSCopying 
+    init(ident: NSObjectProtocol & NSCopying) { self.ident = ident }
+    func hash(into hasher: inout Hasher) { return ident.hash() }
+    static func == (lhs: Trek, rhs: Trek) -> Bool { return lhs.hash() == rhs.hash() }
+  }
+}
 
 func Renderimage(width: Double, height: Double, 
  process: (NSGraphicsContext) -> Void) -> CGImage?

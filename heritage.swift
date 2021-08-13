@@ -1,6 +1,6 @@
 /*  􀪿􀪾􀆪 | modern and widely recognized. */
 
-func perclude(status₋response response: URLResponse, mime type: inout String?) -> Bool {
+func preclude(status₋response response: URLResponse, mime type: inout String?) -> Bool {
   guard let correspond = response as? HTTPURLResponse else { return false }
   type = nil; if let mimetype = correspond.mimeType { type = mimetype }
   return (200...299).contains(correspond.statusCode)
