@@ -1,4 +1,4 @@
-/*  module.modulemap | for Swift. */
+/*  module.modulemap | for later harmonization C++ and Swift. */
 
 module ClibTwinbeam [system] {
   header "ClibTwinbeam.h"

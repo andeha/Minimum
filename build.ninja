@@ -2,8 +2,8 @@
 
 appname = Minimum
 twinbeamroot = /Users/<User- or project name>/Monitor/Apps
-libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
-libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
+# libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
+# libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
 
 cpp-optflags = -g -I ../Apps/
 swift-flags = -g -D DEBUG -I .
@@ -15,7 +15,8 @@ gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
  -Wincomplete-umbrella -Wmodule-conflict -Wno-nullability-completeness
 moduleflags = -fmodules-ts -fimplicit-modules -fmodule-map-file=../Apps/🗿.modules
 commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
-tmacr-version = -mmacosx-version-min=11.4
+tmacr-version = 
+# -mmacosx-version-min=11.5
 macoscflags_commandline = -isysroot $commandline-sdkpath $tmacr-version
 macoscflags = $macoscflags_commandline
 sha1git = `git log -1 '--pretty=format:%h'`
@@ -72,12 +73,11 @@ rule library
   ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
   printf $sha1git
 
-build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
+build libClibTwinbeam: library $objs/ClibTwinbeam.o
 build $appname: primary-compile-macswift histories.swift ensemble.swift      $
  main.swift machine.swift heritage.swift enriching.swift Data+Base16.swift
-build Minimum.app: assemble-macapp libClibTwinbeam $appname
-
-default Minimum.app
+build Minimum.app: assemble-macapp $appname
+default libClibTwinbeam Minimum.app
 
 

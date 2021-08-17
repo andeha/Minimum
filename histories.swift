@@ -246,8 +246,9 @@ extension Minimumview { /* ⬷ minimum and illustrations. */
       var size = CGSize(width: 0.0, height: 0.0); var name: String = ""
       do {
         try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
+          let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> 
           let layer: CALayer = try /* await */ machine.interpret(bytes: fromwire₋utf8.count, 
-           figure₋utf8: fromwire₋utf8.baseAddress!, size: &size, name: &name)
+           figure₋utf8: utf8₋material!, size: &size, name: &name)
           layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
           max₋height = max(layer.frame.height,max₋height)
           layer.name = name
@@ -387,16 +388,16 @@ extension Viewcontroller { /* ⬷ trackpad. */
     /* self.translateRectsNeedingDisplayInRect(NSRect(), by: NSSize()) */
     super.touchesMoved(with: event) }
   override func touchesEnded(with event: NSEvent) {
-    trackpad.ended(with: event)
+    trackpad.ended(with: event, view: minimumview)
     super.touchesEnded(with: event) }
   override func touchesCancelled(with event: NSEvent) {
-    trackpad.cancelled(with: event)
+    trackpad.cancelled(with: event, view: minimumview)
     super.touchesCancelled(with: event) }
   override func mouseExited(with event: NSEvent) { print("mouseexited") 
-    trackpad.exited(with: event)
+    trackpad.exited(with: event, in: self.view)
     super.mouseExited(with: event) }
   override func mouseEntered(with event: NSEvent) { print("mouseentered") 
-    trackpad.entered(with: event)
+    trackpad.entered(with: event, in: self.view)
     super.mouseEntered(with: event) }
   override func pressureChange(with event: NSEvent) { 
     trackpad.pressure(with: event)
@@ -532,7 +533,7 @@ class Windowcontroller: NSWindowController {
      self.window = window
    }
    
-   func coroutine₋keyput₋in₋child(writer: FileHandle) async -> Int { var exitstatus=0 
+   func coroutine₋keyput₋in₋child(writer: FileHandle) async /* a.k.a hypotes. */ -> Int { var exitstatus=0 
      /* for try await line in input₋handle.bytes.lines { print(line) } */
      return exitstatus
    } /* ⬷ a coroutine may suspend at anytime. */
