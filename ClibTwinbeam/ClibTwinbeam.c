@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* import Twinbeam;
 import Unistd;
@@ -118,78 +119,107 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
 
-#define TRUE 1
+#define FALSE 0
+#define TRUE (! FALSE)
 
-typedef __builtin_int_t Nonabsolute; /* ⬷ index into symbols. */
+int CastTˣᵗToSequent(
+  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
+  sequent * value
+)
+{ __builtin_int_t val=0; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned short zero₋to₋nine; int sgn=1;
+   while (1) {
+      enum CastToIntOpinion opinion = feeder(&zero₋to₋nine);
+      switch (opinion) {
+       case accept: val *= 10; val += sgn*zero₋to₋nine; break;
+       case rejecting: continue;
+       case negate: sgn *= -1; break;
+       case commit: *value=val; return 0;
+       case annul: return -1;
+      }
+   }
+}
 
-union Artwork₋symbol₋token₋detail {
-  Nonabsolute symbol; double parameter; uchar * base16₋image;
+unionᵢ Artwork₋symbol₋token₋detail {
+  double parameter;                                                /*  (1) */
+  Nonabsolute symbol;                                              /*  (2) */
+  const char * base16₋image;                                       /*  (3) */
+  void * ref;                                                      /*  (4) */
 };
 
-struct Artwork₋symbol₋token {
+structᵢ Artwork₋symbol₋token {
   enum Artwork₋token₋symbol kind;
   union Artwork₋symbol₋token₋detail detail;
 }; /* ⬷ preferable 𝟽₋bit₋possibly₋truncated₋symbol. */
 
-struct Artworkcontext₁ {
-  enum Mode { initial, c₋comment, rawtext, non₋7₋bit } mode;
+enum Artwork₋scanner₋mode {
+ initial, digitAltsignAltPeriod, digits, digitsperiod, regular, unicodes, 
+ base16₋image₋text, div₋prefix₋comment, div₋suffix₋comment₋ie₋comment
 };
 
-struct Artworkcontext₂ { };
+structᵢ c₋kiddle { char32_t * symbols; __builtin_int_t nxt; }; /* no-no closure swift. */
+inexorable int append₋to₋current(struct c₋kiddle * symbols, char32_t unicode) { return 0; }
+inexorable int close₋current(struct c₋kiddle * symbols) { return 0; }
 
-/* --<mikaels far>--<Il duche>--<mikaels bror>--<mikael> */
+struct Scanner₋ctxt {
+  __builtin_int_t lineno₋first, lineno₋last;
+  __builtin_int_t idx₋u8c; int negative; sequentAltdouble ongoing;
+  enum Artwork₋scanner₋mode mode;
+  struct c₋kiddle kiddle;
+};
 
-struct c₋kiddle { char32_t * symbols; __builtin_int_t nxt; };
-
-inexorable int init₋kiddle(__builtin_int_t program₋bytes, c₋kiddle * kiddle)
+inexorable int init₋context(__builtin_int_t program₋bytes, struct Scanner₋ctxt * ctx)
 {
-   kiddle.symbols = (char32_t *)malloc(program₋bytes*4);
-   return kiddle.symbols != NULL;
+   ctx->lineno₋first=1, ctx->lineno₋last=1; ctx->idx₋u8c=0; ctx->negative=0; 
+   ctx->mode = initial;
+   ctx->kiddle.symbols = (char32_t *)malloc(program₋bytes*4);
+   return ctx->kiddle.symbols != NULL;
 }
 
 inexorable int
-Lookahead₋scan₋Artwork(__builtin_int_t bytes, 
-  uchar program₋u8s[], enum Artwork₋token₋symbol * kind, 
+Lookahead₋scan₋Artwork(
+  __builtin_int_t bytes, uchar program₋u8s[], 
+  enum Artwork₋token₋symbol * kind, 
   union Artwork₋symbol₋token₋detail * detail, 
-  __builtin_int_t * nonabsolute, 
-  __builtin_int_t * idx₋u8c
+  struct Scanner₋ctxt * s₋ctxt
 )
 {
-   uchar c; struct Artworkcontext ctx = { 1 };
-   __builtin_int_t lineno₋first=1, lineno₋last=1;
+   uchar c,f,e,d; char32_t unicode; __builtin_int_t i=s₋ctxt->idx₋u8c;
    
-   🧵(utf8₋error,unterminated₋quote,unknown₋keyword, 
-     wrong₋number₋of₋argument, token) {
+   🧵(utf8₋error,kiddle₋error,scanner₋error,unterminated₋quote,unknown₋keyword, 
+     wrong₋number₋of₋argument,truncated₋token,token) {
     case utf8₋error: return -1;
     case unterminated₋quote: return -2;
     case unknown₋keyword: return -3;
     case wrong₋number₋of₋argument: return -4;
-    case non₋token return 0;
+    case truncated₋token: return 0;
     case token: return 0;
    }
    
-   typedef int (^type)(uchar c);
+   typedef int (^type)(char32_t c);
    typedef void (^action)(void);
    
-   type digit = ^(char8_t c) { return '0' <= c && c <= '9'; };
+   type digit = ^(char32_t c) { return U'0' <= c && c <= U'9'; };
    type derender₋newline = ^(char32_t c) { return c == U'\xa'; }; /* de- = completely = fullgångna. */
-   type newline = ^(char8_t c) { return derender₋newline(c) || c == U'\xd'; };
-   type whitespace = ^(char8_t c) { return c == ' ' || '\t' == c || newline(c); };
-   type regular = ^(char8_t c) { return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || digit(c); };
-   type period = ^(char8_t c) { return '.'; };
-   type comma = ^(char8_t c) { return ','; };
+   type newline = ^(char32_t c) { return derender₋newline(c) || c == U'\xd'; };
+   type whitespace = ^(char32_t c) { return c == U' ' || U'\t' == c || newline(c); };
+   type regular = ^(char32_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z') || digit(c); };
+   type period = ^(char32_t c) { return c == U'.'; };
+   
+   action token₋sep = ^{ s₋ctxt->mode = initial; };
    
    action found₋beziercurve₋start = ^{
-    *detail = { start₋line, .detail.ref=(void *)NULL };
+    *kind = start₋line;
+    detail->ref=(void *)NULL;
     confess(token); };
    action found₋beziercurve₋add = ^{
-    *detail = { add₋line, .detail.ref=(void *)NULL };
+    *kind = add₋line;
+    detail->ref=(void *)NULL;
     confess(token); };
    action found₋beziercurve₋end = ^{
-    *detail = struct Artwork₋symbol₋token { last₋line, .detail.ref=(void *)NULL };
+    *kind = end₋line;
+    detail->ref=(void *)NULL;
     confess(token); };
-   
-   __builtin_int_t i=*idx₋u8c; char32_t unicode; 
+   action found₋text = ^{ };
    
 again:
    
@@ -197,15 +227,15 @@ again:
      c = program₋u8s[i];
      if (248 <= c || (128 <= c && c < 192)) { confess(utf8₋error); }
      else if (c >= 128) {
-       __builtin_int_t onesUntilZero = __builtin_clzll(~((uint64_t)leadOr8Bit<<56)); 
+       __builtin_int_t onesUntilZero = __builtin_clzll(~((uint64_t)c<<56));
        __builtin_int_t followers = onesUntilZero - 1;
        switch (followers) {
-       case 3: if (i+3 >= bytes) { confess(non₋token); }
-         uchar f = program₋u8s[i+3]; *idx₋u8s+=4; 
-       case 2: if (i+2 >= bytes) { confess(non₋token); }
-         uchar e = program₋u8s[i+2]; *idx₋u8s+=3; 
-       case 1: if (i+1 >= bytes) { confess(non₋token); }
-         uchar d = program₋u8s[i+1]; *idx₋u8s+=2; 
+       case 3: if (i+3 >= bytes) { confess(truncated₋token); }
+         f = program₋u8s[i+3]; s₋ctxt->idx₋u8c+=4;
+       case 2: if (i+2 >= bytes) { confess(truncated₋token); }
+         e = program₋u8s[i+2]; s₋ctxt->idx₋u8c+=3;
+       case 1: if (i+1 >= bytes) { confess(truncated₋token); }
+         d = program₋u8s[i+1]; s₋ctxt->idx₋u8c+=2;
        default: confess(utf8₋error);
        }
        if (followers == 1) { unicode = ((0b11111 & c) << 6) | (0x3F & d); }
@@ -213,16 +243,31 @@ again:
         (0x3F & e); }
        if (followers == 3) { unicode = ((0b111 & c) << 18) | ((0x3F & d) << 12) | 
         ((0x3F & e) << 6) | (0x3F & f); }
-     } else { unicode = (char32_t)c; *idx₋u8s+=1; }
+     } else { unicode = (char32_t)c; s₋ctxt->idx₋u8c+=1; }
    }
    
-   if (derender₋newline(unicode)) { lineno₋first+=1, lineno₋last+=1; }
-   else if (newline(unicode)) { }
-   else if (whitespace(unicode)) { }
-   else if (comma(unicode)) { found₋comma(); return; }
-   else if (unicode == 0x241c) { found₋text(); return; }
-   else if (digit(unicode)) { }
-   else if (period(unicode)) { if (ctx.mode == digits) { ctx.mode = digitscomma; } else { } }
+   /* ⤐ Unicode decoded and available ⤐ */
+   
+   if (derender₋newline(unicode)) { s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; token₋sep(); }
+   else if (newline(unicode)) { token₋sep(); }
+   else if (whitespace(unicode)) { token₋sep(); }
+   else if (unicode == U',') {
+     *kind = comma₋0x2c;
+     detail->ref=(void *)NULL;
+     confess(token); token₋sep(); }
+   else if (s₋ctxt->mode == initial && unicode == U'-') { s₋ctxt->negative = !s₋ctxt->negative; }
+   else if (s₋ctxt->mode == initial && digit(unicode)) { }
+   else if (s₋ctxt->mode == initial && period(unicode)) {
+     switch (s₋ctxt->mode) {
+     case digits: s₋ctxt->mode = digitAltsignAltPeriod; break;
+     case digitscomma: break;
+     default: ;
+     }
+   }
+   else if (s₋ctxt->mode == initial && unicode == U'␜') { s₋ctxt->mode = unicodes; } /* ⬷ a․𝘬․a 'e2 90 9c' and U+241c. */
+   else if (s₋ctxt->mode == unicodes && unicode != U'␜') { if (append₋to₋current(&s₋ctxt->kiddle,unicode)) { confess(kiddle₋error); } }
+   else if (s₋ctxt->mode == unicodes && unicode == U'␜') { close₋current(&s₋ctxt->kiddle); token₋sep(); }
+   else { confess(scanner₋error); }
    
    goto again;
 }
@@ -250,7 +295,6 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t bytes, uchar program₋u2s[], se
   
   action consume = ^{
     enum Artwork₋token₋symbol kind; __builtin_int_t nonabsolute;
-   
     typedef void (^mass₋reading₋verse)(struct Artwork₋symbol₋token job);
     mass₋reading₋verse sad₋le = ^(struct Artwork₋symbol₋token job) { lookahead = job; };
     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,sad₋le)) { confess(lex₋error); }
@@ -261,10 +305,14 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t bytes, uchar program₋u2s[], se
 }
 
 int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
-  void (*semantic)(enum Artwork₋instruction instr, double * parameters))
+  struct Scanner₋ctxt * s₋ctxt, void (*semantic)(enum Artwork₋instruction instr, 
+  union Artwork₋instruction₋detail parameters))
 {
+   struct Scanner₋ctxt s₋ctxt;
    struct Artwork₋symbol₋token 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 lookahead;
-   __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 idx₋u8c=0;
+   /* __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 idx₋u8c=0; */
+   
+   if (init₋context(bytes,&s₋ctxt)) { return -1; }
    
    🧵(zerolength,lex₋error,grammar₋error,completion) {
     case zerolength: return -1;
@@ -279,8 +327,8 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[],
    
    action consume = ^{ __builtin_int_t nonabsolute; 
      enum Artwork₋token₋symbol kind; union Artwork₋symbol₋token₋detail detail; 
-     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,&kind,&detail, 
-      &nonabsolute,&idx₋u8c)) { confess(lex₋error); }
+     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,&kind,&detail,&s₋ctxt)) 
+     { confess(lex₋error); }
      if (kind == END₋OF₋TRANSMISSION) { confess(completion); }
      lookahead = { kind, nonabsolute, (void *)NULL };
    };
