@@ -39,8 +39,8 @@ int Details_in_C(uint64_t pid, int32_t cross);
 
 typedef int pid_t;
 
-EXT₋C pid_t Twinbeam₋spawn(const char * utf8₋command, int * fd_p2c, int * fd_c2p /* , 
- const char * NULLterminatedEnv */);
+EXT₋C pid_t Twinbeam₋spawn(const char * u8s₋command, int * fd_p2c, 
+ int * fd_c2p /* ,const char * NULLterminatedEnv */);
 
 EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
@@ -49,24 +49,26 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
-enum CastToSequentOpinion { accept, rejecting, negate, commit, annul };
+enum CastToSequentOpinion { accept, rejecting, negate, complete, annul };
 EXT₋C int CastTˣᵗToSequent(
- enum CastToIntOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
- __builtin_int_t * sequent);
-sequent add(sequent x₁, sequent x₂);
-sequent minus(sequent x₁, sequent x₂);
-sequent mult(sequent x₁, sequent x₂);
-sequent div(sequent x₁, sequent x₂);
-sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
-sequent acumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
-sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-sequent operator_minus(sequent ℝ);
-sequent n₋root(sequent n, sequent ℝ);
+ enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
+ struct sequent * value);
+void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
+struct sequent add(struct sequent x₁, struct sequent x₂);
+struct sequent minus(struct sequent x₁, struct sequent x₂);
+struct sequent mult(struct sequent x₁, struct sequent x₂);
+struct sequent div(struct sequent x₁, struct sequent x₂) __attribute__((overloadable));
+struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
+struct sequent acumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
+struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
+struct sequent operator_minus(struct sequent ℝ);
+struct sequent n₋root(struct sequent n, struct sequent ℝ);
+/* sincos, log₃, lnΓ, 2ˣ, mod, tanh, tanh⁻¹, Erf, 𝟷𝟸𝟹𝟺₋atan. */
 
 /* Överhand- och underhandsuppfattning 
  
  ━━━   ━━━
-  ┊ ☕️  ┊   ⤐ t 
+  ┊ 􀲯  ┊   ⤐ t 
  ━━━   ━━━
  
  */
@@ -113,10 +115,11 @@ union Artwork₋instruction₋detail {
 };
 
 typedef char8_t uchar;
-typedef void (*semantics)(int /* enum Artwork₋instruction */ instr, union Artwork₋instruction₋detail parameters);
+typedef void (*semantics)(int artwork₋instruction, 
+ union Artwork₋instruction₋detail parameters);
 
 int Parse₋Artwork₋LL₍1₎(int bytes, uchar u8s₋program[], semantics truly₋your);
-int Parse₋Artwork(int bytes, uchar program₋u8s[], semantics truly₋yo ur); /* ⬷ a․𝘬․a LL₍k₎₋parse. */
+int Parse₋Artwork(int bytes, uchar program₋u8s[], semantics truly₋your); /* ⬷ a․𝘬․a LL₍k₎₋parse. */
 
 typedef enum Artwork₋instruction {
  width₋and₋height=1, place₋origo, offset₋drawing₋on,      /* ⬷ directive. */
