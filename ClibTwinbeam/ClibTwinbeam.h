@@ -50,6 +50,7 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
 enum CastToSequentOpinion { accept, rejecting, negate, complete, annul };
+typedef enum CastToSequentOpinion (^Feeder)(unsigned short *);
 EXT₋C int CastTˣᵗToSequent(
  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
  struct sequent * value);
