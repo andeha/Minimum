@@ -9,6 +9,7 @@ typedef long long           int64_t;
 #if defined  __mips__ || defined __armv6__ || defined espressif
 typedef unsigned long       uint32_t;
 typedef long                int32_t;
+typedef uint32_t            __builtin_uint_t;
 typedef int32_t             __builtin_int_t;
 #define 𝟷𝟸𝟾₋bit₋integers /* ⬷ flag -fforce-enable-int128 when Mips. */
 #ifdef __MM__
@@ -17,6 +18,7 @@ typedef int32_t             __builtin_int_t;
 #elif defined __armv8a__ || defined __x86_64__
 typedef unsigned int        uint32_t;
 typedef int                 int32_t; /* ≢'long'. */
+typedef uint64_t            __builtin_uint_t;
 typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 /* #define 𝟷𝟸𝟾₋bit₋integers */
 #endif
@@ -41,6 +43,17 @@ struct fifo {
  int 𝟷₋tile₋copy₋include(__builtin_int_t ﹟, __builtin_uint_t * words);
  void 𝟷₋tile₋fifo₋pop();
  int 𝟷₋tile₋shiftout(__builtin_int_t words);
+};
+
+struct structure {
+  void * (^leaf₋alloc)(__builtin_int_t bytes) = ^{ return malloc(bytes); };
+  int lengthen(__builtin_int_t ﹟, void * fixedKbframes[]);
+  uint8_t * realtive(__builtin)int_t byte₋offset);
+  int copy₋append(__builtin_int_t bytes, uint8_t * material, void (^inflate)(
+   __builtin_int_t ﹟, bool& cancel));
+  __builtin_int_t bytes();
+  __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
+  void * treelist, *cached₋tile;
 };
 
 #define NULL 0
