@@ -35,6 +35,14 @@ int Details_in_C(uint64_t pid, int32_t cross);
 #define EXT₋C
 #endif
 
+struct fifo {
+ __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
+ int init(__builtin_int_t words, void * 𝟷₋tile);
+ int 𝟷₋tile₋copy₋include(__builtin_int_t ﹟, __builtin_uint_t * words);
+ void 𝟷₋tile₋fifo₋pop();
+ int 𝟷₋tile₋shiftout(__builtin_int_t words);
+};
+
 #define NULL 0
 
 typedef int pid_t;
