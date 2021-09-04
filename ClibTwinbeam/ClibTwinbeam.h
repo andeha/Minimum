@@ -39,22 +39,26 @@ int Details_in_C(uint64_t pid, int32_t cross);
 
 struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
- int init(__builtin_int_t words, void * 𝟷₋tile);
- int 𝟷₋tile₋copy₋include(__builtin_int_t ﹟, __builtin_uint_t * words);
- void 𝟷₋tile₋fifo₋pop();
- int 𝟷₋tile₋shiftout(__builtin_int_t words);
 };
 
-struct structure {
-  void * (^leaf₋alloc)(__builtin_int_t bytes) = ^{ return malloc(bytes); };
-  int lengthen(__builtin_int_t ﹟, void * fixedKbframes[]);
-  uint8_t * realtive(__builtin)int_t byte₋offset);
-  int copy₋append(__builtin_int_t bytes, uint8_t * material, void (^inflate)(
-   __builtin_int_t ﹟, bool& cancel));
-  __builtin_int_t bytes();
+int init(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile) __attribute__((overloadable));
+int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
+void 𝟷₋tile₋fifo₋pop(struct fifo * 🅵);
+int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
+
+int init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes)) 
+__attribute__((overloadable)); /* = ^{ return malloc(bytes); }; */
+
+struct structat {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
 };
+
+int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+uint8_t * relative(__builtin)int_t byte₋offset);
+int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
+ void (^inflate)(_builtin_int_t ﹟, bool& cancel));
+__builtin_int_t bytes(struct structat * 🅢);
 
 #define NULL 0
 
@@ -76,6 +80,11 @@ EXT₋C int CastTˣᵗToSequent(
  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
  struct sequent * value);
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
+int round₋2⁻ⁱ₋decimals(short unsigned upto𝟼𝟺, char ⁻𝟶to𝟿s[], struct sequent * out);
+/* ⬷ TeX 102 §. */
+void print₋sequent(struct sequent 𝕏, void (^digits)(bool neg, 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
+ void (^zero)(), void (^neginf)(), void (^nonvalid)());
+/* ⬷ TeX 103 §. */
 struct sequent add(struct sequent x₁, struct sequent x₂);
 struct sequent minus(struct sequent x₁, struct sequent x₂);
 struct sequent mult(struct sequent x₁, struct sequent x₂);
@@ -84,8 +93,12 @@ struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 struct sequent acumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
 struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
 struct sequent operator_minus(struct sequent ℝ);
-struct sequent n₋root(struct sequent n, struct sequent ℝ);
-/* sincos, log₃, lnΓ, 2ˣ, mod, tanh, tanh⁻¹, Erf, 𝟷𝟸𝟹𝟺₋atan. */
+typedef struct sequent (^computational)(struct sequent x);
+enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
+int Newton(computational f, computational f₋prim, struct sequent * x₀, 
+ void (^ping)(enum Newtoncontrol &ctrl));
+/* ⬷ for n₋root, sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
+struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x); /* man 432. */
 
 /* Överhand- och underhandsuppfattning 
  
