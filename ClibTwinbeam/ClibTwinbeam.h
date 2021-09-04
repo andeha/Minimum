@@ -55,9 +55,9 @@ struct structat {
 };
 
 int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-uint8_t * relative(__builtin)int_t byte₋offset);
+uint8_t * relative(__builtin_int_t byte₋offset);
 int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
- void (^inflate)(_builtin_int_t ﹟, bool& cancel));
+ void (^inflate)(__builtin_int_t ﹟, int * cancel));
 __builtin_int_t bytes(struct structat * 🅢);
 
 #define NULL 0
@@ -80,9 +80,10 @@ EXT₋C int CastTˣᵗToSequent(
  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
  struct sequent * value);
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
-int round₋2⁻ⁱ₋decimals(short unsigned upto𝟼𝟺, char ⁻𝟶to𝟿s[], struct sequent * out);
-/* ⬷ TeX 102 §. */
-void print₋sequent(struct sequent 𝕏, void (^digits)(bool neg, 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
+int decimaltxt₋2⁻ⁱ₋round(short unsigned upto𝟼𝟺, char ⁻𝟶to𝟿saltDot[], struct sequent * out);
+/* ⬷ a․𝘬․a digits_to_bignum. See TeX 102 §. */
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
+void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
  void (^zero)(), void (^neginf)(), void (^nonvalid)());
 /* ⬷ TeX 103 §. */
 struct sequent add(struct sequent x₁, struct sequent x₂);
@@ -96,9 +97,12 @@ struct sequent operator_minus(struct sequent ℝ);
 typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 int Newton(computational f, computational f₋prim, struct sequent * x₀, 
- void (^ping)(enum Newtoncontrol &ctrl));
+ void (^ping)(enum Newtoncontrol * ctrl));
 /* ⬷ for n₋root, sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
 struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x); /* man 432. */
+int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
+ struct sequent min, void (^memory)(struct sequent integrale, 
+ struct sequent t₋acc, int * stop));
 
 /* Överhand- och underhandsuppfattning 
  
