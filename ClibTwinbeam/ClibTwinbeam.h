@@ -42,9 +42,9 @@ struct fifo {
 };
 
 int init(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile) __attribute__((overloadable));
-int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
-void 𝟷₋tile₋fifo₋pop(struct fifo * 🅵);
-int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
+void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
+int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
+int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
 
 int init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes)) 
 __attribute__((overloadable)); /* = ^{ return malloc(bytes); }; */
@@ -55,10 +55,10 @@ struct structat {
 };
 
 int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-uint8_t * relative(__builtin_int_t byte₋offset);
+uint8_t * relative(__builtin_int_t byte₋offset) __attribute__((overloadable));
 int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t bytes(struct structat * 🅢);
+__builtin_int_t bytes(struct structat * 🅢) __attribute__((overloadable));
 
 #define NULL 0
 
@@ -79,9 +79,9 @@ typedef enum CastToSequentOpinion (^Feeder)(unsigned short *);
 EXT₋C int CastTˣᵗToSequent(
  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
  struct sequent * value);
-void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
-int decimaltxt₋2⁻ⁱ₋round(short unsigned upto𝟼𝟺, char ⁻𝟶to𝟿saltDot[], struct sequent * out);
-/* ⬷ a․𝘬․a digits_to_bignum. See TeX 102 §. */
+inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
+inexorable int roundedfraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ);
+/* ⬷ a․𝘬․a digits_to_bignum and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
 void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
  void (^zero)(), void (^neginf)(), void (^nonvalid)());
@@ -131,6 +131,7 @@ int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t,
   statement <- 'last-line' real ',' real
   statement <- 'base16-image' [a-z]+
   statement <- 'utf8-text' ␜ <text> ␜
+  statement <- 'next'
   
  */
 
@@ -157,8 +158,22 @@ typedef char8_t uchar;
 typedef void (*semantics)(int artwork₋instruction, 
  union Artwork₋instruction₋detail parameters);
 
-int Parse₋Artwork₋LL₍1₎(int bytes, uchar u8s₋program[], semantics truly₋your);
-int Parse₋Artwork(int bytes, uchar program₋u8s[], semantics truly₋your); /* ⬷ a․𝘬․a LL₍k₎₋parse. */
+enum Artwork₋scanner₋mode {
+ initial, digitAltsignAltPeriod, digits, digitsperiod, regular, unicodes, 
+ base16₋image₋text, div₋prefix₋comment, div₋suffix₋comment₋ie₋comment
+};
+
+struct Scanner₋ctxt {
+  __builtin_int_t lineno₋first, lineno₋last;
+  __builtin_int_t idx₋u8c; int negative; Artnumerical ongoing;
+  enum Artwork₋scanner₋mode mode;
+};
+
+int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
+ struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your);
+int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u8s[], 
+ struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your);
+/* ⬷ a․𝘬․a LL₍k₎₋parse. */
 
 typedef enum Artwork₋instruction {
  width₋and₋height=1, place₋origo, offset₋drawing₋on,      /* ⬷ directive. */

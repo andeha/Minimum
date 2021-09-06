@@ -160,42 +160,36 @@ structᵢ Artwork₋symbol₋token {
   union Artwork₋symbol₋token₋detail detail;
 }; /* ⬷ preferable 𝟽₋bit₋possibly₋truncated₋symbol. */
 
-enum Artwork₋scanner₋mode {
- initial, digitAltsignAltPeriod, digits, digitsperiod, regular, unicodes, 
- base16₋image₋text, div₋prefix₋comment, div₋suffix₋comment₋ie₋comment
-};
-
-struct Scanner₋ctxt {
-  __builtin_int_t lineno₋first, lineno₋last;
-  __builtin_int_t idx₋u8c; int negative; Artnumerical ongoing;
-  enum Artwork₋scanner₋mode mode;
-};
-
-inexorable int init₋context(__builtin_int_t program₋bytes, struct Scanner₋ctxt * ctx)
+inexorable int init₋context(__builtin_int_t program₋bytes, struct Scanner₋ctxt * const ctx)
 {
    ctx->lineno₋first=1, ctx->lineno₋last=1; ctx->idx₋u8c=0; ctx->negative=0; 
    ctx->mode = initial;
    return 0;
 }
 
+typedef int (*Assistant₂₋params)(char32_t unicode);
+typedef Assistant₂₋params Stringpool;
+
 inexorable int
 Lookahead₋scan₋Artwork(
   __builtin_int_t bytes, uchar program₋u8s[], 
   enum Artwork₋token₋symbol * kind, 
   union Artwork₋symbol₋token₋detail * detail, 
-  struct Scanner₋ctxt * s₋ctxt
+  struct Scanner₋ctxt * s₋ctxt, 
+  Stringpool record
 )
 {
    uchar c,f,e,d; char32_t unicode; __builtin_int_t i=s₋ctxt->idx₋u8c; 
    
-   🧵(utf8₋error,kiddle₋error,scanner₋error,conversion₋error,/*unterminated₋quote,unknown₋keyword, 
-     wrong₋number₋of₋argument,*/token,truncated₋token₋utf8) {
+   🧵(utf8₋error,pool₋error,scanner₋error,conversion₋error,
+   unterminated₋quote,unknown₋keyword,wrong₋number₋of₋argument,token,
+   truncated₋token₋utf8) {
     case utf8₋error: return -1;
-    case kiddle₋error: return -2;
-    /* case unterminated₋quote: return -3;
+    case pool₋error: return -2;
+    case unterminated₋quote: return -3;
     case unknown₋keyword: return -4;
-    case wrong₋number₋of₋argument: return -5; */
-    case token: return 0;	
+    case wrong₋number₋of₋argument: return -5;
+    case token: return 0;
     case truncated₋token₋utf8: return 0;
    }
    
@@ -210,9 +204,8 @@ Lookahead₋scan₋Artwork(
    type period = ^(char32_t c) { return c == U'.'; };
    
    typedef int (^Assistant₁)();
-   typedef void (*Assistant₂₋params)(char32_t unicode);
-   typedef int (^Assistant₂)(Assistant₂₋params);
-   Assistant₂ assistant₂ = ^(Assistant₂₋params) { follow₋current(unicode); return 0; };
+   typedef int (^Assistant₂)(Stringpool, char32_t);
+   Assistant₂ assistant₂ = ^(Stringpool follow₋current, char32_t unicode) { return follow₋current(unicode); };
    Assistant₁ assistant₁ = ^(void (*close₋current)(void)) { close₋current(); return 0; };
    
    action token₋sep = ^{ s₋ctxt->mode = initial; };
@@ -281,22 +274,22 @@ again:
      confess(token); token₋sep(); }
    else if (s₋ctxt->mode == initial && unicode == U'␜') { s₋ctxt->mode = unicodes; } /* ⬷ a․𝘬․a 'e2 90 9c' and U+241c. */
    else if (s₋ctxt->mode == unicodes && unicode != U'␜') {
-     if (follow₋current(unicode)) { confess(kiddle₋error); }
+     if (assistant₂(record,unicode)) { confess(pool₋error); }
    }
-   else if (s₋ctxt->mode == unicodes && unicode == U'␜') { close₋current(); token₋sep(); }
+   else if (s₋ctxt->mode == unicodes && unicode == U'␜') { assistant₁(); token₋sep(); }
    else { confess(scanner₋error); }
    
    goto again;
 }
 
-int Parse₋Artwork₋LL₍k₎(__builtin_int_t bytes, uchar program₋u2s[], semantics truly₋yours)
+int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u2s[], semantics truly₋yours)
 {
-  fifo symbol₋lookahead, detail₋lookahead; /* ⬷ Artwork₋symbol₋token and union₋max₋builtin₋bytes. */
+  struct fifo symbol₋lookahead, detail₋lookahead; /* ⬷ Artwork₋symbol₋token and union₋max₋builtin₋bytes. */
   
   /* ⬷ icke-antagonst imateriellt sett antimaterial snarare uppfattas förbättrad samtidig löpande
    rumirat. Omgivning relevant samt språkvård etablerats som kompromitterad. */
   
-  typedef void (^recieved₋symbol)();
+  typedef void (^recieved₋symbol)(enum Artwork₋token₋symbol, union Artwork₋symbol₋token₋detail);
   typedef void (^lookahead)(unsigned retrospect, 
    enum Artwork₋token₋symbol * symbol, 
    union Artwork₋symbol₋token₋detail * detail);
@@ -307,11 +300,12 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t bytes, uchar program₋u2s[], se
      
   };
   
-  recieved₋symbol increment-circular = ^(enum Artwork₋token₋symbol recieved₁, union Artwork₋symbol₋token₋detail recieved₂) { 
-    symbol₋lookahead.𝟷₋tile₋copy₋include(1, (__builtin_int_t)recieved₁);
-    detail₋lookahead.𝟷₋tile₋copy₋include(1, (__builtin_int_t)recieved₂);
-    /* ⬷ samt koppling + T fungerar fint. */
-  };
+  recieved₋symbol increment₋circular = 
+    ^(enum Artwork₋token₋symbol recieved₁, 
+      union Artwork₋symbol₋token₋detail recieved₂) { 
+      𝟷₋tile₋copy₋include(&symbol₋lookahead, 1, (__builtin_uint_t *)&recieved₁);
+      𝟷₋tile₋copy₋include(&detail₋lookahead, 1, (__builtin_uint_t *)&recieved₂.ref);
+    }; /* ⬷ samt koppling + T fungerar fint. */
   
   🧵(zerolength,grammar₋error,completion) {
    case zerolength: return -1;
@@ -336,17 +330,19 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t bytes, uchar program₋u2s[], se
   }; */
   
   return 0;
-} /* 
+}
 
+/* int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
+  struct Scanner₋ctxt * s₋ctxt, void (*semantic)(int instruction, 
+  union Artwork₋instruction₋detail parameters)) */
 int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
-  struct Scanner₋ctxt * s₋ctxt, void (*semantic)(enum Artwork₋instruction instr, 
-  union Artwork₋instruction₋detail parameters))
+  struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your)
 {
-   struct Scanner₋ctxt s₋ctxt;
    struct Artwork₋symbol₋token 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 lookahead;
    /* __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 idx₋u8c=0; */
+   /* enum Artwork₋instruction instr = (enum Artwork₋instruction)artwork₋instruction; */
    
-   if (init₋context(bytes,&s₋ctxt)) { return -1; }
+   if (init₋context(bytes,s₋ctxt)) { return -1; }
    
    🧵(zerolength,lex₋error,grammar₋error,completion) {
     case zerolength: return -1;
@@ -359,12 +355,14 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[],
    
    typedef void (^action)(void);
    
-   action consume = ^{ __builtin_int_t nonabsolute; 
+   action consume = ^{ __builtin_int_t nonabsolute; Stringpool record; 
      enum Artwork₋token₋symbol kind; union Artwork₋symbol₋token₋detail detail; 
-     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,&kind,&detail,&s₋ctxt)) 
+     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,&kind,&detail,s₋ctxt,record)) 
      { confess(lex₋error); }
      if (kind == END₋OF₋TRANSMISSION) { confess(completion); }
-     lookahead = { kind, nonabsolute, (void *)NULL };
+     /* lookahead = { kind, detail }; */
+     lookahead.kind = kind; /* e․g add₋line */
+     lookahead.detail = detail; /* e․g { .ref = (void *)NULL } */
    };
    
    typedef void (^pattern)(enum Artwork₋token₋symbol ensure);
@@ -377,15 +375,15 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[],
    typedef void (^rule)(void);
    
    rule statement = ^{
-     if (lookahead.kind == start₋line) { consume(); match(real); match(comma); match(real); }
-     else if (lookahead.kind == add₋line) { consume(); match(real); match(comma); match(real); }
-     else if (lookahead.kind == last₋line) { consume(); match(real); match(comma); match(real); }
+     if (lookahead.kind == start₋line) { consume(); match(real); match(comma₋0x2c); match(real); }
+     else if (lookahead.kind == add₋line) { consume(); match(real); match(comma₋0x2c); match(real); }
+     else if (lookahead.kind == end₋line) { consume(); match(real); match(comma₋0x2c); match(real); }
      else { confess(grammar₋error); }
    };
    rule directive = ^{
-     if (lookahead.kind == dotsize) { consume(); match(real); match(comma); match(real); }
-     else if (lookahead.kind == dotorigo) { consume(); match(real); match(comma); match(real); }
-     else if (lookahead.kind == dotoffset) { consume(); match(real); match(comma); match(real); }
+     if (lookahead.kind == dotsize) { consume(); match(real); match(comma₋0x2c); match(real); }
+     else if (lookahead.kind == dotorigo) { consume(); match(real); match(comma₋0x2c); match(real); }
+     else if (lookahead.kind == dotoffset) { consume(); match(real); match(comma₋0x2c); match(real); }
      else { confess(grammar₋error); }
    };
    rule statement₋list = ^{ statement(); statement₋list(); };
