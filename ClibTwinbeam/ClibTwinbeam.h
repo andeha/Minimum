@@ -20,12 +20,13 @@ typedef unsigned int        uint32_t;
 typedef int                 int32_t; /* ≢'long'. */
 typedef uint64_t            __builtin_uint_t;
 typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
+/* #define 𝟷𝟸𝟾₋bit₋swift₋integers */
 /* #define 𝟷𝟸𝟾₋bit₋integers */
 #endif
 
 typedef unsigned char char8_t; typedef uint32_t char32_t;
 
-#if defined 𝟷𝟸𝟾₋bit₋integers
+#if defined 𝟷𝟸𝟾₋bit₋swift₋integers
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 #else
 int Details_in_C(uint64_t pid, int32_t cross);
@@ -41,27 +42,27 @@ struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
 };
 
-int init(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile) __attribute__((overloadable));
+int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
 void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
 int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
 int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
-
-int init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes)) 
-__attribute__((overloadable)); /* = ^{ return malloc(bytes); }; */
 
 struct structat {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
 };
 
+int structat₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); }; */
+/* -enable-experimental-cxx-interop */
+
 int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-uint8_t * relative(__builtin_int_t byte₋offset) __attribute__((overloadable));
+uint8_t * relative(__builtin_int_t byte₋offset); /* __attribute__((overloadable)); */
 int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t bytes(struct structat * 🅢) __attribute__((overloadable));
+__builtin_int_t bytes(struct structat * 🅢); /* __attribute__((overloadable)); */
 
 #define NULL 0
-
 typedef int pid_t;
 
 EXT₋C pid_t Twinbeam₋spawn(const char * u8s₋command, int * fd_p2c, 
@@ -86,10 +87,10 @@ struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
 void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
  void (^zero)(), void (^neginf)(), void (^nonvalid)());
 /* ⬷ TeX 103 §. */
-struct sequent add(struct sequent x₁, struct sequent x₂);
-struct sequent minus(struct sequent x₁, struct sequent x₂);
-struct sequent mult(struct sequent x₁, struct sequent x₂);
-struct sequent div(struct sequent x₁, struct sequent x₂) __attribute__((overloadable));
+struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent div_sequent(struct sequent x₁, struct sequent x₂); /* the symbol 'div' requires __attribute__((overloadable)); */
 struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 struct sequent acumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
 struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
@@ -145,7 +146,7 @@ int Draw₋Bezer(int count, struct Illustration * ctxt, struct Point, ...); /* a
 
 enum Artwork₋token₋symbol { dotsize, dotorigo, dotoffset, real, comma₋0x2c, 
  start₋line, add₋line, end₋line, base16₋image, base16₋text, 
- utf8₋text, rawtext₋sentinel, text, END₋OF₋TRANSMISSION };
+ utf8₋text, rawtext₋sentinel, text, next, END₋OF₋TRANSMISSION };
  
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<Character>. */
 
@@ -188,5 +189,4 @@ typedef enum Artwork₋instruction {
  set₋letterbox₋anchor, set₋letterbox₋origo, 
  place₋text /* p3₋color₋select */
 } Artwork₋instruction; /* ⬷ a․𝘬․a ¹directives and ¹instruction. */
-
 
