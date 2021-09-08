@@ -43,39 +43,134 @@ class Minimumview: NSView {
   
   let Operations₁ = DispatchQueue(label: "myops", attributes: .concurrent) /* ⬷ for visible work. */
   let Operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */) /* ⬷ for non-visible work. */
-  /* ⬷ samgörande alt․ schemalaggda (▚) also four-queues for bolted 'gammalt-and-nytt': 
-   mypresentation and myevaluation. */
+  /* ⬷ samgörande alt․ schemalaggda (▚). */
   
-  var rendered₋named₋images = Dictionary<UUID,CGImage>()
-  
-  struct /* not₋actor */ minimum₋collection {
-    let text = CATextLayer()
-    var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
-    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
-    var scribbles = Dictionary<UUID,Feedback>()
-    let composition = CALayer() /* ⬷ a․𝘬․a composition₋with₋scribble. */
+  struct layers { let text = CATextLayer() 
+   var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
+   var rendered₋images = Dictionary<UUID,CGImage>()
+   var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
+   var scribbles = Dictionary<UUID,feedback>()
+   class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() } /* ⬷ a․𝘬․a Inexplanat. */
   }
   
-  var collection = minimum₋collection()
+  var assemble₋pieces = layers()
   let composition₋delegate = Compositiondelegate()
-  
-  class Feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() } /* ⬷ a․𝘬․a Inexplanat. */
-  
-  func total₋twopass₋and₋height() -> CGFloat { return 100.0 }
-  func total₋twopass₋and₋width₋in₋O₍n₎() -> CGFloat { return 100.0 }
-  
-  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
-  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+  let composition₋with₋scribbles = CALayer()
   
   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
+  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
+  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+  func total₋twopass₋and₋height() -> CGFloat { return 100.0 }
+  func total₋twopass₋and₋width₋in₋O₍n₎() -> CGFloat { return 100.0 }
   
-  enum type₋of₋layer { case simulation; case illustration }
   enum anchor { case middle; case ul; case ll; case ur; case lr }
+  enum type₋of₋layer { case simulation₋interaction; case illustration }
   
-  func hit₋test(point: CGPoint) -> CALayer? { return collection.composition.hitTest(point) }
+  let post₋init₋layer = { (_ layer: inout CALayer) -> Void in 
+    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
+    layer.contentsScale = 2.0 /* for retina. */
+    layer.backgroundColor = NSColor.clear.cgColor
+    layer.contentsGravity = .center
+    layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+    layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
+    layer.isOpaque = false
+    layer.needsDisplayOnBoundsChange = true
+    layer.drawsAsynchronously = true
+  }
   
-  func letgo₋all₋ornaments() { for area in trackingAreas { self.removeTrackingArea(area) } }
+  func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
+   NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
+    var sublayer: CALayer? = nil
+    let ident = UUID()
+    switch layer₋type {
+    case .simulation₋interaction:
+     let layer = CAMetalLayer()
+     assemble₋pieces.layers₋with₋realtime.updateValue(layer, forKey: ident)
+     sublayer = layer
+    case .illustration: /* ₋and₋photography. */
+     let layer = CALayer()
+     assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+     sublayer = layer
+    } /* ⬷ note 'doublesided' defaults to true. */
+    if var addition = sublayer {
+      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, width: canvas₋size.width, height: canvas₋size.height)
+      switch origo₋relative₋superlayer {
+      case .middle:
+        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+      case .ul:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      case .ll:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+      case .ur:
+        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+      case .lr:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      }
+      addition.name = name
+      post₋init₋layer(&addition)
+      addition.isGeometryFlipped = true
+      composition₋with₋scribbles.addSublayer(addition)
+      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
+    }
+    return ident
+  }
+  
+}
+
+extension Minimumview { /* ⬷ minimum and illustrations. */
+  
+   func render₋𝟾𝟹(text: String, width: Double, height: Double, ctx: inout CGContext) {
+     let textattrs = default₋textattrs
+     let attrtext = NSAttributedString(string: text, attributes: textattrs)
+     let framesetter = CTFramesetterCreateWithAttributedString(attrtext)
+     let symbols = CFRangeMake(0,attrtext.length)
+     let box = bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
+     let textpath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
+     let frame = CTFramesetterCreateFrame(framesetter,symbols,textpath,nil)
+     ctx.textPosition = CGPoint(x: 8, y: 24)
+     CTFrameDraw(frame,ctx)
+   }
+  
+  func render₋illustrations(
+    from₋wire ⁸textual: UnsafeBufferPointer<UInt8>, 
+    topLeftNextGround: NSEdgeInsets, 
+    typeset₋in columns: Int
+   )
+   {
+     var parent₋cursor₋X=topLeftNextGround.left
+     var parent₋cursor₋Y=topLeftNextGround.top
+     let machine = Drawings₁(); var max₋height=0.0
+     
+     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
+     
+     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = ""
+       let layer: CALayer = try /* await */ machine.interpret(bytes: fromwire₋utf8.count, 
+        figure₋utf8: ⁸textual, size: &size, name: &name)
+       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
+       max₋height = max(layer.frame.height,max₋height)
+       layer.name = name
+       let column = (idx + 1) % columns
+       if column == 0 {
+         parent₋cursor₋X = topLeftNextGround.left
+         parent₋cursor₋Y += max₋height
+         max₋height = 0.0
+       }
+       else {
+         parent₋cursor₋X = size.width + topLeftNextGround.right
+       }
+       
+       let ident = UUID()
+       collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+       composition₋with₋scribble.addSublayer(layer)
+     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
+    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
+    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
+      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
+   }
+}
+
+extension Minimumview { /* ⬷ decoration */
   
   func apply₋ornaments() {
     self.letgo₋all₋ornaments()
@@ -97,55 +192,17 @@ class Minimumview: NSView {
     strategy₁()
   }
   
-  let post₋init₋layer = { (layer: inout CALayer) -> Void in 
-    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
-    layer.contentsScale = 2.0 /* for retina. */
-    layer.backgroundColor = NSColor.clear.cgColor
-    layer.contentsGravity = .center
-    layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
-    layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
-    layer.isOpaque = false
-    layer.needsDisplayOnBoundsChange = true
-    layer.drawsAsynchronously = true
-  }
+  func letgo₋all₋ornaments() { for area in trackingAreas { self.removeTrackingArea(area) } }
   
-  func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
-   NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
-    var sublayer: CALayer? = nil
-    let ident = UUID()
-    switch layer₋type {
-    case .simulation:
-     let layer = CAMetalLayer()
-     collection.layers₋with₋realtime.updateValue(layer, forKey: ident)
-     sublayer = layer
-    case .illustration: /* ₋and₋photography. */
-     let layer = CALayer()
-     collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-     sublayer = layer
-    } /* ⬷ note 'doublesided' defaults to true. */
-    if var addition = sublayer {
-      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, width: canvas₋size.width, height: canvas₋size.height)
-      switch origo₋relative₋superlayer {
-      case .middle:
-        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-      case .ul:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      case .ll:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-      case .ur:
-        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
-      case .lr:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      }
-      addition.name = name
-      post₋init₋layer(&addition)
-      addition.isGeometryFlipped = true
-      collection.composition.addSublayer(addition)
-      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
-    }
-    return ident
-  } /* ⬷ a․𝘬․a incorp₋rendition. */
+}
+
+extension Minimumview { /* ⬷ interaction */
   
+  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
+  
+}
+
+extension Minimumview { /* ⬷ heritage */
   override var isOpaque: Bool { false }
   override var isFlipped: Bool { true }
   override var wantsUpdateLayer: Bool { true }
@@ -175,7 +232,7 @@ class Minimumview: NSView {
   /* 􀞷 */
   
   override func makeBackingLayer() -> CALayer {
-    let composition = collection.composition
+    let composition = composition₋with₋scribbles
     composition.name = "Composition"
     composition.delegate = self.composition₋delegate
     self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.duringViewResize
@@ -217,58 +274,6 @@ class Minimumview: NSView {
     path.line(to: NSPoint(x: 10, y: 10))
     path.stroke()
   }
-}
-
-extension Minimumview { /* ⬷ minimum and illustrations. */
-  
-   func render₋𝟾𝟹(text: String, width: Double, height: Double, ctx: inout CGContext) {
-     let textattrs = default₋textattrs
-     let attrtext = NSAttributedString(string: text, attributes: textattrs)
-     let framesetter = CTFramesetterCreateWithAttributedString(attrtext)
-     let symbols = CFRangeMake(0,attrtext.length)
-     let box = bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
-     let textpath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-     let frame = CTFramesetterCreateFrame(framesetter,symbols,textpath,nil)
-     ctx.textPosition = CGPoint(x: 8, y: 24)
-     CTFrameDraw(frame,ctx)
-   }
-  
-  func render(illusts: Artwork₋swift..., topLeftNextBottom: NSEdgeInsets, columns: Int) {
-    
-    print("render \(columns) columns, inset \(topLeftNextBottom) with \(illusts)")
-    
-    let machine = Drawings₁()
-    var parent₋cursor₋X=topLeftNextBottom.left
-    var parent₋cursor₋Y=topLeftNextBottom.top
-    var max₋height=0.0
-    
-    for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */
-      var size = CGSize(width: 0.0, height: 0.0); var name: String = ""
-      do {
-        try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
-          let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> 
-          let layer: CALayer = try /* await */ machine.interpret(bytes: fromwire₋utf8.count, 
-           figure₋utf8: utf8₋material!, size: &size, name: &name)
-          layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
-          max₋height = max(layer.frame.height,max₋height)
-          layer.name = name
-          let column = (idx + 1) % columns
-          if column == 0 {
-            parent₋cursor₋X = topLeftNextBottom.left
-            parent₋cursor₋Y += max₋height
-            max₋height = 0.0
-          }
-          else { parent₋cursor₋X = size.width + topLeftNextBottom.right }
-          
-          let ident = UUID()
-          collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-          collection.composition.addSublayer(layer)
-        }
-      } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
-    }
-    
-  }
-  
 }
 
 extension Minimumview {
@@ -379,7 +384,11 @@ extension Minimumview {
   func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
 }
 
-extension Viewcontroller { /* ⬷ trackpad. */
+class SeViewcontroller: NSViewController {
+   var trackpad = Trackpad()
+}
+
+extension SeViewcontroller { /* ⬷ trackpad. */
   override func touchesBegan(with event: NSEvent) {
     trackpad.log₋rectangle(with: event, view: minimumview, initial: true)
     super.touchesBegan(with: event) }
@@ -393,19 +402,36 @@ extension Viewcontroller { /* ⬷ trackpad. */
   override func touchesCancelled(with event: NSEvent) {
     trackpad.cancelled(with: event, view: minimumview)
     super.touchesCancelled(with: event) }
+  override func pressureChange(with event: NSEvent) {
+    trackpad.pressure(with: event)
+    super.pressureChange(with: event) }
   override func mouseExited(with event: NSEvent) { print("mouseexited") 
     trackpad.exited(with: event, in: self.view)
     super.mouseExited(with: event) }
   override func mouseEntered(with event: NSEvent) { print("mouseentered") 
     trackpad.entered(with: event, in: self.view)
     super.mouseEntered(with: event) }
-  override func pressureChange(with event: NSEvent) { 
-    trackpad.pressure(with: event)
-    super.pressureChange(with: event)
-  }
 }
 
-class Viewcontroller: NSViewController {
+extension SeViewcontroller {
+  
+  override var acceptsFirstResponder: Bool { true }
+  
+  override func viewDidLoad() { print("viewDidLoad") 
+    /* bind(NSBindingName(rawValue: #keyPath(touchBar)), to: self, 
+     withKeyPath: #keyPath(touchBar), options: nil) */
+  }
+  
+  override func viewDidAppear() { print("viewDidAppear") 
+    print("viewDidAppear view now is \(self.view)")
+    print("viewDidAppear 'frame' now is \(self.view.frame)")
+  }
+  
+  override func viewDidDisappear() { super.viewDidDisappear(); print("viewDidDisappear") }
+  
+}
+
+class Viewcontroller: SeViewcontroller {
   
   init() { print("viewcontroller-init"); super.init(nibName: nil, bundle: nil) }
   
@@ -438,43 +464,11 @@ class Viewcontroller: NSViewController {
     let jobname: String = minimumview.printJobTitle */
   }
   
-  override func viewDidLoad() { print("viewDidLoad") 
-    /* bind(NSBindingName(rawValue: #keyPath(touchBar)), to: self, 
-     withKeyPath: #keyPath(touchBar), options: nil) */
-  }
-  
-  override func viewDidAppear() { print("viewDidAppear") 
-    print("viewDidAppear view now is \(self.view)")
-    print("viewDidAppear 'frame' now is \(self.view.frame)")
-  }
-  
-  override func viewDidDisappear() { super.viewDidDisappear(); print("viewDidDisappear") }
-  
-  var minimumview: Minimumview { get { self.view.subviews[0] as! Minimumview } }
-  
-  var trackpad = Trackpad()
-  
   override var representedObject: Any? {
     didSet { /* update the view if already loaded. */ }
   }
   
-  /* Also keyed 'run-block' and 'load-block'. In terminal implicit 'run-block'. */
-  
-  override var acceptsFirstResponder: Bool { true }
-  
-  override func cursorUpdate(with event: NSEvent) { print("cursorUpdate") 
-    /* NSCursor.arrowCursor.set */
-    /* NSCursor.dragCopyCursor.set */
-    super.cursorUpdate(with: event)
-  }
-  
-  override func noResponder(for: Selector) { print("no responder") }
-  
-  @objc 
-  func addScribblelayer(_ sender: AnyObject)
-  {
-     print("Adding scribbleview")
-  }
+  var minimumview: Minimumview { get { self.view.subviews[0] as! Minimumview } }
   
   static func incorporate₋scribble₋in₋menu(include yes: Bool) {
     guard let viewmenu: NSMenuItem = NSApplication.shared.mainMenu?.items[5] else { return }
@@ -489,23 +483,38 @@ class Viewcontroller: NSViewController {
     }
   }
   
+} /* ⬷ also keyed 'run-block' and 'load-block'. In terminal implicit 'run-block'. */
+
+extension Viewcontroller { /* ⬷ scribbles */ 
+  @objc func addScribblelayer(_ sender: AnyObject)
+  {
+     print("Adding scribbleview")
+  }
+}
+
+extension Viewcontroller { /* ⬷ cursor */ 
+  override func cursorUpdate(with event: NSEvent) { print("cursorUpdate") 
+    /* NSCursor.arrowCursor.set */
+    /* NSCursor.dragCopyCursor.set */
+    super.cursorUpdate(with: event)
+  }
+}
+
+extension Viewcontroller { /* ⬷ the menu */ 
   @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
     print("validate menu for view")
     Viewcontroller.incorporate₋scribble₋in₋menu(include: true)
     guard let window = self.minimumview.window else { return false }
     return window.validateMenuItem(menuItem)
   }
-  
 }
 
-class Windowcontroller: NSWindowController {
-   
-   let viewctrl = Viewcontroller()
-   var shell = Inter₋act₋and₋inte₋r₋u₋p₋t()
-   var recorder = UndoManager() /* ⬷ duplicate undo-manager in NSResponder. */
-   
-   /* CAAction: func run(forKey event: String, object anObject: Any, 
-    arguments dict: [AnyHashable : Any]?) { } */
+extension Viewcontroller { /* ⬷ afterthoughts */
+  override func noResponder(for: Selector) { print("no responder") }
+}
+
+@available(macOS 10.15, *) /* 12.0 for async at later. */
+class SeWindowcontroller: NSWindowController {
    
    convenience init() { print("windowcontroller-convenience-init") 
      self.init(window: nil)
@@ -526,6 +535,10 @@ class Windowcontroller: NSWindowController {
      window?.makeKeyAndOrderFront(sender)
    }
    
+}
+
+class Windowcontroller: SeWindowcontroller {
+   
    override func loadWindow() { print("loadWindow") 
      let window = Minimumwindow(contentViewController: self.viewctrl)
      print("window.frame is \(window.frame)")
@@ -533,7 +546,14 @@ class Windowcontroller: NSWindowController {
      self.window = window
    }
    
-   func coroutine₋keyput₋in₋child(writer: FileHandle) async /* a.k.a hypotes. */ -> Int { var exitstatus=0 
+   /* CAAction: func run(forKey event: String, object anObject: Any, 
+    arguments dict: [AnyHashable : Any]?) { } */
+   
+   let viewctrl = Viewcontroller()
+   var shell = Inter₋act₋and₋inte₋r₋u₋p₋t()
+   var recorder = UndoManager() /* ⬷ duplicate undo-manager in NSResponder. */
+   
+   func coroutine₋keyput₋in₋child(writer: FileHandle) /* async */ /* a․𝘬․a hypotes. */ -> Int { var exitstatus=0 
      /* for try await line in input₋handle.bytes.lines { print(line) } */
      return exitstatus
    } /* ⬷ a coroutine may suspend at anytime. */
@@ -573,7 +593,7 @@ class Windowcontroller: NSWindowController {
      return NSApplication.shared.validateMenuItem(menuItem)
    }
    
-} /* ⬷ c𝘧․ Windowcontroller and Ieee754-Opt. */
+}
 
 class Minimumwindow: NSWindow {
    
@@ -664,7 +684,7 @@ class Minimumwindow: NSWindow {
          }
        }
      }
-   } /* ⬷ String, Character, Unicode and StaticString. */
+   } /* ⬷ String, Character, Unicode and Staticstring. */
    
 }
 
@@ -672,12 +692,12 @@ extension Minimumwindow { /* ⬷ typed 'irreversible' and 'undoable'. */
   
   var minimumview: Minimumview { controller.minimumview }
   
-  func quicklook() {
+  func washline() {
     minimumview.Operations₂.async { DispatchQueue.main.async {
     } }
   }
   
-  func explain₋definition() {
+  func definition() {
     minimumview.Operations₂.async { DispatchQueue.main.async {
       let attribed = NSAttributedString(string: "Hello world")
       let baseline₋origin = NSPoint()
@@ -690,22 +710,37 @@ extension Minimumwindow { /* ⬷ typed 'irreversible' and 'undoable'. */
     } }
   }
   
-  func start₋find₋expression₋alt₋phrase() {
+  func start₋find₋in₋forks() {
     minimumview.Operations₂.async { DispatchQueue.main.async {
       /* minimumview.drawingFindIndicator = true */
       /* NotificationCenter.send() */
     } }
   }
-  
+  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m */
+  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m */
+  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m */
+  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m */
+  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m */
+  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m */
+  func erase₋to₋end₋of₋current₋line() { } /* ⬷ ^K. */
+  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A, and ^[B. */
+  func cursorpos(v: int, h: Int) { } /* ⬷ ^[<v><h>. */
+  func kill₋whole₋line() { } /* ⬷ ^U. */
+  func erase() { } /* ⬷ ^H and 'delete'. */
+  func suspend₋process() { } /* ^Z. */
+  func kill₋process() { } /* ⬷ ^U. */
+  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
+  func send₋eof() { } /* ⬷ ^D. */
   func pause₋scroll() {
     minimumview.Operations₂.async { DispatchQueue.main.async {
     } }
-  }
-  
+  } /* ⬷ ^S. */
+  func scroll₋down₋one₋line() { } /* ⬷ */
+  func scroll₋up₋one₋line() { } /* ⬷ */
   func unpause₋scroll() {
     minimumview.Operations₂.async { DispatchQueue.main.async {
     } }
-  }
+  } /* ⬷ ^Q. */ 
   
   func toggle₋pause₋auto₋scroll(enabled: Bool) {
     minimumview.Operations₂.async { DispatchQueue.main.async {
