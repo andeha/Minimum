@@ -75,13 +75,47 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
+
+#if defined __x86_64__
+struct intel₋sequent₋pair { struct sequent inner[2]; };
+typedef struct intel₋sequent₋pair simd_tᵦ;
+#else
+#include <immintrin.h>
+typedef __m256i simd_tᵦ;
+#endif
+
+/* Because flappy-requires 256-bits and simd-2: */
+#define simd_initᵦ __256_set1_epi128
+#define __builtin_simd_addᵦ __256_add_epi128 
+#define __builtin_simd_subᵦ __256_sub_epi128
+#define __builtin_simd_mulᵦ __256_mul_epi128
+#define __builtin_simd_divᵦ __256_div_epi128
+#define __builtin_simd_rcpᵦ __256_rcp_epi128
+#define __builtin_simd_minᵦ __256_min_epi128
+#define __builtin_simd_maxᵦ __256_max_epi128
+struct sequent simd_scalarᵦ(simd_tᵦ 𝑿);
+
+union 𝟸₋sequent { simd_tᵦ simd; struct sequent sequels[2]; };
+
+simd_tᵦ __256_set1_epi128(simd_tᵦ 𝑿);
+simd_tᵦ __256_add_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+simd_tᵦ __256_sub_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+simd_tᵦ __256_mul_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+simd_tᵦ __256_div_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+simd_tᵦ __256_rcp_epi128(simd_tᵦ 𝑿);
+simd_tᵦ __256_min_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+simd_tᵦ __256_max_epi128(simd_tᵦ 𝑿₁, simd_tᵦ 𝑿₂);
+
+struct sequent simd_scalarᵦ(simd_tᵦ 𝑿) { union 𝟸₋sequent x = { .simd = 𝑿 }; return x.sequels[0]; }
+
+/* Simd-0: */
 enum CastToSequentOpinion { accept, rejecting, negate, complete, annul };
 typedef enum CastToSequentOpinion (^Feeder)(unsigned short *);
 EXT₋C int CastTˣᵗToSequent(
  enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
  struct sequent * value);
 inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
-inexorable int roundedfraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ);
+inexorable int rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ);
 /* ⬷ a․𝘬․a digits_to_bignum and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
 void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
@@ -122,7 +156,7 @@ int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t,
   statement-list <- statement statement-list
   statement-list alt. directive-list <- empty
   
-  directive <- '.size' real ',' real
+  directive <- '.width-and-height' real ',' real
   directive <- '.origo' real ',' real
   directive <- '.offset real ',' real
   real-literal <- '-'* digit+ '.' digit*
@@ -140,7 +174,7 @@ int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t,
 
 typedef struct sequent Artnumerical;
 struct Point { Artnumerical x,y; };
-struct Illustration { Artnumerical width₋and₋height, place₋origo, offset₋drawing₋on; };
+struct Illustration { Artnumerical size, place₋origo, offset₋drawing₋on; };
 int Draw₋Bezer(int count, struct Illustration * ctxt, struct Point, ...); /* arbtrary number of other points. */
 /* int Place₋text(Unicodes symbols); */
 
@@ -156,7 +190,7 @@ union Artwork₋instruction₋detail {
 };
 
 typedef char8_t uchar;
-typedef void (*semantics)(int artwork₋instruction, 
+typedef void (^semantics)(int artwork₋instruction, 
  union Artwork₋instruction₋detail parameters);
 
 enum Artwork₋scanner₋mode {

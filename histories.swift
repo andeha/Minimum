@@ -140,18 +140,19 @@ extension Minimumview { /* ⬷ minimum and illustrations. */
    {
      var parent₋cursor₋X=topLeftNextGround.left
      var parent₋cursor₋Y=topLeftNextGround.top
-     let machine = Drawings₁(); var max₋height=0.0
+     let machine = Drawings₁(); var max₋height=0.0; var colno=1
      
      print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
      
-     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = ""
-       let layer: CALayer = try /* await */ machine.interpret(bytes: fromwire₋utf8.count, 
-        figure₋utf8: ⁸textual, size: &size, name: &name)
+     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
+       guard let address = ⁸textual.baseAddress else { return }
+       let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
+        figure₋utf8: address, size: &size, name: &name)
        layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
        max₋height = max(layer.frame.height,max₋height)
        layer.name = name
-       let column = (idx + 1) % columns
-       if column == 0 {
+       colno = (colno + 1) % columns
+       if colno == 0 {
          parent₋cursor₋X = topLeftNextGround.left
          parent₋cursor₋Y += max₋height
          max₋height = 0.0
@@ -161,8 +162,8 @@ extension Minimumview { /* ⬷ minimum and illustrations. */
        }
        
        let ident = UUID()
-       collection.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-       composition₋with₋scribble.addSublayer(layer)
+       assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+       composition₋with₋scribbles.addSublayer(layer)
      } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
     /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
     /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
@@ -350,9 +351,11 @@ extension Minimumview {
 }
 
 extension Minimumview {
-  func snapshot₋rendition() -> NSBitmapImageRep? { let rect = collection.text.frame 
-    let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rect)
-    return bitmap } /* bitmap.planar, bitmap.samplesPerPixels, ... */
+  func snapshot₋rendition() -> NSBitmapImageRep? {
+    let rectangle = assemble₋pieces.text.frame 
+    let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rectangle)
+    return bitmap
+  } /* bitmap.planar, bitmap.samplesPerPixels, ... */
 }
 
 class Compositiondelegate: NSObject, CALayerDelegate {
@@ -388,30 +391,7 @@ class SeViewcontroller: NSViewController {
    var trackpad = Trackpad()
 }
 
-extension SeViewcontroller { /* ⬷ trackpad. */
-  override func touchesBegan(with event: NSEvent) {
-    trackpad.log₋rectangle(with: event, view: minimumview, initial: true)
-    super.touchesBegan(with: event) }
-  override func touchesMoved(with event: NSEvent) {
-    trackpad.log₋rectangle(with: event, view: minimumview, initial: false)
-    /* self.translateRectsNeedingDisplayInRect(NSRect(), by: NSSize()) */
-    super.touchesMoved(with: event) }
-  override func touchesEnded(with event: NSEvent) {
-    trackpad.ended(with: event, view: minimumview)
-    super.touchesEnded(with: event) }
-  override func touchesCancelled(with event: NSEvent) {
-    trackpad.cancelled(with: event, view: minimumview)
-    super.touchesCancelled(with: event) }
-  override func pressureChange(with event: NSEvent) {
-    trackpad.pressure(with: event)
-    super.pressureChange(with: event) }
-  override func mouseExited(with event: NSEvent) { print("mouseexited") 
-    trackpad.exited(with: event, in: self.view)
-    super.mouseExited(with: event) }
-  override func mouseEntered(with event: NSEvent) { print("mouseentered") 
-    trackpad.entered(with: event, in: self.view)
-    super.mouseEntered(with: event) }
-}
+
 
 extension SeViewcontroller {
   
@@ -500,6 +480,31 @@ extension Viewcontroller { /* ⬷ cursor */
   }
 }
 
+extension Viewcontroller { /* ⬷ trackpad. */
+  override func touchesBegan(with event: NSEvent) {
+    trackpad.log₋rectangle(with: event, view: minimumview, initial: true)
+    super.touchesBegan(with: event) }
+  override func touchesMoved(with event: NSEvent) {
+    trackpad.log₋rectangle(with: event, view: minimumview, initial: false)
+    /* self.translateRectsNeedingDisplayInRect(NSRect(), by: NSSize()) */
+    super.touchesMoved(with: event) }
+  override func touchesEnded(with event: NSEvent) {
+    trackpad.ended(with: event, view: minimumview)
+    super.touchesEnded(with: event) }
+  override func touchesCancelled(with event: NSEvent) {
+    trackpad.cancelled(with: event, view: minimumview)
+    super.touchesCancelled(with: event) }
+  override func pressureChange(with event: NSEvent) {
+    trackpad.pressure(with: event)
+    super.pressureChange(with: event) }
+  override func mouseExited(with event: NSEvent) { print("mouseexited") 
+    trackpad.exited(with: event, in: self.view)
+    super.mouseExited(with: event) }
+  override func mouseEntered(with event: NSEvent) { print("mouseentered") 
+    trackpad.entered(with: event, in: self.view)
+    super.mouseEntered(with: event) }
+}
+
 extension Viewcontroller { /* ⬷ the menu */ 
   @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
     print("validate menu for view")
@@ -553,10 +558,11 @@ class Windowcontroller: SeWindowcontroller {
    var shell = Inter₋act₋and₋inte₋r₋u₋p₋t()
    var recorder = UndoManager() /* ⬷ duplicate undo-manager in NSResponder. */
    
-   func coroutine₋keyput₋in₋child(writer: FileHandle) /* async */ /* a․𝘬․a hypotes. */ -> Int { var exitstatus=0 
+   func coroutine₋keyput₋in₋child(writer: FileHandle) /* async */ -> Int {
+     var exitstatus=0
      /* for try await line in input₋handle.bytes.lines { print(line) } */
      return exitstatus
-   } /* ⬷ a coroutine may suspend at anytime. */
+   } /* ⬷ a․𝘬․a hypotes a coroutine may suspend at anytime. */
    /* 'löper samtidigt' ≢ async a․𝘬․a 'ombesörjd samt stimuli' */
    /* async-let=spawn and await=co_await-after∧join */
    
@@ -629,6 +635,72 @@ class Minimumwindow: NSWindow {
      return super.performKeyEquivalent(with: event)
    }
    
+}
+
+extension Minimumwindow { /* ⬷ typed 'irreversible' and 'undoable'. */
+  
+  var minimumview: Minimumview { controller.minimumview }
+  
+  func washline() {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+  
+  func definition() {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+      let attribed = NSAttributedString(string: "Hello world")
+      let baseline₋origin = NSPoint()
+      self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
+      let target₋range = NSRange()
+      let options = [NSView.DefinitionOptionKey:Any]()
+      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
+      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
+        baselineOriginProvider: baselineOriginProvider)
+    } }
+  } /* ⬷ popover level 2 (åkerplätttransgressionell). */
+  
+  func start₋find₋in₋forks() {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+      /* minimumview.drawingFindIndicator = true */
+      /* NotificationCenter.send() */
+    } }
+  }
+  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m and ^[[0m. */
+  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m. */
+  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m. */
+  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m. */
+  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m. */
+  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m. */
+  func erase₋to₋end₋of₋current₋line() { } /* ⬷ ^K. */
+  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A and ^[B. */
+  func cursorpos(v: Int, h: Int) { } /* ⬷ ^[<v><h>. */
+  func kill₋entire₋line() { } /* ⬷ ^U. */
+  func kill₋other₋on₋line() { } /* ⬷ */
+  func delete₋erase₋symbol() { } /* ⬷ ^H and 'delete'. */
+  func suspend₋process() { } /* ^Z. */
+  func kill₋process() { } /* ⬷ ^U. */
+  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
+  func send₋eof() { } /* ⬷ ^D. */
+  func pause₋scroll() {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^S. */
+  func scroll₋down₋one₋line() { } /* ⬷ ^[M. */
+  func scroll₋up₋one₋line() { } /* ⬷ ^[D. */
+  func unpause₋scroll() {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^Q. */ 
+  
+  func toggle₋pause₋auto₋scroll(enabled: Bool) {
+    minimumview.Operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+  
+}
+
+extension Minimumwindow {
+   
    override func keyDown(with event: NSEvent) {
      super.keyDown(with: event)
      print("keydown \(event.keyCode)")
@@ -677,7 +749,7 @@ class Minimumwindow: NSWindow {
              print("undoKeyDown")
            case NSRedoFunctionKey:
              print("redoKeyDown")
-           case 0x0020: quicklook()
+           case 0x0020: washline()
            default:
              print("keydown default end")
            }
@@ -685,68 +757,5 @@ class Minimumwindow: NSWindow {
        }
      }
    } /* ⬷ String, Character, Unicode and Staticstring. */
-   
 }
-
-extension Minimumwindow { /* ⬷ typed 'irreversible' and 'undoable'. */
-  
-  var minimumview: Minimumview { controller.minimumview }
-  
-  func washline() {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-    } }
-  }
-  
-  func definition() {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-      let attribed = NSAttributedString(string: "Hello world")
-      let baseline₋origin = NSPoint()
-      self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
-      let target₋range = NSRange()
-      let options = [NSView.DefinitionOptionKey:Any]()
-      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
-      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
-        baselineOriginProvider: baselineOriginProvider)
-    } }
-  }
-  
-  func start₋find₋in₋forks() {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-      /* minimumview.drawingFindIndicator = true */
-      /* NotificationCenter.send() */
-    } }
-  }
-  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m */
-  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m */
-  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m */
-  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m */
-  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m */
-  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m */
-  func erase₋to₋end₋of₋current₋line() { } /* ⬷ ^K. */
-  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A, and ^[B. */
-  func cursorpos(v: int, h: Int) { } /* ⬷ ^[<v><h>. */
-  func kill₋whole₋line() { } /* ⬷ ^U. */
-  func erase() { } /* ⬷ ^H and 'delete'. */
-  func suspend₋process() { } /* ^Z. */
-  func kill₋process() { } /* ⬷ ^U. */
-  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
-  func send₋eof() { } /* ⬷ ^D. */
-  func pause₋scroll() {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^S. */
-  func scroll₋down₋one₋line() { } /* ⬷ */
-  func scroll₋up₋one₋line() { } /* ⬷ */
-  func unpause₋scroll() {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^Q. */ 
-  
-  func toggle₋pause₋auto₋scroll(enabled: Bool) {
-    minimumview.Operations₂.async { DispatchQueue.main.async {
-    } }
-  }
-  
-}
-
 
