@@ -1,56 +1,99 @@
-/*  machine.swift | excerpts from a selection of 'quintessential abstract machines'. */
+/*  􀆲􀆽 machine.swift | excerpts from a selection of 'quintessential abstract machines'. */
 
 import AppKit
 import ClibTwinbeam
 
-extension Artwork₋instruction: Hashable {
-  public func hash(into hasher: inout Hasher) { hasher.combine(self.rawValue) }
-  static func == (lhs: Artwork₋instruction, rhs: Artwork₋instruction) -> Bool { return lhs.rawValue == rhs.rawValue }
-} /* ⬷ the c language enumeration is a wrapping 'struct' in swift. */
-
-/*
-                                                                             
-    ->  o♂         skojigt∧roligt∧intressant ⟷ 'tre vis e män'     (􀇱􀤑􀈐)􀇧
-  x     x  ↘︎                                                                 
-   o♂            F-re-dag  13 August 2021 at 07:10:52 CEST      0c6a292b     
-     <-   x o♂   F-re-dag  13 August 2021 at 07:12:11 CEST      'subjekt snabbare'
-                 13 August 2021 at 07:13:29 CEST                senare i kolonn/kolumn
-                                                                             
- */
-
 class Artwork₋swift {
   init(text: String) { self.text = text 
-   directives[width₋and₋height] = (100.0, 100.0) 
+   directives[width₋and₋height] = (100.0, 100.0)
    directives[place₋origo] = (50.0, 50.0) /* case place₋center: plate.anchorpoint=CGPoint(x: 0.5, y: 0.5) */
    directives[offset₋drawing₋on] = (0.0, 0.0) }
+  convenience init() { self.init(text: "") }
   var directives = Dictionary<Artwork₋instruction,(Double,Double)>()
   typealias Artwork₋parameters = (Double,Double,Double,Double,Double,Double)
-  struct Operation { var instruction: Artwork₋instruction; 
+  struct operation { var instruction: Artwork₋instruction 
    var params: Artwork₋parameters; var texts: (String,String)? }
-  var instructions = Array<Operation>()
+  var instructions = Array<operation>()
   var size = CGSize(width: 100, height: 100)
   var text: String
 }
 
-
-//let append₋instruction = @convention(c) (Artwork₋instruction, 
-//UnsafeMutablePointer<Double>?) -> Void { }
-
-//typedef void (*semantics)(enum Artwork₋instruction instr, double * parameters);
-
-func append₋instruction(instr: Artwork₋instruction, /* params: (CDouble,CDouble,CDouble,CDouble, 
- CDouble,CDouble), */ context: Optional<UnsafeMutablePointer<Double>>) 
+func Append₋instruction(_ instruction: Int32, detail: 
+ Artwork₋instruction₋detail, ctx: UnsafeMutableRawPointer?)
 {
-//  let artwork: Artwork₋swift? = unsafeBitCast(context, to: Artwork₋swift.self)
-//  if instr == width₋and₋height || instr == place₋origo || instr == offset₋drawing₋on {
-//    artwork?.directives[instr] = (params.0, params.1)
-//  } else {
-//    let op = Artwork₋swift.Operation(instruction: instr, params: params)
-//    artwork?.instructions.append(op)
-//  }
+   let recorder = ctx as? Artwork₋swift
+   let instr = instruction as! Artwork₋instruction
+   if instr == width₋and₋height || instr == place₋origo || instr == offset₋drawing₋on {
+   }
+   let params: Artwork₋swift.Artwork₋parameters = (0,0,0,0,0,0)
+   let op = Artwork₋swift.operation(instruction: instr, params: params, texts: nil)
+   /* recorder.instructions.append(op) */
 }
 
-func append₋detail(instr: Artwork₋instruction, material: UnsafeMutablePointer<CChar>) { }
+class Drawings₁ {
+  
+  func interpret(bytes: Int, figure₋utf8: UnsafePointer<UInt8>, size: inout CGSize, 
+    name: inout String) /* async */ throws -> CALayer
+  {
+    var artwork₁ = Artwork₋swift(text: ".width-and-height 50.0, 50.0 ")
+    var artwork₂ = Artwork₋swift(text: 
+"""
+.width-and-height 100.0, 100.0
+start-line 50.0 50.0 last-line 75.0 75.0
+next
+.width-and-height 100.0 100.0
+start-line 10.0 10.0 last-line 20.0 20.0
+""")
+   
+    var buffer: UnsafePointer<Int8>? = nil
+    artwork₂.text.withCString { cString in buffer=cString }
+    /* ⬷ NULL at end of utf8-bytes. */
+    /* let bytes: UnsafePointer<CChar> = buffer
+     let fromwire: String? = String(utf8String: bytes) */
+    
+    let second₋figure₋utf8 = figure₋utf8 as! UnsafeMutablePointer<uchar>
+    
+    /* typedef void (^semantics)(int artwork₋instruction, 
+      union Artwork₋instruction₋detail parameters); */
+    
+    /* Optional<@convention(c) (Int32, Artwork₋instruction₋detail) -> ()> */
+    
+    typealias CFunction = @convention(c) (Int32, Artwork₋instruction₋detail, UnsafeMutableRawPointer?) -> ()
+    let bar = unsafeBitCast(Append₋instruction, to: CFunction.self)
+    
+    let append₋instruction = { (instr: Int32, detail: Artwork₋instruction₋detail) -> () in 
+      print("append") /* detail.four₋params: UnsafeMutablePointer<Double>? */
+    } as (@convention(block) (Int32, Artwork₋instruction₋detail) -> ())
+    
+    var s₋ctxt=Scanner₋ctxt();
+    let y = Parse₋Artwork₋LL₍1₎(Int64(bytes),second₋figure₋utf8,&s₋ctxt,bar)
+    var layer = Artworklayer()
+    layer.contents = artwork₂
+    guard let (width,height) = artwork₂.directives[width₋and₋height] else { return layer }
+    size = CGSize(width: width, height: height)
+    return layer
+    
+  /* let p = withUnsafeMutablePointer(&text) { UnsafeMutablePointer<CChar32> 
+  ⬷ CChar32 a․𝘬․a String.UnicodeScalarView.Element. */
+   
+  } /* ⬷ long long long long pause do-re-mi-re-do-re-mi-re-do-re-mi-re. */
+   
+  static func encode(image: NSImage) -> String {
+    let material₋data = image.tiffRepresentation
+    let serial = material₋data!.base16EncodedString(options: [.uppercase])
+    return serial
+  } /* ...for inclusion on web pages: base64. */
+  
+  enum machinectrl { case ok; case reject }
+  
+  enum Anomality: Error { case Rendition }
+  
+}
+
+extension Artwork₋instruction: Hashable {
+  public func hash(into hasher: inout Hasher) { hasher.combine(self.rawValue) }
+  static func == (lhs: Artwork₋instruction, rhs: Artwork₋instruction) -> Bool { return lhs.rawValue == rhs.rawValue }
+}
 
 class Artworklayer: CALayer {
   enum Anomality: Error { case Image; }
@@ -92,64 +135,4 @@ class Artworklayer: CALayer {
   }
 }
 
-class Drawings₁ {
-  
-  func interpret(bytes: Int, figure₋utf8: UnsafeMutablePointer<UInt8>, size: inout CGSize, 
-    name: inout String) /* async */ throws -> CALayer
-  {
-    var artwork = Artwork₋swift(text: ".width-and-height 50.0, 50.0 ")
-    let second₋figure₋utf8 = figure₋utf8 as? UnsafeMutablePointer<uchar> 
-    let y = Parse₋Artwork₋LL₍1₎(CInt(bytes),second₋figure₋utf8,append₋instruction)
-    var layer = Artworklayer()
-    layer.contents = artwork
-    let (width,height) = artwork.directives[width₋and₋height]!
-    size = CGSize(width: width, height: height)
-    return layer
-    
-  /*
-  let bytes: UnsafePointer<CChar> = ... /* ⬷ NULL at end. */
-  let fromwire: String? = String(utf8String: bytes) */
-  /* let p = withUnsafeMutablePointer(&text) { UnsafeMutablePointer<CChar32> 
-  ⬷ CChar32 a․𝘬․a String.UnicodeScalarView.Element. */
-   
-  }
-   
-  static func encode(image: NSImage) -> String {
-    let material₋data = image.tiffRepresentation
-    let serial = material₋data!.base16EncodedString(options: [.uppercase])
-    return serial
-  }
-  
-  enum machinectrl { case ok; case reject }
-  
- /* func c₊₊₋render₋an₋illustration(width: Double, height: Double, artwork: Artwork) -> CGImage {
-    guard let image₂: CGImage = Renderimage(width: width, height: height) { 
-      (context: NSGraphicsContext) -> Void in 
-        let path = NSBezierPath()
-        path.move(to: .init(x: 10.5, y: 10.5))
-        path.line(to: .init(x: 10.5, y: 10.5))
-        path.lineWidth = 1
-        path.lineCapStyle = .round
-        NSColor.blue.set()
-        path.stroke()
-    } else { return nil }
-  } */
-  
- /* func render₋attractive₋frame₁(width: Double, height: Double) -> CGImage? {
-    let output = {
-      let path = NSBezierPath()
-      path.move(to: .init(x: 10.5, y: 10.5))
-      path.line(to: .init(x: 10.5, y: 10.5))
-      path.lineWidth = 1
-      path.lineCapStyle = .round
-      NSColor.blue.set()
-      path.stroke()
-      let string = "```\nlet x = 5\nprint(x)\n```"
-      self.render(text: string, width: width, height: height) }
-    return Renderimage(width: width, height: height, process: output)
-  } */
-  
-  enum Anomality: Error { case Rendition; }
-  
-}
 
