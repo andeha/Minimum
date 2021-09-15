@@ -380,7 +380,7 @@ class Windowcontroller: SeWindowcontroller {
    func corout₋keyput₋in₋child(text: String) async -> Void {
      while true {
        while !self.i₋materials.isEmpty {
-         guard let oldest₋text = self.ⁱmaterials.first else { await Task.yield(); continue }
+         guard let oldest₋text = self.i₋materials.first else { await Task.yield(); continue }
          shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
          self.i₋materials.removeFirst()
        }
