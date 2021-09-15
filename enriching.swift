@@ -1,21 +1,22 @@
 /*  􀻒􀓐 enriching.swift | conveniences for built stable. */
 
 import AppKit
-import Darwin.C /* as 'Posix₋fraktal' alt․ 'Posix'. */
+import Darwin.C
 import ClibTwinbeam
 
 func ReapTwinbeam() {
   print("hello language-analysis-and-church")
-  let pid : UInt64 = 0x17
-  let val : Int32 = 0x13
-  let y : Int32 = Details_in_C(pid,val)
+  let pid: UInt64 = 0x17
+  let val: Int32 = 0x13
+  /* let al: CU128 = 0x21 a.k.a UInt128 */
+  let y: Int32 = Details_in_C(pid,val)
   print("y is \(y)")
 }
 
 func Start(execute command: String, parameters: [String], path₋exe: String, 
- p2c p2c₋pipe: Pipe, c2p c2p₋pipe: Pipe) -> Int?
+ p2c p2c₋pipe: Pipe, c2p c2p₋pipe: Pipe) -> Int
 {
-  var args = Array<String>(); let process = "/bin/zsh"
+  var args = Array<String>(); let process = path₋exe + command
   args.append(process); args.append(command + path₋exe); args += parameters
   let argv: [UnsafeMutablePointer<CChar>?] = args.map { $0.withCString(strdup) }
   defer { for case let arg? in argv { free(arg) } }
@@ -35,19 +36,20 @@ func Start(execute command: String, parameters: [String], path₋exe: String,
    argv + [nil], envir) != 0 { return -1 } / * ⬷ a․𝘬․a 'fork' and 'execlp'. */
   if pid < 0 { return -1 }
   return 0
-} /* ⬷ unstructurered 'konkurrens'. */
+}
 
+/*
 func Periodictimer(is timer: inout DispatchSourceTimer, 
   initial₋delay seconds₁: Double, reissue₋delay seconds₂: Double, 
   fire observe: @escaping () -> Void) {
-   let due₋initial = dispatch_time(DISPATCH_TIME_NOW,seconds₁*NSEC_PER_SEC)
+   let due₋initial = dispatch_time(DISPATCH_TIME_NOW, seconds₁ * NSEC_PER_SEC)
    let reissue₋operation = seconds₂ * NSEC_PER_SEC
    dispatch_source_set_timer(timer,due₋initial,reissue₋operation,0.0)
    dispatch_source_set_event_handler(timer,observe)
    let timer₋found = { print("timer available") }
    dispatch_source_set_registration_handler(timer,timer₋found)
    dispatch_resume(timer)
-}
+} */
 
 func Periodic(unresumed timer: inout DispatchSourceTimer?, 
   initial₋delay seconds₁: Double, 
@@ -64,8 +66,6 @@ func Periodic(unresumed timer: inout DispatchSourceTimer?,
    timer?.resume()
 }
 
-/* play-and-listen-i --<Pigments>--<Antares>--<1 left = 2SINE SWEEPS>--<A D G>. */
-
 class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread? 
   
   var output: ((Data) -> Void)?
@@ -75,7 +75,7 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
   func slow₋write₋to₋child(fifo: Pipe, text: String) {
     if let symbols = text.data(using: String.Encoding.utf8) {
       fifo.fileHandleForWriting.write(symbols)
-    } else { fatalError("Unable to unwrap material") }
+    } else { fatalError("Unable to unwrap material (a․𝘬․a never-happens)") }
   } /* ⬷ see --<machine.swift>{parse} for correct suffixial possibly-maybe. */
   
   @objc func print₋child₋output(reader: FileHandle) {
@@ -89,19 +89,18 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
   
   var atlast₋exit: Int?
   
-  func occurrent₋spawn(execute command: String, parameters: [String], out: 
-    @escaping (Data) -> Void) -> Int {
+  func commence(execute command: String, parameters: [String], path₋exe: String, 
+    out: @escaping (Data) -> Void) -> Int {
    /* int status=0; int fd_p2c[2], fd_c2p[2]; 
     if (pipe(fd_p2c) == -1 || pipe(fd_c2p) == -1) { return -1; } */
     self.output = out
-    let y = Start(execute: "ls", parameters: ["-l", "-a"], path₋exe: "/bin/", 
+    let y = Start(execute: command, parameters: parameters, path₋exe: path₋exe, 
      p2c: p2c₋pipe, c2p: c2p₋pipe)
     if y != 0 { print("Start execute failed") }
     child = Thread(target: self, selector: #selector(print₋child₋output(reader:)), 
      object: c2p₋pipe.fileHandleForReading)
     if let child = child { child.start() }
-    /* slow₋write₋to₋child(fifo: p2c₋pipe, text: "Hello world") */
-    return 0 /* Thread.sleep(forTimeInterval: 2.0) */
+    return y
   }
   
 } /* ⬷ not 'struct': 'mutating' and '@objc'. */
@@ -151,95 +150,119 @@ extension NSBezierPath {
   
 }
 
+func Utf8ToUnicode(ξ: UnsafeMutablePointer<UInt8>, bytes: Int) -> CChar32
+{
+  switch bytes {
+  case 2:
+    return CChar32(UInt32(0b111111 & ξ[1]) | UInt32(0b11111 & ξ[0])<<6)!
+  case 3:
+    return CChar32(UInt32(0b111111 & ξ[2]) | UInt32(0b1111 & ξ[0])<<12 | UInt32(0b111111 & ξ[1])<<6)!
+  case 4:
+    return CChar32(UInt32(0b111111 & ξ[3]) | UInt32(0b111 & ξ[0])<<18 | UInt32(0b111111 & ξ[1])<<12 | UInt32(0b111111 & ξ[2])<<6)!
+  default:
+    return Unicode.Scalar(UInt32(0xffff))!
+  }
+}
+
 class Trackpad {
   struct Spatial { var instant: TimeInterval; var proximity₋spatial: NSPoint }
   struct Pressure { var instant: TimeInterval; var pressure: Double }
   struct Segment { var ended: Bool; var samples: Array<Spatial> }
-  struct Point { var samples: Array<Pressure> }
-  var tracklines = Dictionary<NSView.Trek,Segment>() /* ⬷ c𝘧․ preskriptionstid. */
+  struct Point { /* var ended: Bool; */ var samples: Array<Pressure> }
+  let feedback = NSAlignmentFeedbackFilter()
+  var tracklines = Dictionary<NSView.Trek,Segment>()
   var pressures = Dictionary<NSView.Trek,Point>()
   
-  func log₋rectangle(with: NSEvent, view: NSView, initial: Bool) { 
-    let event = with; let instant: TimeInterval = event.timestamp
+  func log₋rectangle(with event: NSEvent, view: NSView, initial: Bool) {
+    let instant: TimeInterval = event.timestamp
     let pressure = event.pressure
     let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
     for oval in ovals {
       let identity = NSView.Trek(ident: oval.identity)
      /* let location₁ = event.locationInWindow
      let location₂ = self.superview.convertPoint(location₁, fromView: nil) */
-      let location₃ = oval.normalizedPosition
-      let sample = Spatial(instant: instant, proximity₋spatial: location₃)
-      if let spatiala = self.tracklines[identity] {
+      let normalized = oval.normalizedPosition
+      let sample = Spatial(instant: instant, proximity₋spatial: normalized)
+      if var spatiala = self.tracklines[identity] {
         spatiala.samples.append(sample)
         /* ⬷ found occurrence in dictionary. */
       } else {
-        let initial = Spatial(instant: instant, proximity₋spatial: location₃)
+        let initial = Spatial(instant: instant, proximity₋spatial: normalized)
         let array = [ initial ]
         let initial₋alt₋suffix = Segment(ended: false, samples: array)
         self.tracklines[identity] = initial₋alt₋suffix
         /* ⬷ first occurrence added. */
       }
-      let spatiala: Skiss₁ = tracklines[identity]
-      let initial₋alt₋suffix : Array<Spatial> = [
+      /* let spatiala: Segment = tracklines[identity]
+      let initial₋alt₋suffix: Array<Spatial> = [
        Spatial(instant: instant, proximity₋spatial: normalized, pressure: pressure)
-      ]
+      ] */
       
       if initial { print("interaction-began") }
       else { print("interaction-moved at \(normalized)") }
     }
   }
   
-  func hapticFeedback() { var prepared = [NSAlignmentFeedbackToken]() 
-    if let token = self.feedbackFilter.alignmentFeedbackTokenForHorizontalMovement(in: 
-     self.view, previousX: 0.0, alignedX: 1.0, defaultX: 2.0) { prepared += [token] }
-    self.feedbackFilter.performFeedback(perpared, performeranceTime: .now) }
-  func entered(with event: NSEvent) { self.hapticFeedback(); print("entered") }
-  func exited(with event: NSEvent) { self.hapticFeedback(); print("exited") }
-  func cancelled(with event: NSEvent) {
-    let synthesized = NSView.Trek(hashable₋identity: UUID())
-    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
-    print("\(instant): must-cancel.") }
-  func ended(with event: NSEvent) {
-    let synthesized = NSView.Trek(hashable₋identity: UUID())
-    tracklines.updateValue(initial₋alt₋suffix, forKey: synthesized)
-    print("\(instant): not-ended.") }
+  func hapticFeedback(_ view: NSView) { var prepared = [NSAlignmentFeedbackToken]() 
+    if let token = self.feedback.alignmentFeedbackTokenForHorizontalMovement(in: 
+     view, previousX: 0.0, alignedX: 1.0, defaultX: 2.0) { prepared += [token] }
+    self.feedback.performFeedback(prepared, performanceTime: .now) }
+  func entered(with event: NSEvent, in view: NSView) { self.hapticFeedback(view); print("entered") }
+  func exited(with event: NSEvent, in view: NSView) { self.hapticFeedback(view); print("exited") }
+  func cancelled(with event: NSEvent, view: NSView) {
+    let instant: TimeInterval = event.timestamp
+    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
+    for oval in ovals {
+      let identity = NSView.Trek(ident: oval.identity)
+      print("\(instant): must-cancel.")
+    }
+  }
+  func ended(with event: NSEvent, view: NSView) {
+    let instant: TimeInterval = event.timestamp
+    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
+    for oval in ovals {
+      let identity = NSView.Trek(ident: oval.identity)
+      print("\(instant): not-ended.")
+    }
+  }
   func pressure(with event: NSEvent) {
     let instant: TimeInterval = event.timestamp
     let pressure = event.pressure
-    if let existing = pressures[] { print("existing old") 
-     
-    } else { print("non-existing old") 
-     
-    }
-    print("\(instant): pressure is \(pressure)")
+/*    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
+    for oval in ovals {
+      if var spatiala = self.pressures[identity] {
+      } else { print("non-existing old") 
+      }
+      print("\(instant): pressure is \(pressure)")
+    } */
   }
-} /* ⬷ 'sak är som skojigt-roligt-intressant såsom ...'. */
+}
 
 extension NSView {
   struct Trek : Hashable { var ident: NSObjectProtocol & NSCopying 
     init(ident: NSObjectProtocol & NSCopying) { self.ident = ident }
-    func hash(into hasher: inout Hasher) { return ident.hash() }
-    static func == (lhs: Trek, rhs: Trek) -> Bool { return lhs.hash() == rhs.hash() }
+    func hash(into hasher: inout Hasher) { return hasher.combine(ident.hash) }
+    static func == (lhs: Trek, rhs: Trek) -> Bool { return lhs.ident.isEqual(rhs.ident) }
   }
 }
 
-func Renderimage(width: Double, height: Double, 
+func Renderimage(width: Int, height: Int, 
  process: (NSGraphicsContext) -> Void) -> CGImage?
 {
-  let omgivning = CGContext(data: nil, width: width, height: height, 
+  guard let plate = CGContext(data: nil, width: width, height: height, 
     bitsPerComponent: 8, bytesPerRow: 0, 
     space: CGColorSpace(name: CGColorSpace.sRGB)!, 
-    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-  let ns₋omgivning = NSGraphicsContext(cgContext: omgivning, flipped: true)
-  let previous = NSGraphicsContext.current
-  CGContextSaveGState(previous); NSGraphicsContext.current = ns₋omgivning
-  CGContextBeginTransparencyLayer(ns₋omgivning, nil)
-  do { process(context: ns₋omgivning) }
-  CGContextEndTransparencyLayer(ns₋omgivning)
+    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+  let ns₋plate = NSGraphicsContext(cgContext: plate, flipped: true)
+  guard let previous = NSGraphicsContext.current else { return nil }
+  previous.cgContext.saveGState(); NSGraphicsContext.current = ns₋plate
+  ns₋plate.cgContext.beginTransparencyLayer(auxiliaryInfo: nil)
+  do { process(ns₋plate) }
+  ns₋plate.cgContext.endTransparencyLayer()
   /* NSGraphicsContext.current = nil */
-  CGContextRestoreGState(previous)
-  return omgivning.makeImage()
-} /* ⬷ c𝘧․ /on-giving/ selected items. */
+  previous.cgContext.restoreGState()
+  return plate.makeImage()
+}
 
 extension NSMenuItem {
   convenience init(title string: String, target: AnyObject = self as AnyObject, 
@@ -262,7 +285,7 @@ extension NotificationCenter {
   static func receive(_ key: Notification.Name, instance: Any, 
  selector: Selector) { self.default.addObserver(instance, 
    selector: selector, name: key, object: nil) }
-} /* depricated-psssibly-maybe, see async-await. */
+}
 
 class default₋Windowdelegate: NSObject, NSWindowDelegate {
 func windowDidEndLiveResize(_ notification: Notification) { print("windowDidEndLiveResize") }
@@ -299,4 +322,5 @@ func windowWillExitVersionBrowser(_ notification: Notification) { print("windowW
 func windowDidExitVersionBrowser(_ notification: Notification) { print("windowDidExitVersionBrowser") }
 }
 
+/* play-and-listen-i --<Pigments>--<Antares>--<1 left = 2SINE SWEEPS>--<A D G>. */
 

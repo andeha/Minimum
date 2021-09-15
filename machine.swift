@@ -6,7 +6,7 @@ import ClibTwinbeam
 class Artwork₋swift {
   init(text: String) { self.text = text 
    directives[width₋and₋height] = (100.0, 100.0)
-   directives[place₋origo] = (50.0, 50.0) /* case place₋center: plate.anchorpoint=CGPoint(x: 0.5, y: 0.5) */
+   directives[place₋origo] = (50.0, 50.0)
    directives[offset₋drawing₋on] = (0.0, 0.0) }
   convenience init() { self.init(text: "") }
   var directives = Dictionary<Artwork₋instruction,(Double,Double)>()
@@ -21,13 +21,20 @@ class Artwork₋swift {
 func Append₋instruction(_ instruction: Int32, detail: 
  Artwork₋instruction₋detail, ctx: UnsafeMutableRawPointer?)
 {
-   let recorder = ctx as? Artwork₋swift
-   let instr = instruction as! Artwork₋instruction
+   let recorder = ctx!.load(as: Artwork₋swift.self)
+   let instr = Artwork₋instruction(rawValue: UInt32(instruction))
+   /* let cpointer: UnsafeMutablePointer<CDouble> = detail.four₋parameters!
+   let rawpointer = UnsafeMutableRawPointer(cpointer)
+   let ⁴doubles: UnsafeMutablePointer<CDouble> = rawpointer.bindMemory(to: CDouble.self, capacity: 4) */
+   let ⁴doubles = UnsafeBufferPointer(start: detail.four₋parameters, count: 4)
    if instr == width₋and₋height || instr == place₋origo || instr == offset₋drawing₋on {
+     recorder.directives[instr] = (⁴doubles[0], ⁴doubles[1])
+   } else {
+     let params: Artwork₋swift.Artwork₋parameters = (⁴doubles[0],⁴doubles[1],⁴doubles[2], 
+      ⁴doubles[3],⁴doubles[4], ⁴doubles[5])
+     let op = Artwork₋swift.operation(instruction: instr, params: params, texts: nil)
+     recorder.instructions.append(op)
    }
-   let params: Artwork₋swift.Artwork₋parameters = (0,0,0,0,0,0)
-   let op = Artwork₋swift.operation(instruction: instr, params: params, texts: nil)
-   /* recorder.instructions.append(op) */
 }
 
 class Drawings₁ {
@@ -44,38 +51,26 @@ next
 .width-and-height 100.0 100.0
 start-line 10.0 10.0 last-line 20.0 20.0
 """)
-   
-    var buffer: UnsafePointer<Int8>? = nil
-    artwork₂.text.withCString { cString in buffer=cString }
-    /* ⬷ NULL at end of utf8-bytes. */
-    /* let bytes: UnsafePointer<CChar> = buffer
+    
+   /* let bytes: UnsafePointer<CChar> = buffer
      let fromwire: String? = String(utf8String: bytes) */
+    var buffer: ContiguousArray<CChar> = artwork₂.text.utf8CString
+    /* ⬷ NULL at end of utf8-bytes. */
+    /* let text = String(bytes: material, encoding: String.Encoding.utf8) 
+     print("child message: \(String(describing: text))") */
     
-    let second₋figure₋utf8 = figure₋utf8 as! UnsafeMutablePointer<uchar>
+    /* let u8s = figure₋utf8.bindMemory(to: uchar.self, capacity: bytes)
+    let recorder = prec.pointee */
     
-    /* typedef void (^semantics)(int artwork₋instruction, 
-      union Artwork₋instruction₋detail parameters); */
-    
-    /* Optional<@convention(c) (Int32, Artwork₋instruction₋detail) -> ()> */
-    
-    typealias CFunction = @convention(c) (Int32, Artwork₋instruction₋detail, UnsafeMutableRawPointer?) -> ()
-    let bar = unsafeBitCast(Append₋instruction, to: CFunction.self)
-    
-    let append₋instruction = { (instr: Int32, detail: Artwork₋instruction₋detail) -> () in 
-      print("append") /* detail.four₋params: UnsafeMutablePointer<Double>? */
-    } as (@convention(block) (Int32, Artwork₋instruction₋detail) -> ())
-    
-    var s₋ctxt=Scanner₋ctxt();
-    let y = Parse₋Artwork₋LL₍1₎(Int64(bytes),second₋figure₋utf8,&s₋ctxt,bar)
+    var artwork = artwork₂
+    var s₋ctxt=Scanner₋ctxt()
+    let second₋figure₋utf8 = UnsafeMutablePointer<uchar>(mutating: figure₋utf8)
+    let y = Parse₋Artwork₋LL₍1₎(Int64(bytes),second₋figure₋utf8,&s₋ctxt,Append₋instruction)
     var layer = Artworklayer()
-    layer.contents = artwork₂
-    guard let (width,height) = artwork₂.directives[width₋and₋height] else { return layer }
+    layer.contents = artwork
+    guard let (width,height) = artwork.directives[width₋and₋height] else { return layer }
     size = CGSize(width: width, height: height)
     return layer
-    
-  /* let p = withUnsafeMutablePointer(&text) { UnsafeMutablePointer<CChar32> 
-  ⬷ CChar32 a․𝘬․a String.UnicodeScalarView.Element. */
-   
   } /* ⬷ long long long long pause do-re-mi-re-do-re-mi-re-do-re-mi-re. */
    
   static func encode(image: NSImage) -> String {

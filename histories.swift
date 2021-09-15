@@ -9,7 +9,7 @@ class Minimumview: NSView {
     print("minimumview-init")
     self.controller = ctrl /* ⬷ must be before hierachial init. */
     super.init(frame: frameRect)
-    self.wantsLayer = true
+    /* self.wantsLayer = true */
     let later₋future: DispatchTime = .now() + .seconds(1)
     DispatchQueue.main.asyncAfter(deadline: later₋future) {
       let frame₋update = NSRect(x: 0, y: 0, width: self.frame.width, 
@@ -256,7 +256,6 @@ class Viewcontroller: SeViewcontroller {
      material.topAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.topAnchor, constant: 20), 
      material.bottomAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.bottomAnchor, constant: 20)
     ])
-    
    /* let header: NSAttributedString = minimumview.pageHeader
     let footer: NSAttributedString = minimumview.pageFooter
     let jobname: String = minimumview.printJobTitle */
@@ -378,20 +377,66 @@ class Windowcontroller: SeWindowcontroller {
    var rendition: Rendition { self.contentViewController!.representedObject as! Rendition }
    
    @available(macOS 12.0.0, *)
-   func corout₋keyput₋in₋child(text: String) /* transitive */ async -> Void {
-     await shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: text)
+   func corout₋keyput₋in₋child(text: String) async -> Void {
+     while true {
+       while !self.ⁱmaterials.isEmpty {
+         guard let oldest₋text = self.ⁱmaterials.first else { await Task.yield(); continue }
+         shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
+         self.ⁱmaterials.removeFirst()
+       }
+       await Task.yield()
+     }
    } /* ⬷ a․𝘬․a 'a coroutine that may suspend at any time'. 
-    'löper samtidigt' ≢ async. */
+    'löper samtidigt' ≢ async.
+     let t₁ = Task.detached { }
+     let t₂ = Task { await shell.slow-write... }
+     t.cancel() */
+   
+   @available(macOS 12.0.0, *)
+   func corout₋textual₋and₋graphical₋output() async {
+     let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
+     while true {
+       guard let oldest = self.ᵒmaterials.first else { await Task.yield(); continue }
+       var idx=0, errors=0; var uc: CChar32 = Unicode.Scalar(0x0000)
+       while idx < oldest.count {
+         let leadOr8Bit: UInt8 = oldest[idx]
+         let followersAndLead = (~leadOr8Bit).leadingZeroBitCount
+         let followers = followersAndLead - 1
+         if followers >= 1 { maxfour[0] = leadOr8Bit 
+           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { }
+           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { }
+           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { }
+         }
+         if leadOr8Bit >= 128 {
+           if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followersAndLead; continue; }
+           if (248 <= leadOr8Bit) { errors += 1; idx += followersAndLead; continue }
+           uc = Utf8ToUnicode(maxfour,followersAndLead)
+         } else {
+           uc = CChar32(leadOr8Bit)
+         }
+         print("unicode \(uc)")
+         idx += followersAndLead
+       }
+       self.ᵒmaterials.removeFirst()
+       await Task.yield()
+     }
+   }
+   
+   var ᵒmaterials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarly cut in full unicodes. */
+   var ⁱmaterials = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
      NotificationCenter.receive(.preferences₋changed, 
       instance: self, selector: #selector(reloadUi))
      let textual = { (material: Data) in 
-      let text = String(bytes: material, encoding: String.Encoding.utf8)
-      print("child message: \(String(describing: text))") }
+       self.ᵒmaterials.append(material)
+       if #available (macOS 12.0.0, *) {
+         Task { await self.corout₋textual₋and₋graphical₋output() }
+       }
+     }
      let y = shell.commence(execute: "zsh", parameters: ["-i", "-s"], 
       path₋exe: "/bin/", out: textual)
-     if y != 0 { print("unable to spawn") }
+     if y != 0 { fatalError("unable to spawn") }
      self.viewctrl.representedObject = Rendition(minimumview: self.minimumview)
    }
    
@@ -444,7 +489,7 @@ class Minimumwindow: NSWindow {
      cmd = modifs.contains(.command)
    } /* ⬷ 'OptionSet', not a generic …. */
    
-   override func keyDown(with event: NSEvent) { print("key-down in NSWindow-class")
+   override func keyDown(with event: NSEvent) { print("key-down in NSWindow-class") 
      super.keyDown(with: event) /* ⬷ passes event to next responder. */
    } /* ⬷ responder chain traverses NSView hierarchy, then NSWindow finally NSWindowController. */
    
@@ -462,9 +507,7 @@ extension Windowcontroller { /* ⬷ keyboard */
      if #available (macOS 12.0.0, *) {
        Task { await self.corout₋keyput₋in₋child(text: String(unicode)) }
      }
-   }     /* let t₁ = Task.detached { }
-     let t₂ = Task { await shell.slow-write... }
-     t.cancel() */
+   } 
   
   override func keyDown(with event: NSEvent) { print("keydown in window-controller") 
     super.keyDown(with: event)
@@ -529,7 +572,7 @@ extension Windowcontroller { /* ⬷ keyboard */
      }
   } /* ⬷ String, Character, Unicode and Staticstring. */
   
-  override func noResponder(for: Selector) { print("no responder") }
+  override func noResponder(for event: Selector) { print("no responder for \(event)") }
   
 }
 
