@@ -410,7 +410,7 @@ class Windowcontroller: SeWindowcontroller {
          if leadOr8Bit >= 128 {
            if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
            if (248 <= leadOr8Bit) { errors += 1; idx += followers₋and₋lead; continue }
-           uc = Utf8ToUnicode(maxfour,followers₋and₋lead)
+           uc = Utf8ToUnicode(ξ: maxfour, bytes: followers₋and₋lead)
          } else {
            uc = CChar32(leadOr8Bit)
          }
