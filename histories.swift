@@ -379,10 +379,10 @@ class Windowcontroller: SeWindowcontroller {
    @available(macOS 12.0.0, *)
    func corout₋keyput₋in₋child(text: String) async -> Void {
      while true {
-       while !self.ⁱmaterials.isEmpty {
+       while !self.i₋materials.isEmpty {
          guard let oldest₋text = self.ⁱmaterials.first else { await Task.yield(); continue }
          shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
-         self.ⁱmaterials.removeFirst()
+         self.i₋materials.removeFirst()
        }
        await Task.yield()
      }
@@ -396,40 +396,40 @@ class Windowcontroller: SeWindowcontroller {
    func corout₋textual₋and₋graphical₋output() async {
      let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
      while true {
-       guard let oldest = self.ᵒmaterials.first else { await Task.yield(); continue }
+       guard let oldest = self.o₋materials.first else { await Task.yield(); continue }
        var idx=0, errors=0; var uc: CChar32 = Unicode.Scalar(0x0000)
        while idx < oldest.count {
          let leadOr8Bit: UInt8 = oldest[idx]
-         let followersAndLead = (~leadOr8Bit).leadingZeroBitCount
-         let followers = followersAndLead - 1
+         let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
+         let followers = followers₋and₋lead - 1
          if followers >= 1 { maxfour[0] = leadOr8Bit 
-           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { }
-           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { }
-           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { }
+           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { await Task.yield() }
+           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { await Task.yield() }
+           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { await Task.yield() }
          }
          if leadOr8Bit >= 128 {
-           if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followersAndLead; continue; }
-           if (248 <= leadOr8Bit) { errors += 1; idx += followersAndLead; continue }
-           uc = Utf8ToUnicode(maxfour,followersAndLead)
+           if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
+           if (248 <= leadOr8Bit) { errors += 1; idx += followers₋and₋lead; continue }
+           uc = Utf8ToUnicode(maxfour,followers₋and₋lead)
          } else {
            uc = CChar32(leadOr8Bit)
          }
          print("unicode \(uc)")
-         idx += followersAndLead
+         idx += followers₋and₋lead
        }
-       self.ᵒmaterials.removeFirst()
+       self.o₋materials.removeFirst()
        await Task.yield()
      }
    }
    
-   var ᵒmaterials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarly cut in full unicodes. */
-   var ⁱmaterials = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
+   var o₋materials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarly cut in full unicodes. */
+   var i₋materials = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
      NotificationCenter.receive(.preferences₋changed, 
       instance: self, selector: #selector(reloadUi))
      let textual = { (material: Data) in 
-       self.ᵒmaterials.append(material)
+       self.o₋materials.append(material)
        if #available (macOS 12.0.0, *) {
          Task { await self.corout₋textual₋and₋graphical₋output() }
        }
