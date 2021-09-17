@@ -620,13 +620,13 @@ struct Rendition {
   
   struct Theme {
     var background: NSColor
-    var background₋isDark: Bool
+    var isDark: Bool
   }
   
   var assemble₋pieces = layers()
   let composition₋with₋scribbles = CALayer()
-  var theme₁=Theme(background: creme₋paper, background₋isDark: true), 
-   theme₂=Theme(background: crepe₋paper, background₋isDark: false)
+  var theme₁=Theme(background: crepe, isDark: true), 
+   theme₂=Theme(background: paper, isDark: false)
   
   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
