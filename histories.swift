@@ -418,7 +418,7 @@ class Windowcontroller: SeWindowcontroller {
          if uc == Unicode.Scalar(0x008a) {
            if graphics₋currently { rendition.fixup₋graphics() } else { rendition.start₋graphics() }
            graphics₋currently = !graphics₋currently
-         }
+         } /* Jde|1|18| */
          else {
            if graphics₋currently { rendition.append₋text(uc: uc) } else { rendition.append₋graphics(uc: uc) }
          } /* 1) Unicode code point == 32-bit word and 
@@ -443,7 +443,7 @@ class Windowcontroller: SeWindowcontroller {
          Task { await self.corout₋textual₋and₋graphical₋output() }
        }
      }
-     let y = shell.commence(execute: "zsh", parameters: ["-i", "-s"], 
+     let y = shell.commence(execute: "zsh", parameters: ["-s", "-i"], /* 'r', 'i'. */
       path₋exe: "/bin/", out: textual)
      if y != 0 { fatalError("unable to spawn") }
      self.viewctrl.representedObject = Rendition(minimumview: self.minimumview)
@@ -695,8 +695,8 @@ struct Rendition {
 }
 
 class ᴬᴾᴾᴸTektron {
-  init(variant: Int) { if (variant == 2) { self.append₋one₋unicode(uc: "​") } }
   let Unicodes₋per₋tile=8192; var brk: Nonabsolute = 0
+  init(variant: Int) { if (variant == 2) { self.append₋one₋unicode(uc: "​") } }
   struct patchwork { var memory: ContigousArray<Tetra𝘖rUnicode> }
   var linate = Array<patchwork>()
   let retrieve₋character = @convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int
@@ -708,7 +708,8 @@ class ᴬᴾᴾᴸTektron {
   }
   func start(uc: CChar32) -> Nonabsolute { let copy=self.brk }
   func append₋one₋unicode(uc: CChar32) { brk += 1 }
-} /* ⬷ when crossing to C the ContigousArray is implicity casted to an UnsafeMutablePointer<CChar32> */
+} /* ⬷ when crossing to C the ContigousArray is implicity casted to 
+ an UnsafeMutablePointer<CChar32>. */
 
 extension Renditions { /* ⬷ Tx'ed from child. */
   func fixup₋graphics() { print("fixup graphics") }
