@@ -694,7 +694,6 @@ struct Rendition {
    
 }
 
-typealias Nonabsolute = Int
 class ᴬᴾᴾᴸTektron {
   init(variant: Int) { if (variant == 2) { self.append₋one₋unicode(uc: "​") } }
   let Unicodes₋per₋tile=8192; var brk: Nonabsolute = 0

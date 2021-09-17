@@ -143,6 +143,7 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
 /* Typechecked in your military-project: */
 
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
+typedef __builtin_int Nonabsolute;
 
 typedef struct sequent Artnumerical;
 struct Point { Artnumerical x,y; };
