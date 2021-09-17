@@ -76,8 +76,6 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
-
-/* Simd-0: */
 enum CastToSequentOpinion { accept, rejecting, negate, complete, annul };
 typedef enum CastToSequentOpinion (^Feeder)(unsigned short *);
 EXT₋C int CastTˣᵗToSequent(
@@ -103,10 +101,13 @@ enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 int Newton(computational f, computational f₋prim, struct sequent * x₀, 
  void (^ping)(enum Newtoncontrol * ctrl));
 /* ⬷ for n₋root, sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
-struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x); /* man 432. */
+struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
 int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
  struct sequent min, void (^memory)(struct sequent integrale, 
  struct sequent t₋acc, int * stop));
+struct intel₋sequent₋pair { struct sequent inner[2]; };
+typedef struct intel₋sequent₋pair simd_tᵦ;
+/* typedef _Float16 half; ⬷ in Swift already named Float16 and SIMD8. */
 
 /* Överhand- och underhandsuppfattning 
  
@@ -115,14 +116,6 @@ int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t,
  ━━━   ━━━
  
  */
- 
-/* Because flappy-requires 128-bits and simd-2: */
-
-#if defined __x86_64__
-struct intel₋sequent₋pair { struct sequent inner[2]; };
-typedef struct intel₋sequent₋pair simd_tᵦ;
-/* typedef _Float16 half; ⬷ in Swift already named Float16 and SIMD8. */
-#endif
 
 /*
   
@@ -148,6 +141,8 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
  */
 
 /* Typechecked in your military-project: */
+
+union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
 
 typedef struct sequent Artnumerical;
 struct Point { Artnumerical x,y; };

@@ -421,7 +421,9 @@ class Windowcontroller: SeWindowcontroller {
          }
          else {
            if graphics₋currently { rendition.append₋text(uc: uc) } else { rendition.append₋graphics(uc: uc) }
-         }
+         } /* 1) Unicode code point == 32-bit word and 
+          2) grapheme == smallest functional unit in a writing system and 
+          3) grapheme cluster == multiple code points == a user-percieved-character. */ 
          idx += followers₋and₋lead
        }
        self.o₋materials.removeFirst()
@@ -687,31 +689,33 @@ struct Rendition {
     return ident
   }
    
-   var graphic₋tiles = ᴬᴾᴾᴸKiddle() /* ⬷ text definitely machine-read. */
-   var unicode₋tiles = ᴬᴾᴾᴸKiddle() /* ⬷ text may have been machine-read. */
+   var graphic₋original = ᴬᴾᴾᴸTektron(variant: 1), /* ⬷ text definitely machine-read. */
+    unicode₋original = ᴬᴾᴾᴸTektron(variant: 2) /* ⬷ text may have been machine-read. */
    
 }
 
-class ᴬᴾᴾᴸKiddle { typealias Nonabsolute = Int 
-  let capacity=8192; var brk: Nonabsolute = 0
-  var tiles = Array<ContigousArray<CChar32>>()
+typealias Nonabsolute = Int
+class ᴬᴾᴾᴸTektron {
+  init(variant: Int) { if (variant == 2) { self.append₋one₋unicode(uc: "​") } }
+  let Unicodes₋per₋tile=8192; var brk: Nonabsolute = 0
+  struct patchwork { var memory: ContigousArray<Tetra𝘖rUnicode> }
+  var linate = Array<patchwork>()
   let retrieve₋character = @convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int
-  private func location(loc: Nonabsolute, idx: inout Int, slot: inout Int) { idx=loc/capacity; slot=loc%capacity }
-  private func appendonetile() {
+  private func location(loc: Nonabsolute, idx: inout Int, slot: inout Int) {
+    let capacity=unicodes₋per₋tile; idx=loc/capacity; slot=loc%capacity }
+  private func append₋one₋tile() {
     var onetile = ContigousArray<CChar32>(unsafeUninitializedCapacity: capacity)
-    /* When crossing to C, ContigousArray is implicity casted to an UnsafeMutablePointer<CChar32> */
-    tile.append(onetile)
+    linate.memory.append(onetile)
   }
   func start(uc: CChar32) -> Nonabsolute { let copy=self.brk }
-  func append₋one₋unicode(uc: CChar32) { brk += 1 
-  }
-}
+  func append₋one₋unicode(uc: CChar32) { brk += 1 }
+} /* ⬷ when crossing to C the ContigousArray is implicity casted to an UnsafeMutablePointer<CChar32> */
 
-extension Rendition { /* ⬷ Tx'ed from child. */
-   func fixup₋graphics() { print("fixup graphics") }
-   func append₋graphic(uc: CChar32) { print("graphics unicode \(uc)") }
-   func start₋graphics() { print("start graphics") }
-   func append₋text(uc: CChar32) { print("text unicode \(uc)") }
+extension Renditions { /* ⬷ Tx'ed from child. */
+  func fixup₋graphics() { print("fixup graphics") }
+  func append₋graphic(uc: CChar32) { graphic₋original.append₋one₋unicode(uc) }
+  func start₋graphics() -> Nonabsolute { graphic₋original.print("start graphics"); return 0 }
+  func append₋text(uc: CChar32) { unicode₋orginal.append₋one₋unicode(uc) }
 }
 
 extension Rendition { /* ⬷ minimum and illustrations. */
