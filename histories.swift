@@ -395,26 +395,33 @@ class Windowcontroller: SeWindowcontroller {
    @available(macOS 12.0.0, *)
    func corout₋textual₋and₋graphical₋output() async {
      let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
+     var graphics₋currently = false
      while true {
        guard let oldest = self.o₋materials.first else { await Task.yield(); continue }
-       var idx=0, errors=0; var uc: CChar32 = Unicode.Scalar(0x0000)
+       var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)
        while idx < oldest.count {
          let leadOr8Bit: UInt8 = oldest[idx]
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
          let followers = followers₋and₋lead - 1
          if followers >= 1 { maxfour[0] = leadOr8Bit 
-           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { await Task.yield() }
-           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { await Task.yield() }
-           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { await Task.yield() }
+           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { if o₋material.count == 1 { await Task.yield() } else { } }
+           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { if o₋material.count == 1 { await Task.yield() } else { } }
+           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { if o₋material.count == 1 { await Task.yield() } else { } }
          }
          if leadOr8Bit >= 128 {
            if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
-           if (248 <= leadOr8Bit) { errors += 1; idx += followers₋and₋lead; continue }
+           if 248 <= leadOr8Bit { errors += 1; idx += followers₋and₋lead; continue }
            uc = Utf8ToUnicode(ξ: maxfour, bytes: followers₋and₋lead)
          } else {
            uc = CChar32(leadOr8Bit)
          }
-         print("unicode \(uc)")
+         if uc == Unicode.Scalar(0x008a) {
+           if graphics₋currently { rendition.fixup₋graphics() } else { rendition.start₋graphics() }
+           graphics₋currently = !graphics₋currently
+         }
+         else {
+           if graphics₋currently { rendition.append₋text(uc: uc) } else { rendition.append₋graphics(uc: uc) }
+         }
          idx += followers₋and₋lead
        }
        self.o₋materials.removeFirst()
@@ -422,7 +429,7 @@ class Windowcontroller: SeWindowcontroller {
      }
    }
    
-   var o₋materials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarly cut in full unicodes. */
+   var o₋materials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
    var i₋materials = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
@@ -581,6 +588,7 @@ struct Rendition {
   var minimumview: Minimumview
   
   static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
+    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
     paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
   static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
   static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
@@ -597,12 +605,12 @@ struct Rendition {
       return [.font: font, .foregroundColor: fg₋color.cgColor]
     }
   }
-  
+   
   let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent) /* ⬷ for visible work. */
   let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */) /* ⬷ for non-visible work. */
   /* ⬷ samgörande alt․ schemalaggda (▚). */
   
-  struct layers { let text = CATextLayer() 
+  struct layers { let text=CATextLayer() 
    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
    var rendered₋images = Dictionary<UUID,CGImage>()
    var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
@@ -617,7 +625,8 @@ struct Rendition {
   
   var assemble₋pieces = layers()
   let composition₋with₋scribbles = CALayer()
-  var theme = Theme(background: paper, background₋isDark: false)
+  var theme₁=Theme(background: creme₋paper, background₋isDark: true), 
+   theme₂=Theme(background: crepe₋paper, background₋isDark: false)
   
   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
@@ -677,7 +686,32 @@ struct Rendition {
     }
     return ident
   }
-  
+   
+   var graphic₋tiles = ᴬᴾᴾᴸKiddle() /* ⬷ text definitely machine-read. */
+   var unicode₋tiles = ᴬᴾᴾᴸKiddle() /* ⬷ text may have been machine-read. */
+   
+}
+
+class ᴬᴾᴾᴸKiddle { typealias Nonabsolute = Int 
+  let capacity=8192; var brk: Nonabsolute = 0
+  var tiles = Array<ContigousArray<CChar32>>()
+  let retrieve₋character = @convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int
+  private func location(loc: Nonabsolute, idx: inout Int, slot: inout Int) { idx=loc/capacity; slot=loc%capacity }
+  private func appendonetile() {
+    var onetile = ContigousArray<CChar32>(unsafeUninitializedCapacity: capacity)
+    /* When crossing to C, ContigousArray is implicity casted to an UnsafeMutablePointer<CChar32> */
+    tile.append(onetile)
+  }
+  func start(uc: CChar32) -> Nonabsolute { let copy=self.brk }
+  func append₋one₋unicode(uc: CChar32) { brk += 1 
+  }
+}
+
+extension Rendition { /* ⬷ Tx'ed from child. */
+   func fixup₋graphics() { print("fixup graphics") }
+   func append₋graphic(uc: CChar32) { print("graphics unicode \(uc)") }
+   func start₋graphics() { print("start graphics") }
+   func append₋text(uc: CChar32) { print("text unicode \(uc)") }
 }
 
 extension Rendition { /* ⬷ minimum and illustrations. */
@@ -707,7 +741,7 @@ extension Rendition { /* ⬷ minimum and illustrations. */
      do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
        guard let address = ⁸textual.baseAddress else { return }
        let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
-        figure₋utf8: address, size: &size, name: &name)
+        figure₋utf8: address, nil, size: &size, name: &name)
        layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
        max₋height = max(layer.frame.height,max₋height)
        layer.name = name
