@@ -2,6 +2,7 @@
 
 import AppKit
 import Metal /* ⬷ alt․ AppKit + Metal. */
+import ClibTwinbeam
 
 class Minimumview: NSView {
   
@@ -379,10 +380,10 @@ class Windowcontroller: SeWindowcontroller {
    @available(macOS 12.0.0, *)
    func corout₋keyput₋in₋child(text: String) async -> Void {
      while true {
-       while !self.i₋materials.isEmpty {
-         guard let oldest₋text = self.i₋materials.first else { await Task.yield(); continue }
+       while !self.i₋material.isEmpty {
+         guard let oldest₋text = self.i₋material.first else { await Task.yield(); continue }
          shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
-         self.i₋materials.removeFirst()
+         self.i₋material.removeFirst()
        }
        await Task.yield()
      }
@@ -397,8 +398,8 @@ class Windowcontroller: SeWindowcontroller {
      let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
      var graphics₋currently = false
      while true {
-       guard let oldest = self.o₋materials.first else { await Task.yield(); continue }
-       var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)
+       guard let oldest = self.o₋material.first else { await Task.yield(); continue }
+       var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)!
        while idx < oldest.count {
          let leadOr8Bit: UInt8 = oldest[idx]
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
@@ -416,7 +417,7 @@ class Windowcontroller: SeWindowcontroller {
            uc = CChar32(leadOr8Bit)
          }
          if uc == Unicode.Scalar(0x008a) {
-           if graphics₋currently { rendition.fixup₋graphics() } else { rendition.start₋graphics() }
+           if graphics₋currently { let nonabsolute = rendition.fixup₋graphics() } else { rendition.start₋graphics() }
            graphics₋currently = !graphics₋currently
          } /* Jde|1|18| */
          else {
@@ -426,19 +427,19 @@ class Windowcontroller: SeWindowcontroller {
           3) grapheme cluster == multiple code points == a user-percieved-character. */ 
          idx += followers₋and₋lead
        }
-       self.o₋materials.removeFirst()
+       self.o₋material.removeFirst()
        await Task.yield()
      }
    }
    
-   var o₋materials = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
-   var i₋materials = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
+   var o₋material = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
+   var i₋material = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
      NotificationCenter.receive(.preferences₋changed, 
       instance: self, selector: #selector(reloadUi))
      let textual = { (material: Data) in 
-       self.o₋materials.append(material)
+       self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
          Task { await self.corout₋textual₋and₋graphical₋output() }
        }
@@ -454,8 +455,8 @@ class Windowcontroller: SeWindowcontroller {
    @objc private func reloadUi() { print("reloadUi") 
      if NSApp.effectiveAppearance.name == .darkAqua { return }
      guard let window = self.window else { return }
-     window.backgroundColor = rendition.theme.background
-     if rendition.theme.background₋isDark {
+     window.backgroundColor = rendition.theme₁.background
+     if rendition.theme₁.isDark {
        window.appearance = NSAppearance(named: .darkAqua)
      } else {
        window.appearance = NSAppearance(named: .aqua)
@@ -689,33 +690,60 @@ struct Rendition {
     return ident
   }
    
-   var graphic₋original = ᴬᴾᴾᴸTektron(variant: 1), /* ⬷ text definitely machine-read. */
-    unicode₋original = ᴬᴾᴾᴸTektron(variant: 2) /* ⬷ text may have been machine-read. */
+   var graphic₋patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
+   var unicodes = Original() /* ⬷ textual text may have been machine-read. */
    
 }
 
 class ᴬᴾᴾᴸTektron {
-  let Unicodes₋per₋tile=8192; var brk: Nonabsolute = 0
-  init(variant: Int) { if (variant == 2) { self.append₋one₋unicode(uc: "​") } }
-  struct patchwork { var memory: ContigousArray<Tetra𝘖rUnicode> }
-  var linate = Array<patchwork>()
-  let retrieve₋character = @convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int
-  private func location(loc: Nonabsolute, idx: inout Int, slot: inout Int) {
-    let capacity=unicodes₋per₋tile; idx=loc/capacity; slot=loc%capacity }
-  private func append₋one₋tile() {
-    var onetile = ContigousArray<CChar32>(unsafeUninitializedCapacity: capacity)
-    linate.memory.append(onetile)
+  let Unicodes₋per₋tile=8192; var brk: Nonabsolute=0
+  init() { self.append₋one₋unicode(uc: "​") }
+  var patchwork = Array<ContiguousArray<Tetra𝘖rUnicode>>()
+  private func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
+    let capacity=Unicodes₋per₋tile; arrayidx=loc/capacity; inousidx=loc%capacity }
+  private func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
+    var onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: capacity, 
+     initializingWith: nil)
+    patchwork.append(onetile)
   }
-  func start(uc: CChar32) -> Nonabsolute { let copy=self.brk }
-  func append₋one₋unicode(uc: CChar32) { brk += 1 }
+  private func append(taltu: Tetra𝘖rUnicode) { var idx, slot: Int 
+    location(loc: brk, arrayidx: &idx, inousidx: &slot)
+    if slot >= patchwork.count { append₋one₋tile() }
+    var array = patchwork[idx]
+    array.append(taltu)
+    brk += 1
+  }
+  func append₋one₋unicode(uc: CChar32) {
+    let elem = Tetra𝘖rUnicode(uc: uc)
+    self.append(taltu: elem)
+  }
+  func append₋sentinel(﹟: Int32) {
+    let elem = Tetra𝘖rUnicode(count: ﹟)
+    self.append(taltu: elem)
+  }
+  /* func start(uc: CChar32) -> Nonabsolute { let copy=self.brk } */
+  let feed₋character: (@convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int)?
+}
+
+class Quilt { struct Zebra { var there, count: Int }
+  var patchwork = Array<Zebra>()
+  func apply₋at₋unicode(uc₋idx: Int) {
+   let stomp = Zebra(there: uc₋idx, count: -1)
+   patchwork.append(stomp) }
+  func close₋segment() -> Nonabsolute { return 0 }
+}
+
+class Original { var tape = ᴬᴾᴾᴸTektron() 
+  func append₋one₋unicode(uc: CChar32) { self.tape.append₋one₋unicode(uc: uc) }
+  func close₋segment(quilt: inout Quilt) { let alcoda = quilt.close₋segment() }
 } /* ⬷ when crossing to C the ContigousArray is implicity casted to 
  an UnsafeMutablePointer<CChar32>. */
 
-extension Renditions { /* ⬷ Tx'ed from child. */
-  func fixup₋graphics() { print("fixup graphics") }
-  func append₋graphic(uc: CChar32) { graphic₋original.append₋one₋unicode(uc) }
+extension Rendition { /* ⬷ Tx'ed from child. */
+  func fixup₋graphics() -> Nonabsolute { print("fixup graphics") }
+  func append₋graphic(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) }
   func start₋graphics() -> Nonabsolute { graphic₋original.print("start graphics"); return 0 }
-  func append₋text(uc: CChar32) { unicode₋orginal.append₋one₋unicode(uc) }
+  func append₋text(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) }
 }
 
 extension Rendition { /* ⬷ minimum and illustrations. */
