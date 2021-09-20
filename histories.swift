@@ -699,20 +699,19 @@ class ᴬᴾᴾᴸTektron {
   let Unicodes₋per₋tile=8192; var brk: Nonabsolute=0
   init() { self.append₋one₋unicode(uc: "​") }
   var patchwork = Array<ContiguousArray<Tetra𝘖rUnicode>>()
+  private func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
+    var onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
+     capacity, initializingWith: nil)
+    patchwork.append(onetile) }
   private func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
     let capacity=Unicodes₋per₋tile; arrayidx=loc/capacity; inousidx=loc%capacity }
-  private func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
-    var onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: capacity, 
-     initializingWith: nil)
-    patchwork.append(onetile)
-  }
+  /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
   private func append(taltu: Tetra𝘖rUnicode) { var idx, slot: Int 
     location(loc: brk, arrayidx: &idx, inousidx: &slot)
     if slot >= patchwork.count { append₋one₋tile() }
     var array = patchwork[idx]
     array.append(taltu)
-    brk += 1
-  }
+    brk += 1 }
   func append₋one₋unicode(uc: CChar32) {
     let elem = Tetra𝘖rUnicode(uc: uc)
     self.append(taltu: elem)
@@ -721,9 +720,9 @@ class ᴬᴾᴾᴸTektron {
     let elem = Tetra𝘖rUnicode(count: ﹟)
     self.append(taltu: elem)
   }
+  let read₋character: (@convention(c) (Nonabsolute, UnsafeMutablePointer<CChar32>?) -> Int)?
   /* func start(uc: CChar32) -> Nonabsolute { let copy=self.brk } */
-  let feed₋character: (@convention(c) (CInt, UnsafeMutablePointer<CChar32>?) -> Int)?
-}
+} /* ⬷ see --<Kiddle.hpp> for early attempt. */
 
 class Quilt { struct Zebra { var there, count: Int }
   var patchwork = Array<Zebra>()
