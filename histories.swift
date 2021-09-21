@@ -720,11 +720,11 @@ class ᴬᴾᴾᴸTektron {
     let elem = Tetra𝘖rUnicode(count: ﹟)
     self.append(taltu: elem)
   }
-  let read₋character: (@convention(c) (Nonabsolute, UnsafeMutablePointer<CChar32>?) -> Int)?
+  let read₋pamphlet: (@convention(c) (Nonabsolute, UnsafeMutablePointer<CChar32>?) -> Int)?
   /* func start(uc: CChar32) -> Nonabsolute { let copy=self.brk } */
 } /* ⬷ see --<Kiddle.hpp> for early attempt. */
 
-class Quilt { struct Zebra { var there, count: Int }
+struct Quilt { struct Zebra { var there, count: Int }
   var patchwork = Array<Zebra>()
   func apply₋at₋unicode(uc₋idx: Int) {
    let stomp = Zebra(there: uc₋idx, count: -1)
@@ -732,7 +732,8 @@ class Quilt { struct Zebra { var there, count: Int }
   func close₋segment() -> Nonabsolute { return 0 }
 }
 
-class Original { var tape = ᴬᴾᴾᴸTektron() 
+struct Original { var tape = ᴬᴾᴾᴸTektron(); var sentinel₋idx: Nonabsolute = 0
+  init() { self.tape.append₋sentinel(﹟: -1) }
   func append₋one₋unicode(uc: CChar32) { self.tape.append₋one₋unicode(uc: uc) }
   func close₋segment(quilt: inout Quilt) { let alcoda = quilt.close₋segment() }
 } /* ⬷ when crossing to C the ContigousArray is implicity casted to 
