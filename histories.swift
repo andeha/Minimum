@@ -377,15 +377,15 @@ class Windowcontroller: SeWindowcontroller {
    var minimumview: Minimumview { minimumwindow.controller.minimumview }
    var rendition: Rendition { self.contentViewController!.representedObject as! Rendition }
    
-   @available(macOS 12.0.0, *)
+   @available(macOS 12.0.0, *) /* ⬷ SwiftStdlib 5.5. */
    func corout₋keyput₋in₋child(text: String) async -> Void {
      while true {
        while !self.i₋material.isEmpty {
-         guard let oldest₋text = self.i₋material.first else { await Task.yield(); continue }
+         guard let oldest₋text = self.i₋material.first else { /* await Task.yield(); */ continue }
          shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
          self.i₋material.removeFirst()
        }
-       await Task.yield()
+       /* await Task.yield() */
      }
    } /* ⬷ a․𝘬․a 'a coroutine that may suspend at any time'. 
     'löper samtidigt' ≢ async.
@@ -393,10 +393,55 @@ class Windowcontroller: SeWindowcontroller {
      let t₂ = Task { await shell.slow-write... }
      t.cancel() */
    
+   var pieced₋work = Array<ContiguousArray<Tetra𝘖rUnicode>>()
+   var brk: Nonabsolute = 0
+   typealias Reference = UnsafeMutablePointer
+   let separator = Unicode.Scalar(0x008a)
+   var graphics₋not₋text = false
+   
+   func tektron(uc: CChar32) -> Void { let Unicodes₋per₋tile = 8192
+     let append₋one₋tile = { let capacity=Unicodes₋per₋tile 
+       typealias Characters = UnsafeMutableBufferPointer<Tetra𝘖rUnicode>
+       let setup = { (buffer: inout Characters, initializedCount: inout Int) -> Void in 
+        initializedCount=0 }
+       let onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
+        capacity, initializingWith: setup)
+       self.pieced₋work.append(onetile)
+     }
+     let location = { (loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) -> Void in 
+       let capacity=Unicodes₋per₋tile; arrayidx=Int(loc)/capacity; inousidx=Int(loc)%capacity }
+     /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
+     let append₋various = { (taltu: Tetra𝘖rUnicode) -> Void in 
+       var idx, slot: Int
+       location(self.brk,&idx,&slot)
+       if slot >= self.pieced₋work.count { append₋one₋tile() }
+       var array = self.pieced₋work[idx]
+       array.append(taltu)
+       self.brk += 1 }
+     let append₋one₋unicode = { (uc: CChar32) -> Void in 
+       let elem = Tetra𝘖rUnicode(uc: uc.value)
+       append₋various(elem)
+     }
+     let append₋sentinel = { (﹟: Int32) -> Void in 
+       let elem = Tetra𝘖rUnicode(count: ﹟)
+       append₋various(elem)
+     }
+     let start = { (tile: Int) -> UnsafeMutablePointer<Tetra𝘖rUnicode>? in 
+       return self.pieced₋work[tile]._baseAddressIfContiguous }
+     if uc == separator {
+       if self.graphics₋not₋text { /* fixup₋graphics: */ } 
+       else { /* graphics₋start: */ }
+       self.graphics₋not₋text = !self.graphics₋not₋text
+     } /* ⬷ Jde|1|18|! */
+     idx += followers₋and₋lead
+     append₋one₋unicode(uc: uc)
+   } /* 1) Unicode code point == 32-bit word and 
+        2) grapheme == smallest functional unit in a writing system and 
+        3) grapheme cluster == multiple code points == a user-percieved-character. */ 
+   
    @available(macOS 12.0.0, *)
    func corout₋textual₋and₋graphical₋output() async {
      let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
-     var graphics₋currently = false
      while true {
        guard let oldest = self.o₋material.first else { await Task.yield(); continue }
        var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)!
@@ -416,16 +461,7 @@ class Windowcontroller: SeWindowcontroller {
          } else {
            uc = CChar32(leadOr8Bit)
          }
-         if uc == Unicode.Scalar(0x008a) {
-           if graphics₋currently { let nonabsolute = rendition.fixup₋graphics() } else { rendition.start₋graphics() }
-           graphics₋currently = !graphics₋currently
-         } /* Jde|1|18| */
-         else {
-           if graphics₋currently { rendition.append₋text(uc: uc) } else { rendition.append₋graphics(uc: uc) }
-         } /* 1) Unicode code point == 32-bit word and 
-          2) grapheme == smallest functional unit in a writing system and 
-          3) grapheme cluster == multiple code points == a user-percieved-character. */ 
-         idx += followers₋and₋lead
+         tektron(uc: uc)
        }
        self.o₋material.removeFirst()
        await Task.yield()
@@ -690,23 +726,23 @@ struct Rendition {
     return ident
   }
    
-   var graphic₋patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
-   var unicodes = Original() /* ⬷ textual text may have been machine-read. */
+//   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
+//   var unicodes = Original() /* ⬷ textual text may have been machine-read. */
    
 }
 
+/*
 class ᴬᴾᴾᴸTektron {
   let Unicodes₋per₋tile=8192; var brk: Nonabsolute=0
-  init() { self.append₋one₋unicode(uc: "​") }
   var patchwork = Array<ContiguousArray<Tetra𝘖rUnicode>>()
   private func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
-    var onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
-     capacity, initializingWith: nil)
+    let onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
+     capacity, initializingWith: { buffer, initializedCount in initializedCount = 0 })
     patchwork.append(onetile) }
   private func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
     let capacity=Unicodes₋per₋tile; arrayidx=loc/capacity; inousidx=loc%capacity }
   /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
-  private func append(taltu: Tetra𝘖rUnicode) { var idx, slot: Int 
+  private func append₋various(taltu: Tetra𝘖rUnicode) { var idx, slot: Int 
     location(loc: brk, arrayidx: &idx, inousidx: &slot)
     if slot >= patchwork.count { append₋one₋tile() }
     var array = patchwork[idx]
@@ -714,36 +750,46 @@ class ᴬᴾᴾᴸTektron {
     brk += 1 }
   func append₋one₋unicode(uc: CChar32) {
     let elem = Tetra𝘖rUnicode(uc: uc)
-    self.append(taltu: elem)
+    self.append₋various(taltu: elem)
   }
   func append₋sentinel(﹟: Int32) {
     let elem = Tetra𝘖rUnicode(count: ﹟)
-    self.append(taltu: elem)
+    self.append₋various(taltu: elem)
   }
-  let read₋pamphlet: (@convention(c) (Nonabsolute, UnsafeMutablePointer<CChar32>?) -> Int)?
-  /* func start(uc: CChar32) -> Nonabsolute { let copy=self.brk } */
+  func fill₋in₋sentinel(﹟: Int32, at: Nonabsolute) { }
+  let read₋tektron: (@convention(c) (Nonabsolute, UnsafeMutablePointer<Tetra𝘖rUnicode>?, CInt /* count */) -> Int)?
+  func start(tile: Int) -> UnsafeMutablePointer<Tetra𝘖rUnicode>? { return patchwork[tile]._baseAddressIfContiguous }
 } /* ⬷ see --<Kiddle.hpp> for early attempt. */
 
-struct Quilt { struct Zebra { var there, count: Int }
-  var patchwork = Array<Zebra>()
-  func apply₋at₋unicode(uc₋idx: Int) {
+struct /* 􀠧􀠧􀠧 (Fanjunkare) */ Quilt { var patchwork = Array<Zebra>() 
+  struct Zebra { var sentinel₋there, count: Int }
+  func mark₋start₋at₋unicode(uc₋idx: Int) {
    let stomp = Zebra(there: uc₋idx, count: -1)
    patchwork.append(stomp) }
-  func close₋segment() -> Nonabsolute { return 0 }
+  func close₋segment(original: Original) -> Nonabsolute { original.close₋segment(); return 0 }
 }
 
-struct Original { var tape = ᴬᴾᴾᴸTektron(); var sentinel₋idx: Nonabsolute = 0
-  init() { self.tape.append₋sentinel(﹟: -1) }
+struct /* 􀠧 (Sergeant) */ Original { var curr₋sentinel₋idx: Nonabsolute 
+  var tape = ᴬᴾᴾᴸTektron()
+  init() { self.curr₋sentinel₋idx=0; self.tape.append₋sentinel(﹟: -1) }
   func append₋one₋unicode(uc: CChar32) { self.tape.append₋one₋unicode(uc: uc) }
-  func close₋segment(quilt: inout Quilt) { let alcoda = quilt.close₋segment() }
+  func close₋segment(quilt: inout Quilt) {
+   let count = tape.brk - curr₋sentinel₋idx - 1
+   tape.fill₋in₋sentinel(﹟: count, at: curr₋sentinel₋idx)
+
+let coda = quilt.close₋segment()
+
+ }
 } /* ⬷ when crossing to C the ContigousArray is implicity casted to 
- an UnsafeMutablePointer<CChar32>. */
+ an UnsafeMutablePointer<Tetra𝘖rUnicode>. */
+*/
 
 extension Rendition { /* ⬷ Tx'ed from child. */
-  func fixup₋graphics() -> Nonabsolute { print("fixup graphics") }
+  /* func fixup₋graphics() -> Nonabsolute { print("fixup graphics") }
   func append₋graphic(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) }
   func start₋graphics() -> Nonabsolute { graphic₋original.print("start graphics"); return 0 }
-  func append₋text(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) }
+  func append₋text(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) } */
+  func notification() { }
 }
 
 extension Rendition { /* ⬷ minimum and illustrations. */
@@ -758,8 +804,9 @@ extension Rendition { /* ⬷ minimum and illustrations. */
      ctx.textPosition = CGPoint(x: 8, y: 24)
      CTFrameDraw(frame,ctx)
    }
-  mutating func render₋illustrations(
-    from₋wire ⁸textual: UnsafeBufferPointer<UInt8>, 
+   
+  mutating func render₋illustrations( 
+    from₋wire textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
     topLeftNextGround: NSEdgeInsets, 
     typeset₋in columns: Int
    )
