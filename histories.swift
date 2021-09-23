@@ -395,56 +395,60 @@ class Windowcontroller: SeWindowcontroller {
    
    var pieced₋work = Array<ContiguousArray<Tetra𝘖rUnicode>>()
    var brk: Nonabsolute = 0
+   let Unicodes₋per₋tile = 8192
    typealias Reference = UnsafeMutablePointer
    let separator = Unicode.Scalar(0x008a)
    var graphics₋not₋text = false
-   var curr₋sentinel₋idx: Nonabsolute
+   var curr₋sentinel₋idx: Nonabsolute = 0
    
-   let at₋concurrent = { append₋sentinel(-1); curr₋sentinel₋idx = 0 }
-   let append₋one₋tile = { let capacity=Unicodes₋per₋tile 
+   func at₋concurrent() { append₋sentinel() }
+   func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
      typealias Characters = UnsafeMutableBufferPointer<Tetra𝘖rUnicode>
      let setup = { (buffer: inout Characters, initializedCount: inout Int) -> Void in 
       initializedCount=0 }
      let onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
       capacity, initializingWith: setup)
-     self.pieced₋work.append(onetile)
-   }
-   let location = { (loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) -> Void in 
-     let capacity=Unicodes₋per₋tile; arrayidx=Int(loc)/capacity; inousidx=Int(loc)%capacity 
+     pieced₋work.append(onetile) }
+   func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
+     let capacity=Unicodes₋per₋tile; arrayidx=Int(loc)/capacity; inousidx=Int(loc)%capacity
    } /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
-   let append₋various = { (taltu: Tetra𝘖rUnicode) -> Void in 
+   func append₋various(_ taltu: Tetra𝘖rUnicode) {
      var idx, slot: Int
-     location(self.brk,&idx,&slot)
-     if slot >= self.pieced₋work.count { append₋one₋tile() }
-     var array = self.pieced₋work[idx]
+     location(loc: brk, arrayidx: &idx, inousidx: &slot)
+     if slot >= pieced₋work.count { append₋one₋tile() }
+     var array = pieced₋work[idx]
      array.append(taltu)
-     self.brk += 1 }
-   let append₋one₋unicode = { (uc: CChar32) -> Void in 
+     brk += 1 }
+   func append₋one₋unicode(uc: CChar32) {
      let elem = Tetra𝘖rUnicode(uc: uc.value)
      append₋various(elem)
    }
-   let append₋sentinel = { (﹟: Int32) -> Void in 
-     let elem = Tetra𝘖rUnicode(count: ﹟)
+   func append₋sentinel() {
+     curr₋sentinel₋idx=self.brk
+     let elem = Tetra𝘖rUnicode(count: -1)
      append₋various(elem)
    }
-   let fill₋in₋sentinel(﹟: Int32, at: Nonabsolute) {
-     let count = tape.brk - curr₋sentinel₋idx - 1
-     tape.fill₋in₋sentinel()
+   func fill₋in₋last₋sentinel() {
+     var idx, slot: Int
+     location(loc: curr₋sentinel₋idx, arrayidx: &idx, inousidx: &slot)
+     let unicode₋count = self.brk - curr₋sentinel₋idx - 1
+     var carray = pieced₋work[idx]
+     carray[slot].count = Int32(unicode₋count)
    }
-   let start = { (tile: Int) -> Reference<Tetra𝘖rUnicode>? in 
-     return self.pieced₋work[tile]._baseAddressIfContiguous 
+   func baseaddress(tile: Int) -> Reference<Tetra𝘖rUnicode>? {
+     return self.pieced₋work[tile]._baseAddressIfContiguous
    }
-   
    /* 1) Unicode code point == 32-bit word and 
       2) grapheme == smallest functional unit in a writing system and 
       3) grapheme cluster == multiple code points == a user-percieved-character. */
-   func tektron(uc: CChar32) -> Void { let Unicodes₋per₋tile = 8192
-     append₋one₋unicode(uc)
+   func tektron(uc: CChar32) -> Void {
+     append₋one₋unicode(uc: uc)
      if uc == separator {
-       if self.graphics₋not₋text { /* fixup₋graphics: */ } 
+       if self.graphics₋not₋text { /* fixup₋graphics: */ }
        else { /* graphics₋start: */ }
        self.graphics₋not₋text = !self.graphics₋not₋text
      } /* ⬷ Jde|1|18|! */
+     /* notification antal alt. tidsåtgång. */
    } 
    
    @available(macOS 12.0.0, *)
@@ -459,9 +463,9 @@ class Windowcontroller: SeWindowcontroller {
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
          let followers = followers₋and₋lead - 1
          if followers >= 1 { maxfour[0] = leadOr8Bit 
-           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { if o₋material.count == 1 { await Task.yield() } else { } }
-           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { if o₋material.count == 1 { await Task.yield() } else { } }
-           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { if o₋material.count == 1 { await Task.yield() } else { } }
+           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
+           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
+           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
          }
          if leadOr8Bit >= 128 {
            if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
@@ -487,7 +491,7 @@ class Windowcontroller: SeWindowcontroller {
      let textual = { (material: Data) in 
        self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
-         Task { await self.corout₋textual₋and₋graphical₋output() }
+         /* Task { await self.corout₋textual₋and₋graphical₋output() } */
        }
      }
      let y = shell.commence(execute: "zsh", parameters: ["-s", "-i"], /* 'r', 'i'. */
@@ -561,7 +565,7 @@ extension Windowcontroller { /* ⬷ keyboard */
    func keyput(_ unicode: CChar32) { /* ⬷ a․𝘬․a Unicode.Scalar. */
      print("start-keyput: \(unicode)")
      if #available (macOS 12.0.0, *) {
-       Task { await self.corout₋keyput₋in₋child(text: String(unicode)) }
+       /* Task { await self.corout₋keyput₋in₋child(text: String(unicode)) } */
      }
    } 
   
