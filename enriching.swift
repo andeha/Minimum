@@ -17,7 +17,7 @@ func Start(execute command: String, parameters: [String], path₋exe: String,
  p2c p2c₋pipe: Pipe, c2p c2p₋pipe: Pipe) -> Int
 {
   var args = Array<String>(); let process = path₋exe + command
-  args.append(process); args.append(command + path₋exe); args += parameters
+  args.append(process); args.append(command); args += parameters
   let argv: [UnsafeMutablePointer<CChar>?] = args.map { $0.withCString(strdup) }
   defer { for case let arg? in argv { free(arg) } }
   let p2c₋rd₋end: FileHandle = p2c₋pipe.fileHandleForReading
@@ -31,7 +31,7 @@ func Start(execute command: String, parameters: [String], path₋exe: String,
   let bufₑ: Pint? = unsafeBitCast(fd_c2p, to: Pint.self)
   let bufᵢ: Pint? = unsafeBitCast(fd_p2c, to: Pint.self)
   /* var env: (String?, String?) = ("SPAWNED_BY_TWINBEAM", nil) */
-  let pid: pid_t = Twinbeam₋spawn(argv[0], bufᵢ, bufₑ /*, F */)
+  let pid: pid_t = Twinbeam₋spawn(argv[0], argv[1], bufᵢ, bufₑ /*, F */)
  /* ⬷ a․𝘬․a if posix_spawn(&chnl.pid, argv[0], &chnl.fdactions₋child, nil, 
    argv + [nil], envir) != 0 { return -1 } / * ⬷ a․𝘬․a 'fork' and 'execlp'. */
   if pid < 0 { return -1 }
@@ -73,7 +73,7 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
  /* var p2c₋input, c2p₋output, c2p₋error, p2c₋ctrl, c2p₋dicipline : Pipe */
   
   func slow₋write₋to₋child(fifo: Pipe, text: String) {
-    if let symbols = text.data(using: String.Encoding.utf8) {
+    if let symbols = text.data(using: .utf8) {
       fifo.fileHandleForWriting.write(symbols)
     } else { fatalError("Unable to unwrap material (a․𝘬․a never-happens)") }
   } /* ⬷ see --<machine.swift>{parse} for correct suffixial possibly-maybe. */
@@ -107,6 +107,90 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
 
 /* Job|12|5| He that is ready to slip with his feet is as a lamp despised in the 
  thought of him that is at ease.~ */
+
+class Interact {
+  
+  var process: Process?
+  let p2c₋pipe=Pipe(), c2p₋pipe=Pipe()
+  var output: ((Data) -> Void)?
+  
+  func slow₋write₋to₋child(fifo: Pipe, text: String) {
+    if let symbols = text.data(using: .utf8) {
+      fifo.fileHandleForWriting.write(symbols)
+    } else { fatalError("Unable to unwrap material") }
+  }
+  
+  func commence(execute command: String, parameters: [String], path₋exe: String) {
+    let url = URL(fileURLWithPath: path₋exe + command)
+    let proc = Process()
+    proc.executableURL = url
+    proc.currentDirectoryURL = URL(fileURLWithPath: path₋exe)
+    proc.arguments = parameters
+    proc.standardInput = p2c₋pipe
+    proc.standardOutput = c2p₋pipe
+    proc.terminationHandler = { process in 
+      if let c2p₋pipe = process.standardOutput as? Pipe {
+        c2p₋pipe.fileHandleForReading.readabilityHandler = nil
+      }
+    }
+    c2p₋pipe.fileHandleForReading.readabilityHandler = { fileHandle in 
+      /* self.output?(fileHandle.availableData) */
+      if let str = String(data: fileHandle.availableData, encoding: .utf8) {
+        print(str, terminator: "")
+      }
+    }
+    self.process = proc
+    do { try proc.run() } catch _ { print("unable to launch process") }
+  }
+}
+
+class Original {
+  var pieced₋work = Array<Adjacents>()
+  var curr₋sentinel₋idx: Nonabsolute = 0
+  var brk: Nonabsolute = 0
+  let Unicodes₋per₋tile = 8192
+  init() { append₋sentinel() }
+  func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
+    let setup = { (buffer: inout Nonownings, initializedCount: inout Int) -> Void in 
+     initializedCount=0 }
+    let onetile = Adjacents(unsafeUninitializedCapacity: capacity, initializingWith: setup)
+    pieced₋work.append(onetile) }
+  func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
+    let capacity=Unicodes₋per₋tile; arrayidx=Int(loc)/capacity; inousidx=Int(loc)%capacity
+  } /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
+  func append₋various(_ taltu: Tetra𝘖rUnicode) {
+    var idx: Int = 0; var slot: Int = 0
+    location(loc: brk, arrayidx: &idx, inousidx: &slot)
+    if slot >= pieced₋work.count { append₋one₋tile() }
+    var array = pieced₋work[idx]
+    array.append(taltu)
+    self.brk += 1 }
+  func append₋one₋unicode(uc: CChar32) {
+    let elem = Tetra𝘖rUnicode(uc: uc.value)
+    append₋various(elem)
+  }
+  func append₋sentinel() {
+    curr₋sentinel₋idx = self.brk
+    let elem = Tetra𝘖rUnicode(count: -1)
+    append₋various(elem)
+  }
+  func fill₋in₋sentinel() {
+    var idx: Int = 0; var slot: Int = 0
+    location(loc: curr₋sentinel₋idx, arrayidx: &idx, inousidx: &slot)
+    let unicode₋count = self.brk - curr₋sentinel₋idx - 1
+    var carray = pieced₋work[idx]
+    carray[slot].count = Int32(unicode₋count)
+  }
+  func baseaddress(tile: Int) -> Reference<Tetra𝘖rUnicode>? {
+    return self.pieced₋work[tile]._baseAddressIfContiguous
+  } /* ⬷ when crossing to C the ContigousArray is implicity casted to 
+ an UnsafeMutablePointer<Tetra𝘖rUnicode>. */
+} /* ⬷ a․𝘬․a 􀠧-Sergeant and ᴬᴾᴾᴸTektron. See --<Kiddle.hpp> for early attempt. */
+
+class Quilt {
+  func graphics₋begin() { print("graphics begin") }
+  func graphics₋ended() { print("graphics ended") }
+} /* ⬷ a․𝘬․a 􀠧􀠧􀠧-Fanjunkare. */
 
 extension NSBezierPath {
   
@@ -323,4 +407,5 @@ func windowDidExitVersionBrowser(_ notification: Notification) { print("windowDi
 }
 
 /* play-and-listen-i --<Pigments>--<Antares>--<1 left = 2SINE SWEEPS>--<A D G>. */
+
 

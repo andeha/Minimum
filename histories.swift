@@ -1,8 +1,259 @@
 /*  􀣳 terms.swift | histories logged. */
 
 import AppKit
-import Metal /* ⬷ alt․ AppKit + Metal. */
 import ClibTwinbeam
+import Metal /* ⬷ alt․ AppKit + Metal. */
+
+struct Rendition {
+  
+  var minimumview: Minimumview
+  
+  static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
+   crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
+   paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
+  static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
+  static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
+   coarse₋grid = NSColor(calibratedWhite: 0.88, alpha: 1.0)
+  static let systemfont = NSFont.systemFont(ofSize: 30.0), 
+   textfont = NSFont(name: "SF Mono", size: 9)
+  static let zinkwhite = NSColor(calibratedWhite: 0.99, alpha: 1.0), 
+   Ti₋white = NSColor(calibratedWhite: 0.90, alpha: 1.0), 
+   textcolor = NSColor.labelColor, 
+   textcolor₂ = NSColor.secondaryLabelColor, 
+   ⁻¹textcolor = zinkwhite, ⁻¹textcolor₂ = Ti₋white
+  static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
+  
+  var default₋textattrs: [NSAttributedString.Key: Any] {
+    get {
+      guard let font = Rendition.textfont else { return [:] }
+      return [.font: font, .foregroundColor: Rendition.textcolor.cgColor]
+    }
+  }
+  
+  /* …for visible work and for non-visible work respectively ⤐ */
+  let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
+  let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
+  /* ⬷ samgörande alt․ schemalaggda (▚). */
+  
+  struct layers { let text=CATextLayer() 
+   var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
+   var rendered₋images = Dictionary<UUID,CGImage>()
+   var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
+   var scribbles = Dictionary<UUID,feedback>()
+   class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() }
+  }
+  
+  struct theme { var background: NSColor; var ink: NSColor; var isDark: Bool }
+  
+  var assemble₋pieces = layers()
+  let composition₋with₋scribbles = CALayer()
+  var theme₁=theme(background: crepe, ink: textcolor, isDark: true), 
+   theme₂=theme(background: paper, ink: ⁻¹textcolor, isDark: false)
+  
+  var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
+  var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
+  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
+  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+  func total₋twopass₋and₋height₋and₋width₋in₋O₍n₎() -> NSPoint { return 
+   self.minimumview.convertFromBacking(NSMakePoint(100.0, 100.0)) }
+  
+  enum anchor { case middle; case ul; case ll; case ur; case lr }
+  enum type₋of₋layer { case simulation₋interaction; case illustration }
+  
+  let post₋init₋layer = { (_ layer: inout CALayer) -> Void in 
+    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
+    layer.contentsScale = 2.0 /* for retina. */
+    layer.backgroundColor = NSColor.clear.cgColor
+    layer.contentsGravity = .center
+    layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+    layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
+    layer.isOpaque = false
+    layer.needsDisplayOnBoundsChange = true
+    layer.drawsAsynchronously = true
+  }
+  
+  mutating func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, 
+   canvas₋initial: NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: 
+   anchor) -> UUID {
+    var sublayer: CALayer? = nil
+    let ident = UUID()
+    switch layer₋type {
+    case .simulation₋interaction:
+     let layer = CAMetalLayer()
+     self.assemble₋pieces.layers₋with₋realtime.updateValue(layer, forKey: ident)
+     sublayer = layer
+    case .illustration: /* ₋and₋photography. */
+     let layer = CALayer()
+     self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+     sublayer = layer
+    } /* ⬷ note 'doublesided' defaults to true. */
+    if var addition = sublayer {
+      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, 
+       width: canvas₋size.width, height: canvas₋size.height)
+      switch origo₋relative₋superlayer {
+      case .middle:
+        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+      case .ul:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      case .ll:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+      case .ur:
+        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+      case .lr:
+        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+      }
+      addition.name = name
+      post₋init₋layer(&addition)
+      addition.isGeometryFlipped = true
+      composition₋with₋scribbles.addSublayer(addition)
+      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
+    }
+    return ident
+  }
+   
+}
+
+extension Rendition { /* ⬷ minimum and illustrations. */
+   func render₋83(text: String, width: Double, height: Double, ctx: inout CGContext) {
+     let textattrs = default₋textattrs
+     let attrtext = NSAttributedString(string: text, attributes: textattrs)
+     let framesetter = CTFramesetterCreateWithAttributedString(attrtext)
+     let symbols = CFRangeMake(0,attrtext.length)
+     let box = minimumview.bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
+     let textpath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
+     let frame = CTFramesetterCreateFrame(framesetter,symbols,textpath,nil)
+  //   ctx.textPosition = CGPoint(x: 8, y: 24)
+     CTFrameDraw(frame,ctx)
+   }
+   
+  mutating func render₋illustrations( 
+    from₋wire ⁸textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
+    topLeftNextGround: NSEdgeInsets, 
+    typeset₋in columns: Int
+   )
+   {
+   /*
+     var parent₋cursor₋X=topLeftNextGround.left
+     var parent₋cursor₋Y=topLeftNextGround.top
+     let machine = Drawings₁(); var max₋height=0.0; var colno=1
+     
+     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
+     
+     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
+       guard let address = ⁸textual.baseAddress else { return }
+	   let layer = CALayer()
+//       let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
+//        figure₋utf8: address, nil, size: &size, name: &name)
+       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
+       max₋height = max(layer.frame.height,max₋height)
+       layer.name = name
+       colno = (colno + 1) % columns
+       if colno == 0 {
+         parent₋cursor₋X = topLeftNextGround.left
+         parent₋cursor₋Y += max₋height
+         max₋height = 0.0
+       }
+       else {
+         parent₋cursor₋X = size.width + topLeftNextGround.right
+       }
+       
+       let ident = UUID()
+       self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+       composition₋with₋scribbles.addSublayer(layer)
+     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
+    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
+    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
+      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
+	   
+	   */
+   }
+}
+
+extension Rendition { /* ⬷ decoration */
+  func apply₋ornaments() {
+    self.letgo₋all₋ornaments()
+    let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
+    let local₋cursor: NSCursor = NSCursor.dragCopy
+    minimumview.addCursorRect(rect, cursor: local₋cursor)
+    let strategy₁ = {
+      let userdata: UnsafeMutableRawPointer? = nil
+      let _ /* tag */: NSView.TrackingRectTag = minimumview.addTrackingRect(rect, owner: self, 
+       userData: userdata, assumeInside: true)
+       minimumview.updateTrackingAreas()
+    }
+ /* let _ /* strategy₂ */ = { tracking₋bounds: NSRect in 
+      let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
+      /* let opts = [NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.mouseMoved, NSTrackingArea.Options.mouseEnteredAndExited] */
+      let area = NSTrackingArea(rect: tracking₋bounds, options: opts, owner: self, userInfo: nil)
+      self.addTrackingArea(area)
+    } */
+    strategy₁()
+  }
+  func letgo₋all₋ornaments() { for area in minimumview.trackingAreas { minimumview.removeTrackingArea(area) } }
+}
+
+extension Rendition { /* ⬷ interaction */
+  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
+}
+
+extension Rendition {
+  func washline() {
+    operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+  func definition() {
+    operations₂.async { DispatchQueue.main.async {
+      let attribed = NSAttributedString(string: "Hello world")
+      let baseline₋origin = NSPoint()
+      self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
+      let target₋range = NSRange()
+      let options = [NSView.DefinitionOptionKey:Any]()
+      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
+      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
+        baselineOriginProvider: baselineOriginProvider)
+    } }
+  } /* ⬷ popover level 2 (åkerplättransgressionell). */
+  func start₋find₋in₋forks() {
+    operations₂.async { DispatchQueue.main.async {
+      /* minimumview.drawingFindIndicator = true */
+      /* NotificationCenter.send() */
+    } }
+  }
+  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m and ^[[0m. */
+  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m. */
+  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m. */
+  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m. */
+  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m. */
+  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m. */
+  func erase₋to₋end₋of₋current₋line() { } /* ⬷ a․𝘬․a kill₋other₋on₋line and ^K. */
+  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A and ^[B. */
+  func cursorpos(v: Int, h: Int) { } /* ⬷ ^[<v><h>. */
+  func kill₋entire₋line() { } /* ⬷ ^U. */
+  func delete₋erase₋symbol() { } /* ⬷ ^H and 'delete' and 0x08. */
+  func suspend₋process() { } /* ^Z. */
+  func kill₋process() { } /* ⬷ ^U. */
+  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
+  func send₋eof() { } /* ⬷ ^D. */
+  func pause₋scroll() {
+    operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^S. */
+  func scroll₋down₋one₋line() { } /* ⬷ ^[M. */
+  func scroll₋up₋one₋line() { } /* ⬷ ^[D. */
+  func unpause₋scroll() {
+    operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^Q. */
+  func toggle₋pause₋auto₋scroll(enabled: Bool) {
+    operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+}
+
+typealias Adjacents = ContiguousArray<Tetra𝘖rUnicode> /* ⬷ interval and scalar region. */
+typealias Reference = UnsafeMutablePointer /* ⬷ a C language pointer: both access and manipulation. */
+typealias Nonownings = UnsafeMutableBufferPointer<Tetra𝘖rUnicode> /* ⬷ no manipulations of characters. */
+typealias Voidstar = UnsafeMutableRawPointer /* ⬷ crossing at least two language barriers. */
 
 class Minimumview: NSView {
   
@@ -26,16 +277,16 @@ class Minimumview: NSView {
   }
   
   var controller: Viewcontroller
-  let composition₋delegate = Compositiondelegate()
+  // let composition₋delegate = Compositiondelegate()
   
 }
 
 extension Minimumview { /* ⬷ heritage */
   override var isOpaque: Bool { false }
-  override var isFlipped: Bool { true }
+  /* override var isFlipped: Bool { true } */
   override var wantsUpdateLayer: Bool { true }
-  override var preservesContentDuringLiveResize: Bool { true }
-  override func setFrameSize(_ newSize: NSSize) {
+ // override var preservesContentDuringLiveResize: Bool { true }
+ /* override func setFrameSize(_ newSize: NSSize) {
     super.setFrameSize(newSize)
     if self.inLiveResize {
       let r: NSRect = self.rectPreservedDuringLiveResize
@@ -50,7 +301,7 @@ extension Minimumview { /* ⬷ heritage */
       if count >= 3 { self.setNeedsDisplay(exposed.2) }
       if count >= 4 { self.setNeedsDisplay(exposed.3) }
      } else { self.needsDisplay=true }
-   }
+   }*/
   
   /* 􀑆 */ /* 𐤟𐤟𐤟 */
   /* override var wantsDefaultClipping: Bool { false } */
@@ -62,10 +313,10 @@ extension Minimumview { /* ⬷ heritage */
   override func makeBackingLayer() -> CALayer {
     let composition = controller.rendition.composition₋with₋scribbles
     composition.name = "Composition"
-    composition.delegate = composition₋delegate
+    //composition.delegate = composition₋delegate
     self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.duringViewResize
-    self.layerContentsPlacement = .scaleAxesIndependently
-    composition.layoutManager = CAConstraintLayoutManager()
+//    self.layerContentsPlacement = .scaleAxesIndependently
+//    composition.layoutManager = CAConstraintLayoutManager()
     composition.needsDisplayOnBoundsChange = true
    /* composition.autoresizingMask: CAAutoresizingMask = 
      [.kCALayerWidthSizable, .kCALayerHeightSizable] */
@@ -73,7 +324,7 @@ extension Minimumview { /* ⬷ heritage */
     composition.borderColor = Rendition.paperborder.cgColor
     composition.borderWidth = 0.5
     return composition }
-  override func viewWillMove(toWindow: NSWindow?) {
+/*  override func viewWillMove(toWindow: NSWindow?) {
     print("viewWillMoveToWindow")
     super.viewWillMove(toWindow: window) }
   override func viewWillMove(toSuperview: NSView?) {
@@ -101,16 +352,53 @@ extension Minimumview { /* ⬷ heritage */
     path.move(to: NSPoint(x: 0, y: 0))
     path.line(to: NSPoint(x: 10, y: 10))
     path.stroke()
-  }
+  } */
 }
 
 extension Minimumview {
   override func draw(_ dirty: CGRect) { print("draw-rect: \(dirty)") 
     
-    guard let omgivning = NSGraphicsContext.current?.cgContext else { return }
+    guard var omgivning = NSGraphicsContext.current?.cgContext else { return }
     
     print("self.frame now is \(self.frame)")
     
+    //let width = minimumview.bounds.size.width
+    controller.rendition.render₋83(text: "String", width: 100, height: 100, ctx: &omgivning)
+    
+    let attributedString = NSAttributedString(string: "Hello World lorem ipsum dolor sit", attributes: [NSAttributedString.Key.font: Rendition.textfont])
+    let framesetter = CTFramesetterCreateWithAttributedString(attributedString)
+    let path = CGPath(rect: bounds, transform: nil)
+    let textFrame = CTFramesetterCreateFrame(framesetter, CFRange(), path, nil)
+    CTFrameDraw(textFrame, omgivning)
+    
+    let is₋continuing₋character = { (uc: UInt32) -> Bool in 
+     return (0x300 <= uc && uc <= 0x360) || /* ⬷ combining diacritical marks. */
+      (0x1AB0 <= uc && uc <= 0x1AFF) || /* ⬷ combining diacritical marks extended. */
+      (0x1DC0 <= uc && uc <= 0x1DFF) || /* ⬷ combining diacritical marks supplement. */
+      (0x20D0 <= uc && uc <= 0x20FF) || /* ⬷ combining diacritical marks for symbols. */
+      (0xFE20 <= uc && uc <= 0xFE2F) /* ⬷ combining half marks. */
+     } /* ⬷ documented to be 'identic to the Mc Unicode Character 
+ Property' consisting of 445 characters and not the U+1F16A Unicode. */
+    
+    let is₋private₋use = { (uc: UInt32) -> Bool in
+      return (0xE000 <= uc && uc <= 0xF8FF) || 
+       (0xF0000 <= uc && uc <= 0xFFFFD) || 
+       (0x100000 <= uc && uc <= 0x10FFFD) }
+    
+    let pointer = UnsafeMutablePointer<CChar32>.allocate(capacity: 5)
+    pointer[0] = Unicode.Scalar(0x0041)
+    pointer[1] = Unicode.Scalar(0x0042)
+    pointer[2] = Unicode.Scalar(0x0043)
+    pointer[3] = Unicode.Scalar(0x0044)
+    pointer[4] = Unicode.Scalar(UInt32(0x1f610))!
+    let rawpointer = UnsafeMutableRawPointer(pointer)
+    let str = String(bytesNoCopy: rawpointer, length: 20, encoding: .utf32LittleEndian, 
+     freeWhenDone: false)
+    print("sträng är \(String(describing: str!))")
+    let attrs = NSAttributedString(string: str!)
+    /* a basic unit may consist of multiple Unicode code points. */
+	/* in swift extended grapheme cluster a.k.a Character e.g \u{E9}\u{20DD} and UAX # 29. */
+	/* legacy/extended is base followed by zero or more continuing characters. */
     /* a small drawing-machine: */
     
     let setup₋coordinates = {
@@ -176,15 +464,15 @@ extension Minimumview {
   }
 }
 
-extension Minimumview {
+/* extension Minimumview {
   func snapshot₋rendition() -> NSBitmapImageRep? {
     let rectangle = controller.rendition.assemble₋pieces.text.frame 
     let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rectangle)
     return bitmap
   } /* bitmap.planar, bitmap.samplesPerPixels, ... */
-}
+} */
 
-class Compositiondelegate: NSObject, CALayerDelegate {
+/* class Compositiondelegate: NSObject, CALayerDelegate {
   class Action: CAAction {
     func run(forKey event: String, object anObject: Any, 
      arguments: [AnyHashable : Any]?) { print("run \(event)") }
@@ -200,9 +488,9 @@ class Compositiondelegate: NSObject, CALayerDelegate {
   func action(for layer: CALayer, forKey event: String) -> CAAction? {
     print("action \(optname(layer))")
     return Action() }
-}
+} */
 
-extension Minimumview {
+/* extension Minimumview {
   func loupe₋overlayed(_ sender: AnyObject) {
     /* let bounds = CGContextConvertRectToDeviceSpace() */
     /* composition.minificationFilter = CALayer.trilinear 
@@ -211,7 +499,7 @@ extension Minimumview {
   } /* ⬷ protocol-􀤎. */
   enum Perspective { case undo; case redo; case hidden₋detailed }
   func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
-}
+} */
 
 class SeViewcontroller: NSViewController {
    var trackpad = Trackpad()
@@ -241,25 +529,19 @@ class Viewcontroller: SeViewcontroller {
     let initial₋rect = NSSize(width: 501, height: 502) /* ⬷ construe and merged later. */
     let frame = NSRect(origin: initial₋placement, size: initial₋rect)
     let visualeffect = NSVisualEffectView(frame: frame)
-    visualeffect.translatesAutoresizingMaskIntoConstraints = false
+    /* visualeffect.translatesAutoresizingMaskIntoConstraints = false */
     visualeffect.blendingMode = .behindWindow
     visualeffect.state = .active
-    /* visualeffect.layer?.cornerRadius = 16.0 */
     /* visualeffect.maskImage = NSImage(data: Data(contentsOf: url)) /​* ⬷ '130px-Cross-Pattee-Heraldry.png'. */
     self.view = visualeffect
     let material = Minimumview(frame: frame, controller: self)
     /* material.acceptsTouchEvents = true */
     material.allowedTouchTypes = [.indirect] /* ⬷ ipad = .direct */
     self.view.addSubview(material)
-    NSLayoutConstraint.activate([
-     material.leadingAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.leadingAnchor, constant: 20), 
-     material.trailingAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.trailingAnchor, constant: 20), 
-     material.topAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.topAnchor, constant: 20), 
-     material.bottomAnchor.constraint(greaterThanOrEqualTo: visualeffect.safeAreaLayoutGuide.bottomAnchor, constant: 20)
-    ])
-   /* let header: NSAttributedString = minimumview.pageHeader
-    let footer: NSAttributedString = minimumview.pageFooter
-    let jobname: String = minimumview.printJobTitle */
+    let views = ["material" : minimumview]
+    self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[material]|", options: [], metrics: nil, views: views))
+    self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[material]|", options: [], metrics: nil, views: views))
+    material.translatesAutoresizingMaskIntoConstraints = false
   }
   
   /* override var representedObject: Any? {
@@ -369,92 +651,35 @@ class Windowcontroller: SeWindowcontroller {
     arguments dict: [AnyHashable : Any]?) { } */
    
    let viewctrl = Viewcontroller()
-   var shell = Inter₋act₋and₋inte₋r₋u₋p₋t()
-   var recorder = UndoManager() /* ⬷ duplicate undo-manager, earlier specified 
-    residing inside NSResponder as undoManager. */
+   var shell = Interact()
+   var recorder = UndoManager() /* ⬷ duplicate undo-manager incorrectly 
+    placed inside NSResponder named 'undoManager'. */
    
    var minimumwindow: Minimumwindow { self.window as! Minimumwindow }
    var minimumview: Minimumview { minimumwindow.controller.minimumview }
    var rendition: Rendition { self.contentViewController!.representedObject as! Rendition }
    
-   @available(macOS 12.0.0, *) /* ⬷ SwiftStdlib 5.5. */
-   func corout₋keyput₋in₋child(text: String) async -> Void {
-     while true {
-       while !self.i₋material.isEmpty {
-         guard let oldest₋text = self.i₋material.first else { /* await Task.yield(); */ continue }
-         shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: oldest₋text)
-         self.i₋material.removeFirst()
-       }
-       /* await Task.yield() */
-     }
-   } /* ⬷ a․𝘬․a 'a coroutine that may suspend at any time'. 
-    'löper samtidigt' ≢ async.
-     let t₁ = Task.detached { }
-     let t₂ = Task { await shell.slow-write... }
-     t.cancel() */
-   
-   var pieced₋work = Array<ContiguousArray<Tetra𝘖rUnicode>>()
-   var brk: Nonabsolute = 0
-   let Unicodes₋per₋tile = 8192
-   typealias Reference = UnsafeMutablePointer
-   let separator = Unicode.Scalar(0x008a)
+   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
+   var unicodes = Array<CChar32>() /* ⬷ textual text may have been machine-read. */
    var graphics₋not₋text = false
-   var curr₋sentinel₋idx: Nonabsolute = 0
+   let separator = Unicode.Scalar(0x008a)
    
-   func at₋concurrent() { append₋sentinel() }
-   func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
-     typealias Characters = UnsafeMutableBufferPointer<Tetra𝘖rUnicode>
-     let setup = { (buffer: inout Characters, initializedCount: inout Int) -> Void in 
-      initializedCount=0 }
-     let onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
-      capacity, initializingWith: setup)
-     pieced₋work.append(onetile) }
-   func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
-     let capacity=Unicodes₋per₋tile; arrayidx=Int(loc)/capacity; inousidx=Int(loc)%capacity
-   } /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
-   func append₋various(_ taltu: Tetra𝘖rUnicode) {
-     var idx, slot: Int
-     location(loc: brk, arrayidx: &idx, inousidx: &slot)
-     if slot >= pieced₋work.count { append₋one₋tile() }
-     var array = pieced₋work[idx]
-     array.append(taltu)
-     brk += 1 }
-   func append₋one₋unicode(uc: CChar32) {
-     let elem = Tetra𝘖rUnicode(uc: uc.value)
-     append₋various(elem)
-   }
-   func append₋sentinel() {
-     curr₋sentinel₋idx=self.brk
-     let elem = Tetra𝘖rUnicode(count: -1)
-     append₋various(elem)
-   }
-   func fill₋in₋last₋sentinel() {
-     var idx, slot: Int
-     location(loc: curr₋sentinel₋idx, arrayidx: &idx, inousidx: &slot)
-     let unicode₋count = self.brk - curr₋sentinel₋idx - 1
-     var carray = pieced₋work[idx]
-     carray[slot].count = Int32(unicode₋count)
-   }
-   func baseaddress(tile: Int) -> Reference<Tetra𝘖rUnicode>? {
-     return self.pieced₋work[tile]._baseAddressIfContiguous
-   }
-   /* 1) Unicode code point == 32-bit word and 
+   var read₋graphics: (@convention(c) (CChar32) -> Void)?
+   
+   func tektron(uc: CChar32) {
+     unicodes.append(uc) /* ⬷ Tx'ed from child. */
+     if uc == separator {
+       if self.graphics₋not₋text { patchwork.graphics₋ended() }
+       else { patchwork.graphics₋begin() }
+       self.graphics₋not₋text = !self.graphics₋not₋text
+     } else if graphics₋not₋text { read₋graphics!(uc) }
+   } /* ⬷ 1) Unicode code point == 32-bit word and 
       2) grapheme == smallest functional unit in a writing system and 
       3) grapheme cluster == multiple code points == a user-percieved-character. */
-   func tektron(uc: CChar32) -> Void {
-     append₋one₋unicode(uc: uc)
-     if uc == separator {
-       if self.graphics₋not₋text { /* fixup₋graphics: */ }
-       else { /* graphics₋start: */ }
-       self.graphics₋not₋text = !self.graphics₋not₋text
-     } /* ⬷ Jde|1|18|! */
-     /* notification antal alt. tidsåtgång. */
-   } 
    
    @available(macOS 12.0.0, *)
    func corout₋textual₋and₋graphical₋output() async {
-     at₋concurrent()
-     let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
+     let maxfour = Reference<UInt8>.allocate(capacity: 4)
      while true {
        guard let oldest = self.o₋material.first else { /* await Task.yield(); */ continue }
        var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)!
@@ -463,9 +688,9 @@ class Windowcontroller: SeWindowcontroller {
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
          let followers = followers₋and₋lead - 1
          if followers >= 1 { maxfour[0] = leadOr8Bit 
-           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
-           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
-           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { if o₋material.count == 1 { /* await Task.yield() */ } else { } }
+           if idx + 1 < oldest.count { maxfour[1] = oldest[idx+1] } else { if o₋material.count == 1 { await Task.yield() } else { } }
+           if idx + 2 < oldest.count { maxfour[2] = oldest[idx+2] } else { if o₋material.count == 1 { await Task.yield() } else { } }
+           if idx + 3 < oldest.count { maxfour[3] = oldest[idx+3] } else { if o₋material.count == 1 { await Task.yield() } else { } }
          }
          if leadOr8Bit >= 128 {
            if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
@@ -478,9 +703,13 @@ class Windowcontroller: SeWindowcontroller {
          idx += followers₋and₋lead
        }
        self.o₋material.removeFirst()
-       /* await Task.yield() */
+       await Task.yield()
      }
-   }
+   } /* ⬷ a․𝘬․a 'a coroutine that may suspend at any time'. 
+    'löper samtidigt' ≢ async.
+     let t₁ = Task.detached { }
+     let t₂ = Task { await shell.slow-write... }
+     t.cancel() */
    
    var o₋material = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
    var i₋material = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
@@ -488,15 +717,15 @@ class Windowcontroller: SeWindowcontroller {
    override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
      NotificationCenter.receive(.preferences₋changed, 
       instance: self, selector: #selector(reloadUi))
-     let textual = { (material: Data) in 
+     shell.output = { (material: Data) in 
        self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
-         /* Task { await self.corout₋textual₋and₋graphical₋output() } */
+         Task { await self.corout₋textual₋and₋graphical₋output() }
        }
      }
-     let y = shell.commence(execute: "zsh", parameters: ["-s", "-i"], /* 'r', 'i'. */
-      path₋exe: "/bin/", out: textual)
-     if y != 0 { fatalError("unable to spawn") }
+     // shell.commence(execute: "zsh", parameters: ["-s", "-i"], path₋exe: "/bin/")
+     //shell.commence(execute: "ls", parameters: ["-l", "-a"], path₋exe: "/bin/")
+     shell.commence(execute: "bash", parameters: [], path₋exe: "/bin/")
      self.viewctrl.representedObject = Rendition(minimumview: self.minimumview)
    }
    
@@ -541,17 +770,14 @@ class Minimumwindow: NSWindow {
    
    var shift=false, ctrl=false, opt=false, cmd=false
    
-   override func flagsChanged(with event: NSEvent) { print("flagsChanged") 
+   override func flagsChanged(with event: NSEvent) {
      let modifs: NSEvent.ModifierFlags = event.modifierFlags
      shift = modifs.contains(.shift)
      ctrl = modifs.contains(.control)
      opt = modifs.contains(.option)
      cmd = modifs.contains(.command)
-   } /* ⬷ 'OptionSet', not a generic …. */
-   
-   override func keyDown(with event: NSEvent) { print("key-down in NSWindow-class") 
-     super.keyDown(with: event) /* ⬷ passes event to next responder. */
-   } /* ⬷ responder chain traverses NSView hierarchy, then NSWindow finally NSWindowController. */
+     print("flagsChanged: \(shift), \(ctrl), \(opt), \(cmd)")
+   }
    
    override func performKeyEquivalent(with event: NSEvent) -> Bool {
      print("performKeyEquivalent")
@@ -562,380 +788,27 @@ class Minimumwindow: NSWindow {
 
 extension Windowcontroller { /* ⬷ keyboard */
    
-   func keyput(_ unicode: CChar32) { /* ⬷ a․𝘬․a Unicode.Scalar. */
-     print("start-keyput: \(unicode)")
-     if #available (macOS 12.0.0, *) {
-       /* Task { await self.corout₋keyput₋in₋child(text: String(unicode)) } */
-     }
-   } 
-  
-  override func keyDown(with event: NSEvent) { print("keydown in window-controller") 
-    super.keyDown(with: event)
-     print("keydown \(event.keyCode)")
-     print("keydown \(String(describing: event.characters))")
-     /* let absorb₋sponge = event.pressure */
-     let description = event.modifierFlags.rawValue.description
-     print("modifier \(String(describing: description))")
+   func keyput(_ unicode: CChar32) {
+     let text = String(unicode)
+     shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: text)
+   }
+   
+   override func keyDown(with event: NSEvent) {
+     let spacekey = Unicode.Scalar(0x0020)
      if let characters = event.characters {
        for symbol: Character in characters {
          print("utf8 (\(symbol.utf8)): ", terminator: "")
          symbol.utf8.forEach { byte in print("\(byte) ", terminator: "") }
-         print("\nunicodes \(symbol.unicodeScalars)")
+         print("\nkeydown unicodes \(symbol.unicodeScalars)")
          for possibly₋canonic in symbol.unicodeScalars { /* ⬷ the possibly₋canonic typed UInt32 later 'struct Unicode.Scalar' in Swift. */
-           let possibly₋canonic₂ = 
-  Int(truncatingIfNeeded: possibly₋canonic.value)
-           switch possibly₋canonic₂ {
-           case NSDeleteFunctionKey:
-             print("deleteKeyDown"); keyput("\u{8}") /* ⬷ in Swift 'hexadecimal always'. */
-           case NSInsertFunctionKey:
-             print("insertKeyDown")
-           case NSClearLineFunctionKey:
-             print("clearlineKeyDown")
-           case NSClearDisplayFunctionKey:
-             print("cleardisplayKeyDown")
-           case NSModeSwitchFunctionKey:
-             print("modeSwitchKeyDown")
-           case NSPageUpFunctionKey:
-             print("pageupKeyDown")
-           case NSPageDownFunctionKey:
-             print("pagedownKeyDown")
-           case NSPrintScreenFunctionKey:
-             print("printScreenKeyDown")
-           case NSBreakFunctionKey:
-             print("breakKeyDown")
-           case NSStopFunctionKey:
-             print("stopKeyDown")
-           case NSResetFunctionKey:
-             print("resetKeyDown")
-           case NSPrintFunctionKey:
-             print("printKeyDown")
-           case NSInsertCharFunctionKey:
-             print("insertCharKeyDown")
-           case NSUndoFunctionKey:
-             print("undoKeyDown")
-           case NSRedoFunctionKey:
-             print("redoKeyDown")
-           case 0x0020: if minimumwindow.ctrl { rendition.washline() } else { keyput(" ") } /* ⬷ space character. */
-           default:
-             print("keydown default first end")
-           }
-           switch possibly₋canonic {
-           case "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", 
-                "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 
-                "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", 
-                "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z":
-             keyput(possibly₋canonic)
-           default: print("keydown default second end")
-           }
+           if possibly₋canonic == spacekey && minimumwindow.ctrl { rendition.washline() }
+           else { keyput(possibly₋canonic) }
          }
        }
      }
-  } /* ⬷ String, Character, Unicode and Staticstring. */
-  
-  override func noResponder(for event: Selector) { print("no responder for \(event)") }
-  
-}
-
-struct Rendition {
-  
-  var minimumview: Minimumview
-  
-  static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
-    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
-    paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
-  static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
-  static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
-   coarse₋grid = NSColor(calibratedWhite: 0.88, alpha: 1.0)
-  static let systemfont = NSFont.systemFont(ofSize: 30.0), 
-   textfont = NSFont(name: "SF Mono", size: 9)
-  static let textcolor = NSColor(named: NSColor.Name("primaryControlColor"))
-  static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
-  
-  var default₋textattrs: [NSAttributedString.Key: Any] {
-    get {
-      guard let font = Rendition.textfont else { return [:] }
-      guard let fg₋color = Rendition.textcolor else { return [:] }
-      return [.font: font, .foregroundColor: fg₋color.cgColor]
-    }
-  }
-   
-  let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent) /* ⬷ for visible work. */
-  let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */) /* ⬷ for non-visible work. */
-  /* ⬷ samgörande alt․ schemalaggda (▚). */
-  
-  struct layers { let text=CATextLayer() 
-   var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
-   var rendered₋images = Dictionary<UUID,CGImage>()
-   var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
-   var scribbles = Dictionary<UUID,feedback>()
-   class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() } /* ⬷ a․𝘬․a Inexplanat. */
-  }
-  
-  struct Theme {
-    var background: NSColor
-    var isDark: Bool
-  }
-  
-  var assemble₋pieces = layers()
-  let composition₋with₋scribbles = CALayer()
-  var theme₁=Theme(background: crepe, isDark: true), 
-   theme₂=Theme(background: paper, isDark: false)
-  
-  var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
-  var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
-  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
-  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
-  func total₋twopass₋and₋height() -> CGFloat { return 100.0 }
-  func total₋twopass₋and₋width₋in₋O₍n₎() -> CGFloat { return 100.0 }
-  
-  enum anchor { case middle; case ul; case ll; case ur; case lr }
-  enum type₋of₋layer { case simulation₋interaction; case illustration }
-  
-  let post₋init₋layer = { (_ layer: inout CALayer) -> Void in 
-    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
-    layer.contentsScale = 2.0 /* for retina. */
-    layer.backgroundColor = NSColor.clear.cgColor
-    layer.contentsGravity = .center
-    layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
-    layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
-    layer.isOpaque = false
-    layer.needsDisplayOnBoundsChange = true
-    layer.drawsAsynchronously = true
-  }
-  
-  mutating func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, canvas₋initial: 
-   NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: anchor) -> UUID {
-    var sublayer: CALayer? = nil
-    let ident = UUID()
-    switch layer₋type {
-    case .simulation₋interaction:
-     let layer = CAMetalLayer()
-     self.assemble₋pieces.layers₋with₋realtime.updateValue(layer, forKey: ident)
-     sublayer = layer
-    case .illustration: /* ₋and₋photography. */
-     let layer = CALayer()
-     self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-     sublayer = layer
-    } /* ⬷ note 'doublesided' defaults to true. */
-    if var addition = sublayer {
-      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, width: canvas₋size.width, height: canvas₋size.height)
-      switch origo₋relative₋superlayer {
-      case .middle:
-        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-      case .ul:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      case .ll:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-      case .ur:
-        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
-      case .lr:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      }
-      addition.name = name
-      post₋init₋layer(&addition)
-      addition.isGeometryFlipped = true
-      composition₋with₋scribbles.addSublayer(addition)
-      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
-    }
-    return ident
-  }
-   
-//   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
-//   var unicodes = Original() /* ⬷ textual text may have been machine-read. */
-   
-}
-
-/*
-class ᴬᴾᴾᴸTektron {
-  let Unicodes₋per₋tile=8192; var brk: Nonabsolute=0
-  var patchwork = Array<ContiguousArray<Tetra𝘖rUnicode>>()
-  private func append₋one₋tile() { let capacity=Unicodes₋per₋tile 
-    let onetile = ContiguousArray<Tetra𝘖rUnicode>(unsafeUninitializedCapacity: 
-     capacity, initializingWith: { buffer, initializedCount in initializedCount = 0 })
-    patchwork.append(onetile) }
-  private func location(loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
-    let capacity=Unicodes₋per₋tile; arrayidx=loc/capacity; inousidx=loc%capacity }
-  /* ⬷ suffixial binding of interest after a coupe, 𝘦․𝘨 'loc divmod capacity, arrayidx=rah, inousidx=ral'. */
-  private func append₋various(taltu: Tetra𝘖rUnicode) { var idx, slot: Int 
-    location(loc: brk, arrayidx: &idx, inousidx: &slot)
-    if slot >= patchwork.count { append₋one₋tile() }
-    var array = patchwork[idx]
-    array.append(taltu)
-    brk += 1 }
-  func append₋one₋unicode(uc: CChar32) {
-    let elem = Tetra𝘖rUnicode(uc: uc)
-    self.append₋various(taltu: elem)
-  }
-  func append₋sentinel(﹟: Int32) {
-    let elem = Tetra𝘖rUnicode(count: ﹟)
-    self.append₋various(taltu: elem)
-  }
-  func fill₋in₋sentinel(﹟: Int32, at: Nonabsolute) { }
-  let read₋tektron: (@convention(c) (Nonabsolute, UnsafeMutablePointer<Tetra𝘖rUnicode>?, CInt /* count */) -> Int)?
-  func start(tile: Int) -> UnsafeMutablePointer<Tetra𝘖rUnicode>? { return patchwork[tile]._baseAddressIfContiguous }
-} /* ⬷ see --<Kiddle.hpp> for early attempt. */
-
-struct /* 􀠧􀠧􀠧 (Fanjunkare) */ Quilt { var patchwork = Array<Zebra>() 
-  struct Zebra { var sentinel₋there, count: Int }
-  func mark₋start₋at₋unicode(uc₋idx: Int) {
-   let stomp = Zebra(there: uc₋idx, count: -1)
-   patchwork.append(stomp) }
-  func close₋segment(original: Original) -> Nonabsolute { original.close₋segment(); return 0 }
-}
-
-struct /* 􀠧 (Sergeant) */ Original { var curr₋sentinel₋idx: Nonabsolute 
-  var tape = ᴬᴾᴾᴸTektron()
-  init() { self.curr₋sentinel₋idx=0; self.tape.append₋sentinel(﹟: -1) }
-  func append₋one₋unicode(uc: CChar32) { self.tape.append₋one₋unicode(uc: uc) }
-  func close₋segment(quilt: inout Quilt) {
-   let count = tape.brk - curr₋sentinel₋idx - 1
-   tape.fill₋in₋sentinel(﹟: count, at: curr₋sentinel₋idx)
-
-let coda = quilt.close₋segment()
-
- }
-} /* ⬷ when crossing to C the ContigousArray is implicity casted to 
- an UnsafeMutablePointer<Tetra𝘖rUnicode>. */
-*/
-
-extension Rendition { /* ⬷ Tx'ed from child. */
-  /* func fixup₋graphics() -> Nonabsolute { print("fixup graphics") }
-  func append₋graphic(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) }
-  func start₋graphics() -> Nonabsolute { graphic₋original.print("start graphics"); return 0 }
-  func append₋text(uc: CChar32) { unicodes.append₋one₋unicode(uc: uc) } */
-  func notification() { }
-}
-
-extension Rendition { /* ⬷ minimum and illustrations. */
-   func render₋83(text: String, width: Double, height: Double, ctx: inout CGContext) {
-     let textattrs = default₋textattrs
-     let attrtext = NSAttributedString(string: text, attributes: textattrs)
-     let framesetter = CTFramesetterCreateWithAttributedString(attrtext)
-     let symbols = CFRangeMake(0,attrtext.length)
-     let box = minimumview.bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
-     let textpath = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-     let frame = CTFramesetterCreateFrame(framesetter,symbols,textpath,nil)
-     ctx.textPosition = CGPoint(x: 8, y: 24)
-     CTFrameDraw(frame,ctx)
    }
-   
-  mutating func render₋illustrations( 
-    from₋wire textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
-    topLeftNextGround: NSEdgeInsets, 
-    typeset₋in columns: Int
-   )
-   {
-     var parent₋cursor₋X=topLeftNextGround.left
-     var parent₋cursor₋Y=topLeftNextGround.top
-     let machine = Drawings₁(); var max₋height=0.0; var colno=1
-     
-     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
-     
-     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
-       guard let address = ⁸textual.baseAddress else { return }
-       let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
-        figure₋utf8: address, nil, size: &size, name: &name)
-       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
-       max₋height = max(layer.frame.height,max₋height)
-       layer.name = name
-       colno = (colno + 1) % columns
-       if colno == 0 {
-         parent₋cursor₋X = topLeftNextGround.left
-         parent₋cursor₋Y += max₋height
-         max₋height = 0.0
-       }
-       else {
-         parent₋cursor₋X = size.width + topLeftNextGround.right
-       }
-       
-       let ident = UUID()
-       self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-       composition₋with₋scribbles.addSublayer(layer)
-     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
-    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
-    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
-      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
-   }
-}
-
-extension Rendition { /* ⬷ decoration */
-  func apply₋ornaments() {
-    self.letgo₋all₋ornaments()
-    let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
-    let local₋cursor: NSCursor = NSCursor.dragCopy
-    minimumview.addCursorRect(rect, cursor: local₋cursor)
-    let strategy₁ = {
-      let userdata: UnsafeMutableRawPointer? = nil
-      let _ /* tag */: NSView.TrackingRectTag = minimumview.addTrackingRect(rect, owner: self, 
-       userData: userdata, assumeInside: true)
-       minimumview.updateTrackingAreas()
-    }
- /* let _ /* strategy₂ */ = { tracking₋bounds: NSRect in 
-      let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
-      /* let opts = [NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.mouseMoved, NSTrackingArea.Options.mouseEnteredAndExited] */
-      let area = NSTrackingArea(rect: tracking₋bounds, options: opts, owner: self, userInfo: nil)
-      self.addTrackingArea(area)
-    } */
-    strategy₁()
-  }
-  func letgo₋all₋ornaments() { for area in minimumview.trackingAreas { minimumview.removeTrackingArea(area) } }
-}
-
-extension Rendition { /* ⬷ interaction */
-  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
-}
-
-extension Rendition {
-  func washline() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  }
-  func definition() {
-    operations₂.async { DispatchQueue.main.async {
-      let attribed = NSAttributedString(string: "Hello world")
-      let baseline₋origin = NSPoint()
-      self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
-      let target₋range = NSRange()
-      let options = [NSView.DefinitionOptionKey:Any]()
-      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
-      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
-        baselineOriginProvider: baselineOriginProvider)
-    } }
-  } /* ⬷ popover level 2 (åkerplättransgressionell). */
-  func start₋find₋in₋forks() {
-    operations₂.async { DispatchQueue.main.async {
-      /* minimumview.drawingFindIndicator = true */
-      /* NotificationCenter.send() */
-    } }
-  }
-  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m and ^[[0m. */
-  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m. */
-  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m. */
-  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m. */
-  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m. */
-  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m. */
-  func erase₋to₋end₋of₋current₋line() { } /* ⬷ a․𝘬․a kill₋other₋on₋line and ^K. */
-  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A and ^[B. */
-  func cursorpos(v: Int, h: Int) { } /* ⬷ ^[<v><h>. */
-  func kill₋entire₋line() { } /* ⬷ ^U. */
-  func delete₋erase₋symbol() { } /* ⬷ ^H and 'delete' and 0x08. */
-  func suspend₋process() { } /* ^Z. */
-  func kill₋process() { } /* ⬷ ^U. */
-  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
-  func send₋eof() { } /* ⬷ ^D. */
-  func pause₋scroll() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^S. */
-  func scroll₋down₋one₋line() { } /* ⬷ ^[M. */
-  func scroll₋up₋one₋line() { } /* ⬷ ^[D. */
-  func unpause₋scroll() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^Q. */
-  func toggle₋pause₋auto₋scroll(enabled: Bool) {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  }
+  
+   override func noResponder(for event: Selector) { print("no responder for \(event)") }
+  
 }
 
