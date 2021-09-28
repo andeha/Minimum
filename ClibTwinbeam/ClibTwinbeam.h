@@ -66,8 +66,8 @@ __builtin_int_t bytes(struct structat * 🅢); /* __attribute__((overloadable));
 #define NULL 0
 typedef int pid_t;
 
-EXT₋C pid_t Twinbeam₋spawn(const char * u8s₋command, int * fd_p2c, 
- int * fd_c2p /* ,const char * NULLterminatedEnv */);
+EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * command₋u8s, 
+ int * fd_p2c, int * fd_c2p /* ,const char * NULLterminatedEnv */);
 
 EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
@@ -143,12 +143,13 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
 /* Typechecked in your military-project: */
 
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
-typedef __builtin_int Nonabsolute;
+typedef __builtin_int_t Nonabsolute;
 
 typedef struct sequent Artnumerical;
 struct Point { Artnumerical x,y; };
 struct Illustration { Artnumerical size, place₋origo, offset₋drawing₋on; };
-int Draw₋Bezer(int count, struct Illustration * ctxt, struct Point, ...); /* arbtrary number of other points. */
+int Draw₋Bezer(int count, struct Illustration * ctxt, struct Point, ...);
+/* ⬷ arbtrary number of other points. */
 /* int Place₋text(Unicodes symbols); */
 
 enum Artwork₋token₋symbol { dotsize, dotorigo, dotoffset, real, comma₋0x2c, 
