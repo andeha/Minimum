@@ -23,17 +23,27 @@ struct Rendition {
    ⁻¹textcolor = zinkwhite, ⁻¹textcolor₂ = Ti₋white
   static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
   
-  var default₋textattrs: [NSAttributedString.Key: Any] {
-    get {
-      guard let font = Rendition.textfont else { return [:] }
-      return [.font: font, .foregroundColor: Rendition.textcolor.cgColor]
-    }
-  }
-  
   /* …for visible work and for non-visible work respectively ⤐ */
   let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
   let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
   /* ⬷ samgörande alt․ schemalaggda (▚). */
+  
+  struct theme { var ink: NSColor; var isDark: Bool }
+  var themes = [ theme(ink: textcolor, isDark: true), 
+   theme(ink: ⁻¹textcolor, isDark: false) ]
+  var themeIdx = -1
+  
+  var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
+  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lfAndEot₋deltas. */
+  var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
+  
+  var default₋textattrs: [NSAttributedString.Key: Any] {
+    get {
+      guard let font = Rendition.textfont else { return [:] }
+      let ink = themes[themeIdx].ink.cgColor
+      return [.font: font, .foregroundColor: ink]
+    }
+  }
   
   struct layers { let text=CATextLayer() 
    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
@@ -43,12 +53,8 @@ struct Rendition {
    class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() }
   }
   
-  struct theme { var background: NSColor; var ink: NSColor; var isDark: Bool }
-  
   var assemble₋pieces = layers()
   let composition₋with₋scribbles = CALayer()
-  var theme₁=theme(background: crepe, ink: textcolor, isDark: true), 
-   theme₂=theme(background: paper, ink: ⁻¹textcolor, isDark: false)
   
   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
@@ -239,7 +245,6 @@ extension Rendition {
   }
 }
 
-typealias Adjacents = ContiguousArray<Tetra𝘖rUnicode> /* ⬷ interval and scalar region. */
 typealias Reference = UnsafeMutablePointer /* ⬷ a C language pointer: both access and manipulation. */
 typealias Nonownings = UnsafeMutableBufferPointer<Tetra𝘖rUnicode> /* ⬷ no manipulations of characters. */
 typealias Voidstar = UnsafeMutableRawPointer /* ⬷ crossing at least two language barriers. */
@@ -390,18 +395,20 @@ class Viewcontroller: NSViewController {
   
   override func viewDidDisappear() { super.viewDidDisappear(); print("viewDidDisappear") }
   
-  var rendition: Rendition { get { self.representedObject as! Rendition } }
+  var rendition: Rendition {
+    get { self.representedObject as! Rendition }
+    set { self.representedObject = newValue 
+    /* update the view if already loaded. */ }
+  }
+  
   var minimumview: Minimumview { get { self.view.subviews[0] as! Minimumview } }
   
   override var acceptsFirstResponder: Bool { true }
   
-  /* override var representedObject: Any? {
-    didSet { /* update the view if already loaded. */ }
-  } */
-   
   override func cursorUpdate(with event: NSEvent) { print("cursorUpdate") 
     /* NSCursor.arrowCursor.set */
     /* NSCursor.dragCopyCursor.set */
+    /* NSCursor.pointingHand.set */
     super.cursorUpdate(with: event)
   }
   
@@ -523,22 +530,19 @@ class Windowcontroller: NSWindowController {
    var minimumview: Minimumview { minimumwindow.controller.minimumview }
    var rendition: Rendition { self.contentViewController!.representedObject as! Rendition }
    
-   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
-   var unicodes = Array<CChar32>() /* ⬷ textual text may have been machine-read. */
-   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a crlfAndEotDeltas. */
-   
    var graphics₋not₋text = false
-   let separator = Unicode.Scalar(0x008a)
+   let separator = UInt32(0x0000008a)
+   let Return = UInt32(0x0000000a)
    
-   var read₋graphics: (@convention(c) (CChar32) -> Void)?
+   var read₋graphics: (@convention(c) (UInt32) -> Void)?
    
-   func tektron(uc: CChar32) {
-     unicodes.append(uc) /* ⬷ Tx'ed from child. */
-     if uc == separator {
-       if self.graphics₋not₋text { patchwork.graphics₋ended() }
-       else { patchwork.graphics₋begin() }
+   func tektron(_ unicode: UInt32) {
+     rendition.original.append(unicode) /* ⬷ Tx'ed from child. */
+     if unicode == separator {
+       if self.graphics₋not₋text { rendition.patchwork.graphics₋ended() }
+       else { rendition.patchwork.graphics₋begin() }
        self.graphics₋not₋text = !self.graphics₋not₋text
-     } else if graphics₋not₋text { read₋graphics!(uc) }
+     } else if graphics₋not₋text { read₋graphics!(unicode) }
    } /* ⬷ 1) Unicode code point == 32-bit word and 
       2) grapheme == smallest functional unit in a writing system and 
       3) grapheme cluster == multiple code points == a user-percieved-character. */
@@ -547,8 +551,8 @@ class Windowcontroller: NSWindowController {
    func corout₋textual₋and₋graphical₋output() async {
      let maxfour = Reference<UInt8>.allocate(capacity: 4)
      while true {
-       guard let oldest = self.o₋material.first else { /* await Task.yield(); */ continue }
-       var idx=0, errors=0; var uc=Unicode.Scalar(0x0000)!
+       guard let oldest = self.o₋material.first else { await Task.yield(); continue }
+       var idx=0, errors=0; var unicode = Return
        while idx < oldest.count {
          let leadOr8Bit: UInt8 = oldest[idx]
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
@@ -561,11 +565,11 @@ class Windowcontroller: NSWindowController {
          if leadOr8Bit >= 128 {
            if 128 <= leadOr8Bit && leadOr8Bit < 192 { errors += 1; idx += followers₋and₋lead; continue; }
            if 248 <= leadOr8Bit { errors += 1; idx += followers₋and₋lead; continue }
-           uc = Utf8ToUnicode(ξ: maxfour, bytes: followers₋and₋lead)
+           unicode = Utf8ToUnicode(ξ: maxfour, bytes: followers₋and₋lead)
          } else {
-           uc = CChar32(leadOr8Bit)
+           unicode = UInt32(leadOr8Bit)
          }
-         tektron(uc: uc)
+         tektron(unicode)
          idx += followers₋and₋lead
        }
        self.o₋material.removeFirst()
@@ -589,19 +593,18 @@ class Windowcontroller: NSWindowController {
          Task { await self.corout₋textual₋and₋graphical₋output() }
        }
      }
-     // shell.commence(execute: "zsh", parameters: ["-s", "-i"], path₋exe: "/bin/")
-     //shell.commence(execute: "ls", parameters: ["-l", "-a"], path₋exe: "/bin/")
-     shell.commence(execute: "bash", parameters: [], path₋exe: "/bin/")
+     shell.commence(execute: "zsh", parameters: ["-s", "-i"], path₋exe: "/bin/")
+     /* shell.commence(execute: "ls", parameters: ["-l", "-a"], path₋exe: "/bin/") */
      self.viewctrl.representedObject = Rendition(minimumview: self.minimumview)
    }
    
    func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? { return recorder }
    
    @objc private func reloadUi() { print("reloadUi") 
-     if NSApp.effectiveAppearance.name == .darkAqua { return }
+     /* if NSApp.effectiveAppearance.name == .darkAqua { return }
+     window.backgroundColor = rendition.theme.background */
      guard let window = self.window else { return }
-     window.backgroundColor = rendition.theme₁.background
-     if rendition.theme₁.isDark {
+     if rendition.themes[rendition.themeIdx].isDark {
        window.appearance = NSAppearance(named: .darkAqua)
      } else {
        window.appearance = NSAppearance(named: .aqua)

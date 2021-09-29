@@ -144,7 +144,19 @@ class Interact {
   }
 }
 
-class Original {
+class ᴮʳTektron {
+  let Unicode₋per₋tile = 8192
+  var pieced₋work = Array<Reference<UInt32>>()
+  func append₋one₋tile() {
+    let pointer = Reference<UInt32>.allocate(capacity: Unicode₋per₋tile)
+    pieced₋work.append(pointer)
+  }
+  func append(_ unicode: UInt32) { }
+  func tiles(count: Int, selection: Array<Reference<UInt32>>) { }
+} /* ⬷ a․𝘬․a Original. */
+
+class ᴬᴾᴾᴸTektron {
+  typealias Adjacents = ContiguousArray<Tetra𝘖rUnicode> /* ⬷ interval and scalar region. */
   var pieced₋work = Array<Adjacents>()
   var curr₋sentinel₋idx: Nonabsolute = 0
   var brk: Nonabsolute = 0
@@ -185,7 +197,7 @@ class Original {
     return self.pieced₋work[tile]._baseAddressIfContiguous
   } /* ⬷ when crossing to C the ContigousArray is implicity casted to 
  an UnsafeMutablePointer<Tetra𝘖rUnicode>. */
-} /* ⬷ a․𝘬․a 􀠧-Sergeant and ᴬᴾᴾᴸTektron. See --<Kiddle.hpp> for early attempt. */
+} /* ⬷ a․𝘬․a 􀠧-Sergeant. See --<Kiddle.hpp> for early attempt. */
 
 class Quilt {
   func graphics₋begin() { print("graphics begin") }
@@ -234,17 +246,17 @@ extension NSBezierPath {
   
 }
 
-func Utf8ToUnicode(ξ: UnsafeMutablePointer<UInt8>, bytes: Int) -> CChar32
+func Utf8ToUnicode(ξ: UnsafeMutablePointer<UInt8>, bytes: Int) -> UInt32
 {
   switch bytes {
   case 2:
-    return CChar32(UInt32(0b111111 & ξ[1]) | UInt32(0b11111 & ξ[0])<<6)!
+    return UInt32(0b111111 & ξ[1]) | UInt32(0b11111 & ξ[0])<<6
   case 3:
-    return CChar32(UInt32(0b111111 & ξ[2]) | UInt32(0b1111 & ξ[0])<<12 | UInt32(0b111111 & ξ[1])<<6)!
+    return UInt32(0b111111 & ξ[2]) | UInt32(0b1111 & ξ[0])<<12 | UInt32(0b111111 & ξ[1])<<6
   case 4:
-    return CChar32(UInt32(0b111111 & ξ[3]) | UInt32(0b111 & ξ[0])<<18 | UInt32(0b111111 & ξ[1])<<12 | UInt32(0b111111 & ξ[2])<<6)!
+    return UInt32(0b111111 & ξ[3]) | UInt32(0b111 & ξ[0])<<18 | UInt32(0b111111 & ξ[1])<<12 | UInt32(0b111111 & ξ[2])<<6
   default:
-    return Unicode.Scalar(UInt32(0xffff))!
+    return UInt32(0xffff)
   }
 }
 
