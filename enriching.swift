@@ -131,7 +131,7 @@ class Interact { var process: Process?
   let maxfour = Reference<UInt8>.allocate(capacity: 4)
   
   func UnicodeToUtf8(_ uc: UInt32, maxfour bytes: inout Int) {
-    let s = String(format: "%02x ", uc); print("converting \(s)")
+    /* let s = String(format: "%02x ", uc); print("converting \(s)") */
     let firstByteMark: [UInt8] = [ 0x00, 0x00, 0xc0, 0xe0, 0xf0 ]
     let mask: UInt32 = 0xbf; let mark: UInt32 = 0x80
     var Ξ=uc; if Ξ < 0x80 { bytes=1 }
@@ -148,7 +148,7 @@ class Interact { var process: Process?
   func slow₋write₋to₋child(_ unicode: UInt32) { var bytes: Int = 0
     UnicodeToUtf8(unicode, maxfour: &bytes)
     let buffer = UnsafeBufferPointer<UInt8>(start: maxfour, count: bytes)
-    do { print("writing \(buffer.count) bytes \(buffer[0])") 
+    do { /* print("writing \(buffer.count) bytes \(buffer[0])") */
       try p2c₋pipe.fileHandleForWriting.write(contentsOf: buffer)
     } catch _ { print("unable to write to child") }
   }
