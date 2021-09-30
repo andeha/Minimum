@@ -128,11 +128,31 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
 class Interact { var process: Process?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ /'fifo' och 'pipe' är samma sak/. */
   var output: ((Data) -> Void)?
+  let maxfour = Reference<UInt8>.allocate(capacity: 4)
   
-  func slow₋write₋to₋child(_ text: String) {
-    if let symbols = text.data(using: .utf8) {
-      p2c₋pipe.fileHandleForWriting.write(symbols)
-    } else { fatalError("Unable to unwrap material") }
+  func UnicodeToUtf8(_ uc: UInt32, sometime₋valid: (UnsafeBufferPointer<UInt8>) -> Void) {
+    /* let s = String(format: "%02x ", uc); print("converting \(s)") */
+    let firstByteMark: [UInt8] = [ 0x00, 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc ]
+    let mask: UInt32 = 0xbf; let mark: UInt32 = 0x80; var bytes: Int = 0
+    var Ξ=uc; if Ξ < 0x80 { bytes=1 }
+    else if Ξ < 0x800 { bytes=2 }
+    else if Ξ < 0x10000 { bytes=3 }
+    else if Ξ < 0x0010ffff { bytes=4 }
+    else { return }
+    if bytes == 4 { maxfour[3] = UInt8((Ξ | mark) & mask); Ξ >>= 6 }
+    if bytes >= 3 { maxfour[2] = UInt8((Ξ | mark) & mask); Ξ >>= 6 }
+    if bytes >= 2 { maxfour[1] = UInt8((Ξ | mark) & mask); Ξ >>= 6 }
+    if bytes >= 1 { maxfour[0] = UInt8(UInt8(truncatingIfNeeded: Ξ) | firstByteMark[bytes]) }
+    let buffer = UnsafeBufferPointer<UInt8>(start: maxfour, count: bytes)
+    sometime₋valid(buffer)
+  }
+  
+  func slow₋write₋to₋child(_ unicode: UInt32) {
+    UnicodeToUtf8(unicode) {
+      do { /* print("writing \($0.count) bytes \($0[0])") */
+        try p2c₋pipe.fileHandleForWriting.write(contentsOf: $0)
+      } catch _ { print("unable to write to child") }
+    }
   }
   
   func commence(execute command: String, parameters: [String], path₋exe: String) {
@@ -171,7 +191,7 @@ class ᴮʳTektron {
   func append(_ unicode: UInt32) { var idx=0, slot=0
     location(brk, arrayidx: &idx, inousidx: &slot)
     if slot >= pieced₋work.count { append₋one₋tile() }
-    var tile: Reference<UInt32> = pieced₋work[slot]
+    let tile: Reference<UInt32> = pieced₋work[slot]
     tile[slot] = unicode
     self.brk += 1
   }

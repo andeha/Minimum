@@ -39,7 +39,7 @@ class Rendition { /* var minimumview: Minimumview
   /* ⬷ samgörande alt․ schemalaggda (▚). */
   
   var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
-  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lfAndEot₋deltas. */
+  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
   
   struct layers { let text=CATextLayer() 
@@ -414,14 +414,16 @@ class Viewcontroller: NSViewController {
       let distance₂ = moved₋touches[second]!.y - beginning₋touches[second]!.y
       let magnitude = (distance₁ + distance₂) / 2
       print("two-finger swipe \(magnitude)")
+      /* top to botton prints magnitude from 0 to approximately -0.97. */
       let rect: CGRect = minimumview.frame
+      let physical₋size = ovals[𝟶].deviceSize
       minimumview.setNeedsDisplay(rect)
     }
   }
   
   override func touchesEnded(with event: NSEvent) {
     /* let instant: TimeInterval = event.timestamp */
-    let ovals: Set<NSTouch> = event.touches(matching: .ended, in: view)
+    let ovals = event.touches(matching: .ended, in: view)
     for oval in ovals {
       let identity = key(oval)
       beginning₋touches.removeValue(forKey: identity)
@@ -563,6 +565,7 @@ class Windowcontroller: NSWindowController {
    
    func tektron(_ unicode: UInt32) {
      rendition.original.append(unicode) /* ⬷ Tx'ed from child. */
+     /* if unicode == 0x0a { rendition.linebreaks.append() } */
      if unicode == separator {
        if self.graphics₋not₋text { rendition.patchwork.graphics₋ended() }
        else { rendition.patchwork.graphics₋begin() }
@@ -634,13 +637,8 @@ class Windowcontroller: NSWindowController {
    
    @objc func reloadUi(sender: NSNotification) { print("reloadUi") 
      guard let window = self.window else { return }
-     if NSApp.effectiveAppearance.name != .aqua {
-       /* window.appearance = NSAppearance(named: .darkAqua) */
-       rendition.theme₋idx = 1
-     } else {
-       /* window.appearance = NSAppearance(named: .aqua) */
-       rendition.theme₋idx = 0
-     }
+     if NSApp.effectiveAppearance.name != .aqua 
+     { rendition.theme₋idx = 1 } else { rendition.theme₋idx = 0 }
    }
    
    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -651,23 +649,15 @@ class Windowcontroller: NSWindowController {
 }
 
 extension Windowcontroller { /* ⬷ for keyboard. */
-   func keyput(_ unicode: CChar32) {
-     let text = String(unicode)
-     shell.slow₋write₋to₋child(text)
-   }
+   func keyput(_ unicode: UInt32) { shell.slow₋write₋to₋child(unicode) }
    override func keyDown(with event: NSEvent) {
-     let spacekey = Unicode.Scalar(0x0020)
+     let spacekey = Unicode.Scalar(0x20)
      if let characters = event.characters {
        for symbol: Character in characters {
-         /* symbol.utf8.forEach { let s = String(format: :"%02x ", $1); print("\(s)", terminator: "") } */
-         print("utf8 (\(symbol.utf8)): ", terminator: "")
-         symbol.utf8.forEach { byte in print("\(byte) ", terminator: "") }
-         print("\nkeydown unicodes \(symbol.unicodeScalars)")
-         for possibly₋canonic in symbol.unicodeScalars { /* ⬷ the possibly₋canonic typed UInt32 later 'struct Unicode.Scalar' in Swift. */
+         for possibly₋canonic in symbol.unicodeScalars {
            if possibly₋canonic == spacekey && minimumwindow.ctrl { viewctrl.washline() }
-           else {
-             var uc = possibly₋canonic
-             if uc.value == 0xd { uc = CChar32(0xa) }
+           else { var uc: UInt32 = possibly₋canonic.value
+             if uc == 0xd { uc = 0xa }
              keyput(uc)
            }
          }
