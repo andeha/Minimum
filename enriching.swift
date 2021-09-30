@@ -4,11 +4,15 @@ import AppKit
 import Darwin.C
 import ClibTwinbeam
 
+typealias Reference = UnsafeMutablePointer /* ⬷ a C language pointer: both access and manipulation. */
+typealias Nonownings = UnsafeMutableBufferPointer<Tetra𝘖rUnicode> /* ⬷ no manipulations of characters. */
+typealias Voidstar = UnsafeMutableRawPointer /* ⬷ crossing at least two language barriers. */
+
 func ReapTwinbeam() {
   print("hello language-analysis-and-church")
   let pid: UInt64 = 0x17
   let val: Int32 = 0x13
-  /* let al: CU128 = 0x21 a.k.a UInt128 */
+  /* let al: CU128 = 0x21 a․𝘬․a UInt128 */
   let y: Int32 = Details_in_C(pid,val)
   print("y is \(y)")
 }

@@ -4,10 +4,8 @@ import AppKit
 import ClibTwinbeam
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
-class Rendition {
-  
-  var minimumview: Minimumview
-  init(_ view: Minimumview) { self.minimumview = view }
+class Rendition { /* var minimumview: Minimumview 
+  init(_ view: Minimumview) { self.minimumview = view } */
   static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
    paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
@@ -23,19 +21,9 @@ class Rendition {
    ⁻¹textcolor = zinkwhite, ⁻¹textcolor₂ = Ti₋white
   static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
   
-  /* …for visible work and for non-visible work respectively ⤐ */
-  let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
-  let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
-  /* ⬷ samgörande alt․ schemalaggda (▚). */
-  
-  struct theme { var ink: NSColor; var isDark: Bool }
+  var theme₋idx: Int = -1; struct theme { var ink: NSColor; var isDark: Bool }
   var themes = [ theme(ink: textcolor, isDark: false), theme(ink: ⁻¹textcolor, 
    isDark: true) ]
-  var theme₋idx: Int = -1
-  
-  var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
-  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lfAndEot₋deltas. */
-  var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
   
   var default₋textattrs: [NSAttributedString.Key: Any] {
     get {
@@ -44,6 +32,15 @@ class Rendition {
       return [.font: font, .foregroundColor: ink]
     }
   }
+  
+  /* …for visible work and for non-visible work respectively ⤐ */
+  let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
+  let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
+  /* ⬷ samgörande alt․ schemalaggda (▚). */
+  
+  var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
+  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lfAndEot₋deltas. */
+  var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
   
   struct layers { let text=CATextLayer() 
    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
@@ -60,8 +57,6 @@ class Rendition {
   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
   var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
   var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
-  func total₋twopass₋and₋height₋and₋width₋in₋O₍n₎() -> NSPoint { return 
-   self.minimumview.convertFromBacking(NSMakePoint(100.0, 100.0)) }
   
   enum anchor { case middle; case ul; case ll; case ur; case lr }
   enum type₋of₋layer { case simulation₋interaction; case illustration }
@@ -112,148 +107,55 @@ class Rendition {
       post₋init₋layer(&addition)
       addition.isGeometryFlipped = true
       composition₋with₋scribbles.addSublayer(addition)
-      /* setNeedsLayout() setNeedsDisplay() setNeedsDisplayInRect(r: CGRect) */
     }
     return ident
   }
-   
 }
 
-extension Rendition { /* ⬷ minimum and illustrations. */
+
+
+class Minimumwindow: NSWindow {
+   convenience init(contentViewController: NSViewController) {
+     print("Minimumwindow-convenience-init \(contentViewController)")
+     let initial₋placement = NSPoint(x: 928, y: 10)
+     let initial₋rect = NSSize(width: 0, height: 0) /* ⬷ unused a․𝘬․a /zip/ alt․ 􀆔+􀆝+4 from NSViewController. */
+     let mask: StyleMask = [ .borderless, .closable, .miniaturizable, .resizable, 
+       /* .fullScreen, */ .fullSizeContentView ]
+     self.init(contentRect: NSRect(origin: initial₋placement, size: initial₋rect), 
+       styleMask: mask, backing: .buffered, defer: false)
+     self.setFrameAutosaveName("Minimum-Window")
+     isMovableByWindowBackground = true
+     self.contentViewController = contentViewController
+   } /* ⬷ superflous 'if let window = an₋controller.window { window.center() }'. */
    
-  func render₋illustrations( 
-    from₋wire ⁸textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
-    topLeftNextGround: NSEdgeInsets, 
-    typeset₋in columns: Int
-   )
-   {
-   /*
-     var parent₋cursor₋X=topLeftNextGround.left
-     var parent₋cursor₋Y=topLeftNextGround.top
-     let machine = Drawings₁(); var max₋height=0.0; var colno=1
-     
-     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
-     
-     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
-       guard let address = ⁸textual.baseAddress else { return }
-	   let layer = CALayer()
-//       let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
-//        figure₋utf8: address, nil, size: &size, name: &name)
-       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
-       max₋height = max(layer.frame.height,max₋height)
-       layer.name = name
-       colno = (colno + 1) % columns
-       if colno == 0 {
-         parent₋cursor₋X = topLeftNextGround.left
-         parent₋cursor₋Y += max₋height
-         max₋height = 0.0
-       }
-       else {
-         parent₋cursor₋X = size.width + topLeftNextGround.right
-       }
-       
-       let ident = UUID()
-       self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-       composition₋with₋scribbles.addSublayer(layer)
-     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
-    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
-    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
-      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
-	   
-	   */
+   var controller: Viewcontroller { get { self.contentViewController! as! Viewcontroller } }
+   
+   override var canBecomeKey: Bool { true }
+   
+   var shift=false, ctrl=false, opt=false, cmd=false
+   
+   override func flagsChanged(with event: NSEvent) {
+     let modifs: NSEvent.ModifierFlags = event.modifierFlags
+     shift = modifs.contains(.shift)
+     ctrl = modifs.contains(.control)
+     opt = modifs.contains(.option)
+     cmd = modifs.contains(.command)
+     print("flagsChanged: \(shift), \(ctrl), \(opt), \(cmd)")
    }
+   
+   override func performKeyEquivalent(with event: NSEvent) -> Bool {
+     print("performKeyEquivalent")
+     return super.performKeyEquivalent(with: event)
+   }
+   
+   override func noResponder(for event: Selector) { print("no responder for \(event)") }
+   
 }
-
-extension Rendition { /* ⬷ decoration */
-  func apply₋ornaments() {
-    self.letgo₋all₋ornaments()
-    let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
-    let local₋cursor: NSCursor = NSCursor.dragCopy
-    minimumview.addCursorRect(rect, cursor: local₋cursor)
-    let strategy₁ = {
-      let userdata: UnsafeMutableRawPointer? = nil
-      let _ /* tag */: NSView.TrackingRectTag = self.minimumview.addTrackingRect(rect, owner: self, 
-       userData: userdata, assumeInside: true)
-       self.minimumview.updateTrackingAreas()
-    }
- /* let _ /* strategy₂ */ = { tracking₋bounds: NSRect in 
-      let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
-      /* let opts = [NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.mouseMoved, NSTrackingArea.Options.mouseEnteredAndExited] */
-      let area = NSTrackingArea(rect: tracking₋bounds, options: opts, owner: self, userInfo: nil)
-      self.addTrackingArea(area)
-    } */
-    strategy₁()
-  }
-  func letgo₋all₋ornaments() { for area in minimumview.trackingAreas { minimumview.removeTrackingArea(area) } }
-}
-
-extension Rendition { /* ⬷ interaction */
-  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
-}
-
-extension Rendition {
-  func washline() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  }
-  func definition() {
-    operations₂.async { DispatchQueue.main.async {
-      let attribed = NSAttributedString(string: "Hello world")
-      let baseline₋origin = NSPoint()
-      self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
-      let target₋range = NSRange()
-      let options = [NSView.DefinitionOptionKey:Any]()
-      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
-      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
-        baselineOriginProvider: baselineOriginProvider)
-    } }
-  } /* ⬷ popover level 2 (åkerplättransgressionell). */
-  func start₋find₋in₋forks() {
-    operations₂.async { DispatchQueue.main.async {
-      /* minimumview.drawingFindIndicator = true */
-      /* NotificationCenter.send() */
-    } }
-  }
-  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m and ^[[0m. */
-  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m. */
-  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m. */
-  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m. */
-  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m. */
-  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m. */
-  func erase₋to₋end₋of₋current₋line() { } /* ⬷ a․𝘬․a kill₋other₋on₋line and ^K. */
-  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A and ^[B. */
-  func cursorpos(v: Int, h: Int) { } /* ⬷ ^[<v><h>. */
-  func kill₋entire₋line() { } /* ⬷ ^U. */
-  func delete₋erase₋symbol() { } /* ⬷ ^H and 'delete' and 0x08. */
-  func suspend₋process() { } /* ^Z. */
-  func kill₋process() { } /* ⬷ ^U. */
-  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
-  func send₋eof() { } /* ⬷ ^D. */
-  func pause₋scroll() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^S. */
-  func scroll₋down₋one₋line() { } /* ⬷ ^[M. */
-  func scroll₋up₋one₋line() { } /* ⬷ ^[D. */
-  func unpause₋scroll() {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  } /* ⬷ ^Q. */
-  func toggle₋pause₋auto₋scroll(enabled: Bool) {
-    operations₂.async { DispatchQueue.main.async {
-    } }
-  }
-}
-
-typealias Reference = UnsafeMutablePointer /* ⬷ a C language pointer: both access and manipulation. */
-typealias Nonownings = UnsafeMutableBufferPointer<Tetra𝘖rUnicode> /* ⬷ no manipulations of characters. */
-typealias Voidstar = UnsafeMutableRawPointer /* ⬷ crossing at least two language barriers. */
 
 class Minimumview: NSView {
-  
   init(frame frameRect: NSRect, controller ctrl: Viewcontroller) {
     print("minimumview-init")
-    self.controller = ctrl /* ⬷ must be before hierachial init. */
+    self.controller = ctrl /* ⬷ assignment must occur before hierachial init. */
     super.init(frame: frameRect)
     self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.onSetNeedsDisplay
     let later₋future: DispatchTime = .now() + .seconds(1)
@@ -291,7 +193,7 @@ func Type₋continuing₋character(_ uc: UInt32) -> Bool
 } /* ⬷ documented to be 'identic to the Mc Unicode Character 
  Property' consisting of 445 characters and not equal to the U+1F16A Unicode. In 
  Swift named 'extended grapheme cluster' a․𝘬․a Character 𝘦․𝘨 \u{E9}\u{20DD} and in 
- UAX # 29 legacy/extended is base followed by zero or more continuing characters. 
+ UAX #29 legacy/extended is base followed by zero or more continuing characters. 
  A basic unit may consist of multiple Unicode code points. */
 
 func Type₋private₋use(_ uc: UInt32) -> Bool
@@ -331,11 +233,53 @@ extension Minimumview {
     let textFrame = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
     CTFrameDraw(textFrame,context)
   }
+  func render₋illustrations( 
+    from₋wire ⁸textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
+    topLeftNextGround: inout NSEdgeInsets, 
+    typeset₋in columns: inout Int
+  )
+  { /*
+     var parent₋cursor₋X=topLeftNextGround.left
+     var parent₋cursor₋Y=topLeftNextGround.top
+     let machine = Drawings₁(); var max₋height=0.0; var colno=1
+     
+     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
+     
+     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
+       guard let address = ⁸textual.baseAddress else { return }
+       let layer = CALayer()
+     /* let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
+        figure₋utf8: address, nil, size: &size, name: &name) */
+       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
+       max₋height = max(layer.frame.height,max₋height)
+       layer.name = name
+       colno = (colno + 1) % columns
+       if colno == 0 {
+         parent₋cursor₋X = topLeftNextGround.left
+         parent₋cursor₋Y += max₋height
+         max₋height = 0.0
+       }
+       else {
+         parent₋cursor₋X = size.width + topLeftNextGround.right
+       }
+       
+       let ident = UUID()
+       self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+       composition₋with₋scribbles.addSublayer(layer)
+     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
+    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
+    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
+      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
+    */
+  }
   func snapshot₋rendition() -> NSBitmapImageRep? {
     let rectangle = controller.rendition.assemble₋pieces.text.frame 
     let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rectangle)
     return bitmap
   } /* bitmap.planar, bitmap.samplesPerPixels, ... */
+  func total₋twopass₋and₋height₋and₋width₋in₋O₍n₎() -> NSPoint {
+    return self.convertFromBacking(NSMakePoint(100.0, 100.0))
+  }
   override func draw(_ dirty: CGRect) {
     print("draw-rect: \(dirty) self.frame now is \(self.frame)")
     guard let context = NSGraphicsContext.current?.cgContext else { return }
@@ -355,7 +299,36 @@ extension Minimumview {
   } /* ⬷ protocol-􀤎. */
   enum Perspective { case undo; case redo; case hidden₋detailed }
   func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
+  /* Prefix-suffix .swift alt. object-ive-se. */
+  /* Shanghainese mutually unintelligible with 𝘦․𝘨 Mandarin. */
 } */
+
+extension Rendition { /* ⬷ interaction */
+  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
+}
+
+extension Minimumview { /* ⬷ decoration */
+  func apply₋ornaments() {
+    self.letgo₋all₋ornaments()
+    let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
+    let local₋cursor: NSCursor = NSCursor.dragCopy
+    self.addCursorRect(rect, cursor: local₋cursor)
+    let strategy₁ = {
+      let userdata: UnsafeMutableRawPointer? = nil
+      let _ /* tag */: NSView.TrackingRectTag = self.addTrackingRect(rect, owner: self, 
+       userData: userdata, assumeInside: true)
+       self.updateTrackingAreas()
+    }
+ /* let _ /* strategy₂ */ = { tracking₋bounds: NSRect in 
+      let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
+      /* let opts = [NSTrackingArea.Options.activeAlways, NSTrackingArea.Options.mouseMoved, NSTrackingArea.Options.mouseEnteredAndExited] */
+      let area = NSTrackingArea(rect: tracking₋bounds, options: opts, owner: self, userInfo: nil)
+      self.addTrackingArea(area)
+    } */
+    strategy₁()
+  }
+  func letgo₋all₋ornaments() { for area in self.trackingAreas { self.removeTrackingArea(area) } }
+}
 
 class Viewcontroller: NSViewController {
   
@@ -398,7 +371,7 @@ class Viewcontroller: NSViewController {
   var rendition: Rendition {
     get { self.representedObject as! Rendition }
     set { self.representedObject = newValue 
-    /* update the view if already loaded. */ }
+     minimumview.setNeedsDisplay(minimumview.frame) }
   }
   
   var minimumview: Minimumview { get { self.view.subviews[0] as! Minimumview } }
@@ -419,7 +392,7 @@ class Viewcontroller: NSViewController {
   
   override func touchesBegan(with event: NSEvent) {
     /* let instant: TimeInterval = event.timestamp */
-    let ovals: Set<NSTouch> = event.touches(matching: .began, in: view)
+    let ovals = event.touches(matching: .began, in: view)
     for oval in ovals {
       let identity = key(oval)
       beginning₋touches[identity] = oval.normalizedPosition
@@ -428,7 +401,7 @@ class Viewcontroller: NSViewController {
   
   override func touchesMoved(with event: NSEvent) {
     /* let instant: TimeInterval = event.timestamp */
-    let ovals: Set<NSTouch> = event.touches(matching: .moved, in: view)
+    let ovals = event.touches(matching: .moved, in: view)
     for oval in ovals {
       let identity = key(oval)
       moved₋touches[identity] = oval.normalizedPosition
@@ -441,6 +414,8 @@ class Viewcontroller: NSViewController {
       let distance₂ = moved₋touches[second]!.y - beginning₋touches[second]!.y
       let magnitude = (distance₁ + distance₂) / 2
       print("two-finger swipe \(magnitude)")
+      let rect: CGRect = minimumview.frame
+      minimumview.setNeedsDisplay(rect)
     }
   }
   
@@ -481,6 +456,60 @@ class Viewcontroller: NSViewController {
   
 } /* ⬷ also keyed 'run-block' and 'load-block'. In terminal implicit 'run-block'. */
 
+extension Viewcontroller {
+  func washline() {
+    rendition.operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+  func definition() {
+    rendition.operations₂.async { DispatchQueue.main.async {
+      let attribed = NSAttributedString(string: "Hello world")
+      let baseline₋origin = NSPoint()
+      /* self.minimumview.showDefinition(for: attribed, at: baseline₋origin)
+      let target₋range = NSRange()
+      let options = [NSView.DefinitionOptionKey:Any]()
+      let baselineOriginProvider = { (adjustedRange: NSRange) -> NSPoint in return NSPoint(x: 0, y: 0) }
+      self.minimumview.showDefinition(for: attribed, range: target₋range, options: options, 
+        baselineOriginProvider: baselineOriginProvider) */
+    } }
+  }
+  func start₋find₋in₋forks() {
+    rendition.operations₂.async { DispatchQueue.main.async {
+      /* minimumview.drawingFindIndicator = true */
+      /* NotificationCenter.send() */
+    } }
+  }
+  func turn₋off₋character₋attributes() { } /* ⬷ ^[[m and ^[[0m. */
+  func turn₋bold₋mode₋on() { } /* ⬷ ^[[1m. */
+  func turn₋low₋intensity₋mode₋on() { } /* ⬷ ^[[2m. */
+  func turn₋underline₋mode₋on() { } /* ⬷ ^[[4m. */
+  func turn₋reverse₋video₋on() { } /* ⬷ ^[[7m. */
+  func turn₋invisible₋text₋mode₋on() { } /* ⬷ [[8m. */
+  func erase₋to₋end₋of₋current₋line() { } /* ⬷ a․𝘬․a kill₋other₋on₋line and ^K. */
+  func move₋cursor₋left₋one₋char() { } /* ⬷ ^[D and ^[C and ^[H and ^[A and ^[B. */
+  func cursorpos(v: Int, h: Int) { } /* ⬷ ^[<v><h>. */
+  func kill₋entire₋line() { } /* ⬷ ^U. */
+  func delete₋erase₋symbol() { } /* ⬷ ^H and 'delete' and 0x08. */
+  func suspend₋process() { } /* ^Z. */
+  func kill₋process() { } /* ⬷ ^U. */
+  func foreground₋process() { } /* ⬷ 'prompt> fg'. */
+  func send₋eof() { } /* ⬷ ^D. */
+  func pause₋scroll() {
+    rendition.operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^S. */
+  func scroll₋down₋one₋line() { } /* ⬷ ^[M. */
+  func scroll₋up₋one₋line() { } /* ⬷ ^[D. */
+  func unpause₋scroll() {
+    rendition.operations₂.async { DispatchQueue.main.async {
+    } }
+  } /* ⬷ ^Q. */
+  func toggle₋pause₋auto₋scroll(enabled: Bool) {
+    rendition.operations₂.async { DispatchQueue.main.async {
+    } }
+  }
+}
+
 extension Viewcontroller { /* ⬷ the menu */ 
   @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
     print("validate menu for view")
@@ -491,14 +520,10 @@ extension Viewcontroller { /* ⬷ the menu */
 }
 
 class Windowcontroller: NSWindowController {
-   
    convenience init() { print("windowcontroller-convenience-init") 
-     self.init(window: nil)
-   }
-   
+     self.init(window: nil) }
    override init(window: NSWindow?) { print("windowcontroller-window-init") 
-     super.init(window: window)
-   }
+     super.init(window: window) }
    
    required init?(coder: NSCoder) {
      fatalError("init(coder:) has not been implemented")
@@ -585,12 +610,7 @@ class Windowcontroller: NSWindowController {
    var i₋material = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad") 
-     self.viewctrl.representedObject = Rendition(self.minimumview)
-     let AppleInterfaceThemeChangedNotification = NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification")
-     DistributedNotificationCenter.default.addObserver(self, 
-      selector: #selector(reloadUi(sender:)),
-      name: AppleInterfaceThemeChangedNotification,
-      object: nil)
+     self.viewctrl.representedObject = Rendition(/* self.minimumview */)
      shell.output = { (material: Data) in 
        self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
@@ -601,7 +621,13 @@ class Windowcontroller: NSWindowController {
        }
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
+     let AppleInterfaceThemeChangedNotification = 
+      NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification")
      reloadUi(sender: NSNotification(name: AppleInterfaceThemeChangedNotification, object: nil))
+     DistributedNotificationCenter.default.addObserver(self, 
+      selector: #selector(reloadUi(sender:)),
+      name: AppleInterfaceThemeChangedNotification,
+      object: nil)
    }
    
    func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? { return recorder }
@@ -624,66 +650,30 @@ class Windowcontroller: NSWindowController {
    
 }
 
-class Minimumwindow: NSWindow {
-   
-   convenience init(contentViewController: NSViewController) {
-     print("Minimumwindow-convenience-init \(contentViewController)")
-     let initial₋placement = NSPoint(x: 928, y: 10)
-     let initial₋rect = NSSize(width: 0, height: 0) /* ⬷ unused a․𝘬․a /zip/ alt․ 􀆔+􀆝+4 from NSViewController. */
-     let mask: StyleMask = [ .borderless, .closable, .miniaturizable, .resizable, 
-       /* .fullScreen, */ .fullSizeContentView ]
-     self.init(contentRect: NSRect(origin: initial₋placement, size: initial₋rect), 
-       styleMask: mask, backing: .buffered, defer: false)
-     self.setFrameAutosaveName("Minimum-Window")
-     isMovableByWindowBackground = true
-     self.contentViewController = contentViewController
-   } /* ⬷ superflous 'if let window = an₋controller.window { window.center() }'. */
-   
-   override var canBecomeKey: Bool { true }
-   
-   var controller: Viewcontroller { get { self.contentViewController! as! Viewcontroller } }
-   
-   var shift=false, ctrl=false, opt=false, cmd=false
-   
-   override func flagsChanged(with event: NSEvent) {
-     let modifs: NSEvent.ModifierFlags = event.modifierFlags
-     shift = modifs.contains(.shift)
-     ctrl = modifs.contains(.control)
-     opt = modifs.contains(.option)
-     cmd = modifs.contains(.command)
-     print("flagsChanged: \(shift), \(ctrl), \(opt), \(cmd)")
-   }
-   
-   override func performKeyEquivalent(with event: NSEvent) -> Bool {
-     print("performKeyEquivalent")
-     return super.performKeyEquivalent(with: event)
-   }
-   
-}
-
-extension Windowcontroller { /* ⬷ keyboard */
-   
+extension Windowcontroller { /* ⬷ for keyboard. */
    func keyput(_ unicode: CChar32) {
      let text = String(unicode)
      shell.slow₋write₋to₋child(text)
    }
-   
    override func keyDown(with event: NSEvent) {
      let spacekey = Unicode.Scalar(0x0020)
      if let characters = event.characters {
        for symbol: Character in characters {
+         /* symbol.utf8.forEach { let s = String(format: :"%02x ", $1); print("\(s)", terminator: "") } */
          print("utf8 (\(symbol.utf8)): ", terminator: "")
          symbol.utf8.forEach { byte in print("\(byte) ", terminator: "") }
          print("\nkeydown unicodes \(symbol.unicodeScalars)")
          for possibly₋canonic in symbol.unicodeScalars { /* ⬷ the possibly₋canonic typed UInt32 later 'struct Unicode.Scalar' in Swift. */
-           if possibly₋canonic == spacekey && minimumwindow.ctrl { rendition.washline() }
-           else { keyput(possibly₋canonic) }
+           if possibly₋canonic == spacekey && minimumwindow.ctrl { viewctrl.washline() }
+           else {
+             var uc = possibly₋canonic
+             if uc.value == 0xd { uc = CChar32(0xa) }
+             keyput(uc)
+           }
          }
        }
      }
    }
-  
-   override func noResponder(for event: Selector) { print("no responder for \(event)") }
-  
 }
+
 
