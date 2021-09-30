@@ -59,11 +59,27 @@ func Periodic(unresumed timer: inout DispatchSourceTimer?,
 {
    let due₋initial = DispatchTime.now() + seconds₁
    timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
-   timer?.schedule(deadline: due₋initial, repeating: .milliseconds(milliseconds), leeway: .milliseconds(0))
+   timer?.schedule(deadline: due₋initial, repeating: .milliseconds(milliseconds), leeway: 
+    .milliseconds(0))
    timer?.setEventHandler(handler: observe)
    let timer₋found = { print("timer available") }
    timer?.setRegistrationHandler(handler: timer₋found)
    timer?.resume()
+}
+
+func Utf8ToUnicode(ξ: UnsafeMutablePointer<UInt8>, bytes: Int) -> UInt32
+{
+  switch bytes {
+  case 2:
+    return UInt32(0b111111 & ξ[1]) | UInt32(0b11111 & ξ[0])<<6
+  case 3:
+    return UInt32(0b111111 & ξ[2]) | UInt32(0b1111 & ξ[0])<<12 | UInt32(0b111111 & ξ[1])<<6
+  case 4:
+    return UInt32(0b111111 & ξ[3]) | UInt32(0b111 & ξ[0])<<18 | UInt32(0b111111 & ξ[1])<<12 | 
+     UInt32(0b111111 & ξ[2])<<6
+  default:
+    return UInt32(0xffff)
+  }
 }
 
 class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread? 
@@ -103,20 +119,15 @@ class Inter₋act₋and₋inte₋r₋u₋p₋t { var child: Thread?
     return y
   }
   
-} /* ⬷ not 'struct': 'mutating' and '@objc'. */
+}
 
-/* Job|12|5| He that is ready to slip with his feet is as a lamp despised in the 
- thought of him that is at ease.~ */
-
-class Interact {
-  
-  var process: Process?
-  let p2c₋pipe=Pipe(), c2p₋pipe=Pipe()
+class Interact { var process: Process?
+  let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ /'fifo' och 'pipe' är samma sak/. */
   var output: ((Data) -> Void)?
   
-  func slow₋write₋to₋child(fifo: Pipe, text: String) {
+  func slow₋write₋to₋child(_ text: String) {
     if let symbols = text.data(using: .utf8) {
-      fifo.fileHandleForWriting.write(symbols)
+      p2c₋pipe.fileHandleForWriting.write(symbols)
     } else { fatalError("Unable to unwrap material") }
   }
   
@@ -133,26 +144,34 @@ class Interact {
         c2p₋pipe.fileHandleForReading.readabilityHandler = nil
       }
     }
-    c2p₋pipe.fileHandleForReading.readabilityHandler = { fileHandle in 
-      /* self.output?(fileHandle.availableData) */
-      if let str = String(data: fileHandle.availableData, encoding: .utf8) {
-        print(str, terminator: "")
-      }
-    }
+    c2p₋pipe.fileHandleForReading.readabilityHandler = { handle in 
+      let data = handle.availableData
+      if data.count > 0 { self.output?(data) } }
+    do { try proc.run() } catch _ { fatalError("unable to launch process") }
     self.process = proc
-    do { try proc.run() } catch _ { print("unable to launch process") }
+    /* slow₋write₋to₋child(text: "ls -l -a\n") */
   }
 }
 
 class ᴮʳTektron {
   let Unicode₋per₋tile = 8192
   var pieced₋work = Array<Reference<UInt32>>()
-  func append₋one₋tile() {
+  var brk: Nonabsolute = 0
+  private func append₋one₋tile() {
     let pointer = Reference<UInt32>.allocate(capacity: Unicode₋per₋tile)
     pieced₋work.append(pointer)
   }
-  func append(_ unicode: UInt32) { }
-  func tiles(count: Int, selection: Array<Reference<UInt32>>) { }
+  private func location(_ loc: Nonabsolute, arrayidx: inout Int, inousidx: inout Int) {
+    arrayidx=Int(loc)/Unicode₋per₋tile; inousidx=Int(loc)%Unicode₋per₋tile
+  }
+  func append(_ unicode: UInt32) { var idx=0, slot=0
+    location(brk, arrayidx: &idx, inousidx: &slot)
+    if slot >= pieced₋work.count { append₋one₋tile() }
+    var tile: Reference<UInt32> = pieced₋work[slot]
+    tile[slot] = unicode
+    self.brk += 1
+  }
+  func tile(﹟: Int) -> Reference<UInt32> { return pieced₋work[﹟] }
 } /* ⬷ a․𝘬․a Original. */
 
 class ᴬᴾᴾᴸTektron {
@@ -174,7 +193,7 @@ class ᴬᴾᴾᴸTektron {
     var idx: Int = 0; var slot: Int = 0
     location(loc: brk, arrayidx: &idx, inousidx: &slot)
     if slot >= pieced₋work.count { append₋one₋tile() }
-    var array = pieced₋work[idx]
+    var array = pieced₋work[slot]
     array.append(taltu)
     self.brk += 1 }
   func append₋one₋unicode(uc: CChar32) {
@@ -246,19 +265,7 @@ extension NSBezierPath {
   
 }
 
-func Utf8ToUnicode(ξ: UnsafeMutablePointer<UInt8>, bytes: Int) -> UInt32
-{
-  switch bytes {
-  case 2:
-    return UInt32(0b111111 & ξ[1]) | UInt32(0b11111 & ξ[0])<<6
-  case 3:
-    return UInt32(0b111111 & ξ[2]) | UInt32(0b1111 & ξ[0])<<12 | UInt32(0b111111 & ξ[1])<<6
-  case 4:
-    return UInt32(0b111111 & ξ[3]) | UInt32(0b111 & ξ[0])<<18 | UInt32(0b111111 & ξ[1])<<12 | UInt32(0b111111 & ξ[2])<<6
-  default:
-    return UInt32(0xffff)
-  }
-}
+
 
 class Trackpad {
   struct Spatial { var instant: TimeInterval; var proximity₋spatial: NSPoint }

@@ -4,10 +4,10 @@ import AppKit
 import ClibTwinbeam
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
-struct Rendition {
+class Rendition {
   
   var minimumview: Minimumview
-  
+  init(_ view: Minimumview) { self.minimumview = view }
   static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
    paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
@@ -29,9 +29,9 @@ struct Rendition {
   /* ⬷ samgörande alt․ schemalaggda (▚). */
   
   struct theme { var ink: NSColor; var isDark: Bool }
-  var themes = [ theme(ink: textcolor, isDark: true), 
-   theme(ink: ⁻¹textcolor, isDark: false) ]
-  var themeIdx = -1
+  var themes = [ theme(ink: textcolor, isDark: false), theme(ink: ⁻¹textcolor, 
+   isDark: true) ]
+  var theme₋idx: Int = -1
   
   var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lfAndEot₋deltas. */
@@ -40,7 +40,7 @@ struct Rendition {
   var default₋textattrs: [NSAttributedString.Key: Any] {
     get {
       guard let font = Rendition.textfont else { return [:] }
-      let ink = themes[themeIdx].ink.cgColor
+      let ink = themes[theme₋idx].ink.cgColor
       return [.font: font, .foregroundColor: ink]
     }
   }
@@ -78,7 +78,7 @@ struct Rendition {
     layer.drawsAsynchronously = true
   }
   
-  mutating func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, 
+  func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, 
    canvas₋initial: NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: 
    anchor) -> UUID {
     var sublayer: CALayer? = nil
@@ -121,7 +121,7 @@ struct Rendition {
 
 extension Rendition { /* ⬷ minimum and illustrations. */
    
-  mutating func render₋illustrations( 
+  func render₋illustrations( 
     from₋wire ⁸textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
     topLeftNextGround: NSEdgeInsets, 
     typeset₋in columns: Int
@@ -172,9 +172,9 @@ extension Rendition { /* ⬷ decoration */
     minimumview.addCursorRect(rect, cursor: local₋cursor)
     let strategy₁ = {
       let userdata: UnsafeMutableRawPointer? = nil
-      let _ /* tag */: NSView.TrackingRectTag = minimumview.addTrackingRect(rect, owner: self, 
+      let _ /* tag */: NSView.TrackingRectTag = self.minimumview.addTrackingRect(rect, owner: self, 
        userData: userdata, assumeInside: true)
-       minimumview.updateTrackingAreas()
+       self.minimumview.updateTrackingAreas()
     }
  /* let _ /* strategy₂ */ = { tracking₋bounds: NSRect in 
       let opts: NSTrackingArea.Options = [.cursorUpdate, .mouseEnteredAndExited, .activeInKeyWindow]
@@ -584,30 +584,36 @@ class Windowcontroller: NSWindowController {
    var o₋material = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
    var i₋material = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
-   override func windowDidLoad() { print("windowDidLoad"); reloadUi() 
-     NotificationCenter.receive(.preferences₋changed, 
-      instance: self, selector: #selector(reloadUi))
+   override func windowDidLoad() { print("windowDidLoad") 
+     self.viewctrl.representedObject = Rendition(self.minimumview)
+     let AppleInterfaceThemeChangedNotification = NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification")
+     DistributedNotificationCenter.default.addObserver(self, 
+      selector: #selector(reloadUi(sender:)),
+      name: AppleInterfaceThemeChangedNotification,
+      object: nil)
      shell.output = { (material: Data) in 
        self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
          Task { await self.corout₋textual₋and₋graphical₋output() }
        }
+       if let str = String(data: material, encoding: .utf8) {
+         print(str, terminator: "")
+       }
      }
-     shell.commence(execute: "zsh", parameters: ["-s", "-i"], path₋exe: "/bin/")
-     /* shell.commence(execute: "ls", parameters: ["-l", "-a"], path₋exe: "/bin/") */
-     self.viewctrl.representedObject = Rendition(minimumview: self.minimumview)
+     shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
+     reloadUi(sender: NSNotification(name: AppleInterfaceThemeChangedNotification, object: nil))
    }
    
    func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? { return recorder }
    
-   @objc private func reloadUi() { print("reloadUi") 
-     /* if NSApp.effectiveAppearance.name == .darkAqua { return }
-     window.backgroundColor = rendition.theme.background */
+   @objc func reloadUi(sender: NSNotification) { print("reloadUi") 
      guard let window = self.window else { return }
-     if rendition.themes[rendition.themeIdx].isDark {
-       window.appearance = NSAppearance(named: .darkAqua)
+     if NSApp.effectiveAppearance.name != .aqua {
+       /* window.appearance = NSAppearance(named: .darkAqua) */
+       rendition.theme₋idx = 1
      } else {
-       window.appearance = NSAppearance(named: .aqua)
+       /* window.appearance = NSAppearance(named: .aqua) */
+       rendition.theme₋idx = 0
      }
    }
    
@@ -659,7 +665,7 @@ extension Windowcontroller { /* ⬷ keyboard */
    
    func keyput(_ unicode: CChar32) {
      let text = String(unicode)
-     shell.slow₋write₋to₋child(fifo: shell.p2c₋pipe, text: text)
+     shell.slow₋write₋to₋child(text)
    }
    
    override func keyDown(with event: NSEvent) {
