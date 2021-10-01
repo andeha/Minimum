@@ -4,8 +4,8 @@ import AppKit
 import ClibTwinbeam
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
-class Rendition { /* var minimumview: Minimumview 
-  init(_ view: Minimumview) { self.minimumview = view } */
+class Rendition {
+  
   static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
    paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
@@ -42,7 +42,7 @@ class Rendition { /* var minimumview: Minimumview
   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
   var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
   
-  struct layers { let text=CATextLayer() 
+  struct layers {
    var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
    var rendered₋images = Dictionary<UUID,CGImage>()
    var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
@@ -112,8 +112,6 @@ class Rendition { /* var minimumview: Minimumview
   }
 }
 
-
-
 class Minimumwindow: NSWindow {
    convenience init(contentViewController: NSViewController) {
      print("Minimumwindow-convenience-init \(contentViewController)")
@@ -127,8 +125,6 @@ class Minimumwindow: NSWindow {
      isMovableByWindowBackground = true
      self.contentViewController = contentViewController
    } /* ⬷ superflous 'if let window = an₋controller.window { window.center() }'. */
-   
-   var controller: Viewcontroller { get { self.contentViewController! as! Viewcontroller } }
    
    override var canBecomeKey: Bool { true }
    
@@ -153,9 +149,8 @@ class Minimumwindow: NSWindow {
 }
 
 class Minimumview: NSView {
-  init(frame frameRect: NSRect, controller ctrl: Viewcontroller) {
+  override init(frame frameRect: NSRect) {
     print("minimumview-init")
-    self.controller = ctrl /* ⬷ assignment must occur before hierachial init. */
     super.init(frame: frameRect)
     self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.onSetNeedsDisplay
     let later₋future: DispatchTime = .now() + .seconds(1)
@@ -174,12 +169,15 @@ class Minimumview: NSView {
   
   override var isOpaque: Bool { false }
   
+  var controller: Viewcontroller {
+    get { self.window!.contentViewController as! Viewcontroller }
+    set { self.window!.contentViewController = newValue }
+  }
+  
   override func setFrameSize(_ newSize: NSSize) {
     print("setFrameSize")
     super.setFrameSize(newSize)
   }
-  
-  var controller: Viewcontroller
   
 }
 
@@ -230,16 +228,15 @@ extension Minimumview {
     let symbols = CFRangeMake(0,attributed.length)
     let box = self.bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
     let path = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-    let textFrame = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
-    CTFrameDraw(textFrame,context)
+    let textframe = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
+    CTFrameDraw(textframe,context)
   }
-  func render₋illustrations( 
-    from₋wire ⁸textual: UnsafeBufferPointer<UnsafeMutablePointer<Tetra𝘖rUnicode>>, 
-    topLeftNextGround: inout NSEdgeInsets, 
-    typeset₋in columns: inout Int
-  )
-  { /*
-     var parent₋cursor₋X=topLeftNextGround.left
+  func render₋illustrations(from₋wire textual: Array<Reference<UInt32>>) {
+     let layer = CALayer()
+     let ident = UUID()
+     self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
+     
+ /*  var parent₋cursor₋X=topLeftNextGround.left
      var parent₋cursor₋Y=topLeftNextGround.top
      let machine = Drawings₁(); var max₋height=0.0; var colno=1
      
@@ -247,7 +244,6 @@ extension Minimumview {
      
      do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
        guard let address = ⁸textual.baseAddress else { return }
-       let layer = CALayer()
      /* let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
         figure₋utf8: address, nil, size: &size, name: &name) */
        layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
@@ -263,13 +259,11 @@ extension Minimumview {
          parent₋cursor₋X = size.width + topLeftNextGround.right
        }
        
-       let ident = UUID()
-       self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-       composition₋with₋scribbles.addSublayer(layer)
+       
+       
+       controller.rendition.composition₋with₋scribbles.addSublayer(layer)
      } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
     /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
-    /* try figure.text.withUTF8 { fromwire₋utf8 /* UnsafeBufferPointer<UInt8> */ in 
-      let utf8₋material = fromwire₋utf8.baseAddress! as? UnsafeMutablePointer<UInt8> } */
     */
   }
   func snapshot₋rendition() -> NSBitmapImageRep? {
@@ -278,12 +272,21 @@ extension Minimumview {
     return bitmap
   } /* bitmap.planar, bitmap.samplesPerPixels, ... */
   func total₋twopass₋and₋height₋and₋width₋in₋O₍n₎() -> NSPoint {
-    return self.convertFromBacking(NSMakePoint(100.0, 100.0))
+    let linecount = CGFloat(controller.rendition.linebreaks.count); let vspace=5.0
+    guard let textfont = Rendition.textfont else { return NSMakePoint(0,0) }
+    let lineheight = textfont.xHeight + textfont.ascender + textfont.descender
+    let height: CGFloat = linecount*lineheight + (linecount - 1)*vspace + 2
+    let everyfit = textfont.boundingRectForFont
+    let width₋visible = 2 + everyfit.size.width*83 + (82*2)
+    return self.convertFromBacking(NSMakePoint(width₋visible,height))
   }
   override func draw(_ dirty: CGRect) {
     print("draw-rect: \(dirty) self.frame now is \(self.frame)")
     guard let context = NSGraphicsContext.current?.cgContext else { return }
     let pointer = Append₋opt₋allocate()
+    if let ref: Reference<UInt32> = controller.rendition.original.tile(﹟: 0) {
+      
+    }
     let attributed = attribute₋text₋in₋window(count: 5, material: pointer)
     typeset₋83(attributed, context: context)
     super.draw(dirty)
@@ -346,7 +349,7 @@ class Viewcontroller: NSViewController {
     visualeffect.state = .active
     /* visualeffect.maskImage = NSImage(data: Data(contentsOf: url)) /​* ⬷ '130px-Cross-Pattee-Heraldry.png'. */
     self.view = visualeffect
-    let material = Minimumview(frame: frame, controller: self)
+    let material = Minimumview(frame: frame)
     /* material.acceptsTouchEvents = true */
     material.allowedTouchTypes = [.indirect] /* ⬷ ipad = .direct */
     self.view.addSubview(material)
@@ -554,33 +557,30 @@ class Windowcontroller: NSWindowController {
     placed inside NSResponder named 'undoManager'. */
    
    var minimumwindow: Minimumwindow { self.window as! Minimumwindow }
-   var minimumview: Minimumview { minimumwindow.controller.minimumview }
-   var rendition: Rendition { self.contentViewController!.representedObject as! Rendition }
+   var minimumview: Minimumview { viewctrl.view as! Minimumview }
+   var rendition: Rendition { viewctrl.representedObject as! Rendition }
    
    var graphics₋not₋text = false
-   let separator = UInt32(0x0000008a)
-   let Return = UInt32(0x0000000a)
-   
+   var tektron₋count = 0
    var read₋graphics: (@convention(c) (UInt32) -> Void)?
    
    func tektron(_ unicode: UInt32) {
-     rendition.original.append(unicode) /* ⬷ Tx'ed from child. */
-     /* if unicode == 0x0a { rendition.linebreaks.append() } */
-     if unicode == separator {
+     rendition.original.append(unicode)
+     if unicode == 0x0a { rendition.linebreaks.append(tektron₋count) }
+     tektron₋count += 1
+     if unicode == 0x8a {
        if self.graphics₋not₋text { rendition.patchwork.graphics₋ended() }
        else { rendition.patchwork.graphics₋begin() }
        self.graphics₋not₋text = !self.graphics₋not₋text
      } else if graphics₋not₋text { read₋graphics!(unicode) }
-   } /* ⬷ 1) Unicode code point == 32-bit word and 
-      2) grapheme == smallest functional unit in a writing system and 
-      3) grapheme cluster == multiple code points == a user-percieved-character. */
+   }
    
    @available(macOS 12.0.0, *)
    func corout₋textual₋and₋graphical₋output() async {
      let maxfour = Reference<UInt8>.allocate(capacity: 4)
      while true {
        guard let oldest = self.o₋material.first else { await Task.yield(); continue }
-       var idx=0, errors=0; var unicode = Return
+       var idx=0, errors=0; var unicode = UInt32(0)
        while idx < oldest.count {
          let leadOr8Bit: UInt8 = oldest[idx]
          let followers₋and₋lead = (~leadOr8Bit).leadingZeroBitCount
@@ -610,18 +610,27 @@ class Windowcontroller: NSWindowController {
      t.cancel() */
    
    var o₋material = Array<Data>() /* ⬷ blocks of utf8 bytes not necessarily cut in full unicodes. */
-   var i₋material = Array<String>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
+   var i₋material = Array<UInt32>() /* ⬷ possibly pasted strings of unicodes with ornaments. */
    
    override func windowDidLoad() { print("windowDidLoad") 
-     self.viewctrl.representedObject = Rendition(/* self.minimumview */)
+     self.viewctrl.representedObject = Rendition()
      shell.output = { (material: Data) in 
        self.o₋material.append(material)
        if #available (macOS 12.0.0, *) {
          Task { await self.corout₋textual₋and₋graphical₋output() }
+       } else {
+         if let unicodes = String(data: material, encoding: .utf8) {
+           unicodes.forEach { (symbol: Character) -> Void in 
+             for possibly₋canonic in symbol.unicodeScalars {
+               let uc = possibly₋canonic.value
+               self.tektron(uc)
+               let s = String(format: "%02x ", uc); print("storing \(s)")
+             }
+           }
+         }
        }
-       if let str = String(data: material, encoding: .utf8) {
-         print(str, terminator: "")
-       }
+       let rect = self.minimumview.frame
+       self.minimumview.setNeedsDisplay(rect) /* alt. DispatchQueue.main.async { ... } */
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
      let AppleInterfaceThemeChangedNotification = 
@@ -645,11 +654,12 @@ class Windowcontroller: NSWindowController {
      print("validate-window-menu")
      return NSApplication.shared.validateMenuItem(menuItem)
    }
-   
 }
 
 extension Windowcontroller { /* ⬷ for keyboard. */
-   func keyput(_ unicode: UInt32) { shell.slow₋write₋to₋child(unicode) }
+   func keyput(_ unicode: UInt32) { 
+     shell.slow₋write₋to₋child(unicode)
+     i₋material.append(unicode) }
    override func keyDown(with event: NSEvent) {
      let spacekey = Unicode.Scalar(0x20)
      if let characters = event.characters {

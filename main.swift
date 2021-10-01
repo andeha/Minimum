@@ -4,14 +4,13 @@ import AppKit
 
 @available(macOS 10.15, *)
 class Appdelegate: NSObject, NSApplicationDelegate {
-   
-   let an₋controller = Windowcontroller()
+   let controller = Windowcontroller()
    let fork₋controller = Forkscontroller()
    lazy var appname = ProcessInfo.processInfo.processName
    let delegate = default₋Windowdelegate()
    
    func applicationWillFinishLaunching(_ notification: Notification) {
-     if let window = an₋controller.window { window.delegate = delegate }
+     if let window = controller.window { window.delegate = delegate }
      print("▞ Minimum loading...please stand-by. ▚")
      /* NSInteger major, minor, bugfix; GetSystemVersion(major,minor,bugfix)
      print("for macos version \(major).\(minor).\(bugfix)", terminator: "") */
@@ -23,7 +22,7 @@ class Appdelegate: NSObject, NSApplicationDelegate {
       selector: #selector(thermalStateChanged(notification:)), 
       name: ProcessInfo.thermalStateDidChangeNotification, object: nil)
      include₋menu()
-     an₋controller.showWindow(self)
+     controller.showWindow(self)
      fork₋controller.showWindow(self)
      NSApp.setActivationPolicy(.regular)
      NSApp.activate(ignoringOtherApps: true)
@@ -48,11 +47,9 @@ class Appdelegate: NSObject, NSApplicationDelegate {
    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { return true }
    /* func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply { return .terminateLater }
    func reply(toApplicationShouldTerminate shouldTerminate: Bool) { print("toApplicationShouldTerminate") } */
-   
-} /* ⬷ 􀈐. */
+}
 
-extension Appdelegate { /* ⬷ Heritage */ 
-   
+extension Appdelegate {
    func include₋menu() { print("Building menu") /* ⬷ understand /ma-n⸺v-ä-l-jer⸺f-r-å-n⸺e-n⸺me-n-y/. */
      let appmenu = NSMenuItem()
      appmenu.submenu = NSMenu()
@@ -119,13 +116,12 @@ extension Appdelegate { /* ⬷ Heritage */
      if menuItem.action == #selector(NSApplication.shared.terminate(_:)) { return true }
      return false
    }
-  
 }
 
 extension Notification.Name {
   static let searchitem₋found = Notification.Name("􀊬-found")
   static let preferences₋changed = Notification.Name("􀣔-preferences") /* todo: improve 􀯛. */
-} /* ⬷ c𝘧․ a Scandinavian 'grottmålning'. */
+}
 
 let app = NSApplication.shared
 let delegate = Appdelegate()
