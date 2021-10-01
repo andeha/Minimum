@@ -121,14 +121,16 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
   
   E․𝘨 .size 100.0, 100.0  .offset -5.0, 12.0  .origo 50.0, 50.0 
   
-  program <- directive-list statement-list
+  program <- directive-list statement-list-nandalt-twolevel
   directive-list <- directive directive-list
-  statement-list <- statement statement-list
+  statement-list-alt-hierarchy <- statement statement-list
   statement-list alt. directive-list <- empty
   
   directive <- '.width-and-height' real ',' real
   directive <- '.origo' real ',' real
-  directive <- '.offset real ',' real
+  directive <- '.offset' real ',' real
+  directive <- '.columns' natural
+  
   real-literal <- '-'* digit+ '.' digit*
   
   statement <- 'start-line' real ',' real
@@ -137,6 +139,15 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
   statement <- 'base16-image' [a-z]+
   statement <- 'utf8-text' ␜ <text> ␜
   statement <- 'next'
+  statement <- 'azimuth' real ',' real ',' read ',' real
+  statement <- 'cyan' real ',' real ',' real ',' real
+  statement <- 'mangenta' real ',' real ',' real ',' real
+  statement <- 'yellow' real ',' real ',' real ',' real
+  statement <- 'black' real ',' real ',' real ',' real
+  unit <- 'mm'
+  unit <- 'in'
+  
+  two-level <- 'frame' statement-list 'closed' ⬷ a․𝘬․a 'draft'.
   
  */
 
@@ -148,8 +159,8 @@ typedef __builtin_int_t Nonabsolute;
 typedef struct sequent Artnumerical;
 struct Point { Artnumerical x,y; };
 struct Illustration { Artnumerical size, place₋origo, offset₋drawing₋on; };
-int Draw₋Bezer(int count, struct Illustration * ctxt, struct Point, ...);
-/* ⬷ arbtrary number of other points. */
+int Draw₋Bezer(int columns, int count, struct Illustration * ctxt, struct Point, ...);
+/* ⬷ arbitrary number of other points. */
 /* int Place₋text(Unicodes symbols); */
 
 enum Artwork₋token₋symbol { dotsize, dotorigo, dotoffset, real, comma₋0x2c, 
@@ -197,4 +208,5 @@ typedef enum Artwork₋instruction {
  set₋letterbox₋anchor, set₋letterbox₋origo, 
  place₋text /* p3₋color₋select */
 } Artwork₋instruction; /* ⬷ a․𝘬․a ¹directives and ¹instruction. */
+
 
