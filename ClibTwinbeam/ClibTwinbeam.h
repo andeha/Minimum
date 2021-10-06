@@ -136,16 +136,26 @@ typedef struct intel₋sequent₋pair simd_tᵦ;
   statement <- 'start-line' real ',' real
   statement <- 'add-line' real ',' real
   statement <- 'last-line' real ',' real
-  statement <- 'base16-image' [a-z]+
+  statement <- 'base16-image' [a-z]+                               and not base 21
   statement <- 'utf8-text' ␜ <text> ␜
   statement <- 'next'
-  statement <- 'azimuth' real ',' real ',' read ',' real
-  statement <- 'cyan' real ',' real ',' real ',' real
-  statement <- 'mangenta' real ',' real ',' real ',' real
-  statement <- 'yellow' real ',' real ',' real ',' real
-  statement <- 'black' real ',' real ',' real ',' real
+  statement <- 'azimuth' azimuth-flavor real ',' real ',' real ',' real
+  azimuth-flavor <- 'relative' | unit 'absolut' 
+  statement <- identifier '<-' 'cyan' real ',' real ',' real ',' real 
+   'mangenta' real ',' real ',' real ',' real 
+   'yellow' real ',' real ',' real ',' real 
+   'black' real ',' real ',' real ',' real color-unit real
+  statement <- 'color' identifier 'and' identifier ⬷ with later relative alt. absolut ∓ADSR F 
+  color-unit <- 'relative' | 'absolute'
+  statement <- 'ellipsoid' real ',' real ',' real ',' real
+  statement <- 'intention' 'inner' | 'middle' | 'outer'
+  statement <- 'bleed' real unit
+  
   unit <- 'mm'
+  unit <- 'cm'
   unit <- 'in'
+  unit <- 'pc'
+  unit <- 'throu'
   
   two-level <- 'frame' statement-list 'closed' ⬷ a․𝘬․a 'draft'.
   
@@ -185,13 +195,14 @@ enum Artwork₋scanner₋mode {
 
 struct Scanner₋ctxt {
   __builtin_int_t lineno₋first, lineno₋last;
-  __builtin_int_t idx₋u8c; int negative; Artnumerical ongoing;
+  __builtin_int_t idx₋unicode; /* ⬷ not idx₋u8s. */
+  int negative; Artnumerical ongoing;
   enum Artwork₋scanner₋mode mode;
 };
 
-int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
+int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
  struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your);
-int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u8s[], 
+int Parse₋Artwork(__builtin_int_t symbols, char32_t text[], 
  struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your);
 /* ⬷ a․𝘬․a LL₍k₎₋parse. */
 
