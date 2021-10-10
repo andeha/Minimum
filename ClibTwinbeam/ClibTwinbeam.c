@@ -29,12 +29,32 @@ int mfprint(const char * utf8format,...)
    return printedBytesExcept0;
 }
 
-/* extern "C" */ 
-pid_t Twinbeam₋spawn(const char * utf8₋command, int * fd_p2c, int * fd_c2p /*, const char * NullTerminatedEnv */)
+/* int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
+void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵); */
+int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words)
+{
+  return 0;
+}
+
+/* int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
+
+int structat₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+
+int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+uint8_t * relative(__builtin_int_t byte₋offset);
+int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
+ void (^inflate)(__builtin_int_t ﹟, int * cancel));
+__builtin_int_t bytes(struct structat * 🅢); */
+
+pid_t Twinbeam₋spawn(
+  const char * pathandcommand₋u8s, 
+  const char * command₋u8s, /* ⬷ two UnsafePointer<Int8>. */
+  int * fd_p2c, int * fd_c2p /*, const char * NullTerminatedEnv */
+)
 {
    pid_t pid = fork(); int status=0; /* ⬷ two instances in two images. */
    if (pid == -1) { mfprint("error when fork\n"); return -1; }
-   if (pid) { 
+   if (pid) { /* Parent ⤐ */
       close(fd_p2c[0 /* ⬷ not STDIN_FILENO! */]);
       close(fd_c2p[1 /* ⬷ not STDOUT_FILENO! */]);
    } else { /* Child ⤐ */ 
@@ -52,8 +72,8 @@ pid_t Twinbeam₋spawn(const char * utf8₋command, int * fd_p2c, int * fd_c2p /
          mfprint("error when setting up childs' standard output\n");
          exit(2);
        }
-       const char * envs[] = { "SPAWNED_BY_TWINBEAM", (const char *)NULL };
-       status = execle(utf8₋command, utf8₋command, (char *)NULL, envs);
+       const char * env[] = { "SPAWNED_BY_TWINBEAM", "TERM=xterm", (const char *)0 };
+       status = execle(pathandcommand₋u8s,command₋u8s, (char *)0, env);
        if (status == -1) { mfprint("error when execlp\n"); exit(1); }
        fflush(stdout); /* ⬷ mandates 'import Stdio'. */
    }
@@ -127,26 +147,97 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 #define 𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
 #define ₋𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0xFFFFFFFF<<64 | 0x80000000, 1 }
 
-int CastTˣᵗToSequent(
+/* int CastTˣᵗToSequent(
   enum CastToSequentOpinion (^feeder)(unsigned short * l₋to₋r₋digit), 
   struct sequent * value
 )
-{ struct sequent val=𝟶ᐧ𝟶; unsigned short zero₋to₋nine; struct sequent sgn=𝟷ᐧ𝟶; struct sequent onedigit;
+{ struct sequent val=𝟶ᐧ𝟶, sgn=𝟷ᐧ𝟶, onedigit; unsigned short zero₋to₋nine;
    const struct sequent ten = 𝟷𝟶ᐧ𝟶;
    const struct sequent negator = ₋𝟷ᐧ𝟶;
    while (1) {
      enum CastToSequentOpinion opinion = feeder(&zero₋to₋nine);
      switch (opinion) {
-      case accept: val=mult(ten,val);
+      case accept: val=mult_sequent(ten,val);
        int₋to₋sequent((int64_t)zero₋to₋nine,&onedigit);
-       val=add(val,mult(sgn,onedigit)); break;
+       val=add_sequent(val,mult_sequent(sgn,onedigit)); break;
       case rejecting: continue;
-      case negate: sgn=mult(sgn,negator); break;
+      case negate: sgn=mult_sequent(sgn,negator); break;
       case complete: *value=val; return 0;
       case annul: return -1;
      }
    }
+} */
+
+void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ)
+{ int neg = 0;
+    if (neg) { }
+    uint64_t
+  struct sequent 𝟷ᐧ𝟶 = { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
+   if (neg) {
+     /* twos-complement */
+   }
+   uint128_t 
+   
+   *ℝ = 
 }
+
+void rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ)
+{
+  
+}
+
+void print₋sequent(struct sequent 𝕏, 
+ void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
+ void (^zero)(), void (^neginf)(), void (^nonvalid)()
+)
+{
+  
+}
+
+struct sequent add_sequent(struct sequent x₁, struct sequent x₂)
+{
+  struct sequent sum = { .detail = { x₁.detail.frac + x₂.detail.frac }, .valid=1 };
+  return sum;
+}
+
+struct sequent minus_sequent(struct sequent x₁, struct sequent x₂)
+{
+  struct sequent diff = { .detail = { x₁.detail.frac - x₂.detail.frac }, .valid=1 };
+  return diff;
+}
+
+struct void multiply(struct sequent x₁, struct sequent x₂, 
+ struct sequent * y₋lo, struct sequent * y₋hi)
+{
+  struct sequent x₁ =; struct sequent x₂ = ;
+  struct sequent x₁ =; struct sequent x₂ = ;
+  
+}
+
+struct sequent mult_sequent(struct sequent x₁, struct sequent x₂)
+{
+	multiply(struct sequent x₁, struct sequent x₂, 
+	 struct sequent * y₋lo, struct sequent * y₋hi)
+ // struct sequent mult = { .detail = { x₁.detail.frac * x₂.detail.frac }, .valid=1 };
+  return mult;
+}
+
+struct sequent div_sequent(struct sequent x₁, struct sequent x₂)
+{ /* newton 1/x1 mult x2 */ }
+struct sequent product₋abelian() { struct sequent one = 𝟷ᐧ𝟶; return one; }
+struct sequent accumulative₋zero() { struct sequent zero = 𝟶ᐧ𝟶; return zero; }
+struct sequent negative₋infinity() {
+  struct sequent y = accumulative₋zero();
+  y.valid = 0; return y; }
+/* struct sequent operator_minus(struct sequent ℝ);
+typedef struct sequent (^computational)(struct sequent x);
+enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
+int Newton(computational f, computational f₋prim, struct sequent * x₀, 
+ void (^ping)(enum Newtoncontrol * ctrl));
+ struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
+int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
+ struct sequent min, void (^memory)(struct sequent integrale, 
+ struct sequent t₋acc, int * stop)); */
 
 unionᵢ Artwork₋symbol₋token₋detail {
   double parameter;                                                /*  (1) */
@@ -160,134 +251,140 @@ structᵢ Artwork₋symbol₋token {
   union Artwork₋symbol₋token₋detail detail;
 }; /* ⬷ preferable 𝟽₋bit₋possibly₋truncated₋symbol. */
 
-inexorable int init₋context(__builtin_int_t program₋bytes, struct Scanner₋ctxt * const ctx)
+inexorable int init₋context(__builtin_int_t unicode₋program₋symbols, struct Scanner₋ctxt * ctx)
 {
-   ctx->lineno₋first=1, ctx->lineno₋last=1; ctx->idx₋u8c=0; ctx->negative=0; 
+   ctx->lineno₋first=1, ctx->lineno₋last=1;
+   ctx->idx₋unicode=0;
+   ctx->ongoing = accumulative₋zero();
+   ctx->negative=0;
+   ctx->symbols₋in₋regular = 0;
    ctx->mode = initial;
    return 0;
 }
 
-typedef int (*Assistant₂₋params)(char32_t unicode);
-typedef Assistant₂₋params Stringpool;
-
 inexorable int
 Lookahead₋scan₋Artwork(
-  __builtin_int_t bytes, uchar program₋u8s[], 
+  __builtin_int_t symbols, char32_t text[], 
   enum Artwork₋token₋symbol * kind, 
   union Artwork₋symbol₋token₋detail * detail, 
   struct Scanner₋ctxt * s₋ctxt, 
-  Stringpool record
+  void (^regular𝘖rIdent)(int symbols, char32_t * start)
 )
 {
-   uchar c,f,e,d; char32_t unicode; __builtin_int_t i=s₋ctxt->idx₋u8c; 
+   char32_t unicode, unicode₋₁; __builtin_int_t i=s₋ctxt->idx₋unicode;
    
-   🧵(utf8₋error,pool₋error,scanner₋error,conversion₋error,
-   unterminated₋quote,unknown₋keyword,wrong₋number₋of₋argument,token,
-   truncated₋token₋utf8) {
-    case utf8₋error: return -1;
-    case pool₋error: return -2;
-    case unterminated₋quote: return -3;
-    case unknown₋keyword: return -4;
-    case wrong₋number₋of₋argument: return -5;
+   🧵(scanner₋error,conversion₋error,unterminated₋quote,unterminated₋base16,
+  truncated₋scan,identifier,number₋literal,keyword,token) {
+    case scanner₋error: return -1;
+    case unterminated₋quote: return -2;
+    case unterminated₋base16: return -3;
+    case truncated₋scan: return -4;
+    case identifier: regular𝘖rIdent(s₋ctxt->symbols₋in₋regular,s₋ctxt->regular); return 0;
+    case number₋literal: return 0;
+    case keyword: return 0;
     case token: return 0;
-    case truncated₋token₋utf8: return 0;
    }
    
-   typedef int (^type)(char32_t c);
+   typedef int (^type)(char32_t unicode);
    typedef void (^action)(void);
+   typedef void (^work)(char32_t);
+   
+   work append₋to₋regular = ^(char32_t uc) {
+    short idx = s₋ctxt->symbols₋in₋regular;
+    s₋ctxt->regular[idx] = uc;
+    s₋ctxt->symbols₋in₋regular += 1; };
    
    type digit = ^(char32_t c) { return U'0' <= c && c <= U'9'; };
    type derender₋newline = ^(char32_t c) { return c == U'\xa'; }; /* de- = completely = fullgångna. */
    type newline = ^(char32_t c) { return derender₋newline(c) || c == U'\xd'; };
    type whitespace = ^(char32_t c) { return c == U' ' || U'\t' == c || newline(c); };
-   type regular = ^(char32_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z') || digit(c); };
+   type letter = ^(char32_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
+   type letter₋alt₋digit = ^(char32_t c) { return letter(c) || digit(c); };
+   type base₋5₋character = ^(char32_t c) { return U'B' <= c && c <= U'E'; };
+   type base₋16₋character = ^(char32_t c) { return U'A' <= c && c <= U'Z'; };
    type period = ^(char32_t c) { return c == U'.'; };
    
-   typedef int (^Assistant₁)();
-   typedef int (^Assistant₂)(Stringpool, char32_t);
-   Assistant₂ assistant₂ = ^(Stringpool follow₋current, char32_t unicode) { return follow₋current(unicode); };
-   Assistant₁ assistant₁ = ^(void (*close₋current)(void)) { close₋current(); return 0; };
-   
-   action token₋sep = ^{ s₋ctxt->mode = initial; };
-   
-   action found₋beziercurve₋start = ^{
-    *kind = start₋line;
-    detail->ref=(void *)NULL;
-    confess(token); };
-   action found₋beziercurve₋add = ^{
-    *kind = add₋line;
-    detail->ref=(void *)NULL;
-    confess(token); };
-   action found₋beziercurve₋end = ^{
-    *kind = end₋line;
-    detail->ref=(void *)NULL;
-    confess(token); };
-   action found₋text = ^{ };
+   action presentable₋token = ^{
+     s₋ctxt->ongoing=accumulative₋zero();
+     s₋ctxt->negative=0;
+     if (s₋ctxt->mode == regular) {
+       *kind = start₋line;
+       *kind = add₋line;
+       *kind = end₋line;
+       detail->ref=(void *)NULL;
+       s₋ctxt->symbols₋in₋regular=0;
+       s₋ctxt->mode = initial;
+       confess(keyword);
+     }
+     s₋ctxt->symbols₋in₋regular=0;
+     s₋ctxt->mode = initial;
+   };
    
 again:
    
-   while (i<bytes) {
-     c = program₋u8s[i];
-     if (248 <= c || (128 <= c && c < 192)) { confess(utf8₋error); }
-     else if (c >= 128) {
-       __builtin_int_t onesUntilZero = __builtin_clzll(~((uint64_t)c<<56));
-       __builtin_int_t followers = onesUntilZero - 1;
-       switch (followers) {
-       case 3: if (i+3 >= bytes) { confess(truncated₋token₋utf8); }
-         f = program₋u8s[i+3]; s₋ctxt->idx₋u8c+=4;
-       case 2: if (i+2 >= bytes) { confess(truncated₋token₋utf8); }
-         e = program₋u8s[i+2]; s₋ctxt->idx₋u8c+=3;
-       case 1: if (i+1 >= bytes) { confess(truncated₋token₋utf8); }
-         d = program₋u8s[i+1]; s₋ctxt->idx₋u8c+=2;
-       default: confess(utf8₋error);
-       }
-       if (followers == 1) { unicode = ((0b11111 & c) << 6) | (0x3F & d); }
-       if (followers == 2) { unicode = ((0b1111 & c) << 12) | ((0x3F & d) << 6) | 
-        (0x3F & e); }
-       if (followers == 3) { unicode = ((0b111 & c) << 18) | ((0x3F & d) << 12) | 
-        ((0x3F & e) << 6) | (0x3F & f); }
-     } else { unicode = (char32_t)c; s₋ctxt->idx₋u8c+=1; }
+   if (i >= symbols) { presentable₋token(); *kind = END₋OF₋TRANSMISSION; return 0; }
+   unicode₋₁ = text[i], unicode = text[i+1];
+   
+   if (derender₋newline(unicode)) { s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; }
+   else if (newline(unicode)) { }
+   else if (whitespace(unicode)) { }
+   else if (s₋ctxt->mode == initial && unicode == U'-') {
+     s₋ctxt->negative = !s₋ctxt->negative;
+     s₋ctxt->mode = integer;
    }
-   
-   /* ⤐ Unicode decoded and available ⤐ */
-   
-   if (derender₋newline(unicode)) { s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; token₋sep(); }
-   else if (newline(unicode)) { token₋sep(); }
-   else if (whitespace(unicode)) { token₋sep(); }
-   else if (s₋ctxt->mode == initial && unicode == U'-') { s₋ctxt->negative = !s₋ctxt->negative; }
    else if (s₋ctxt->mode == initial && digit(unicode)) {
-     Feeder feeder = ^(unsigned short * l₋to₋r₋digit) {
-       
-       return complete; };
-     if (CastTˣᵗToSequent(feeder,&s₋ctxt->ongoing)) { confess(conversion₋error); }
+#define to₋integer(digit₋character) digit₋character - U'0'
+     int₋to₋sequent(to₋integer(unicode), &s₋ctxt->ongoing);
+     s₋ctxt->mode = integer;
+   }
+   else if (s₋ctxt->mode == integer && digit(unicode)) {
+     const struct sequent ten = 𝟷𝟶ᐧ𝟶;
+     struct sequent augment;
+     s₋ctxt->ongoing = mult_sequent(ten,s₋ctxt->ongoing);
+     int₋to₋sequent(to₋integer(unicode), &augment);
+     s₋ctxt->ongoing = add_sequent(s₋ctxt->ongoing, augment);
    }
    else if (s₋ctxt->mode == initial && period(unicode)) {
-     switch (s₋ctxt->mode) {
-     case digits: s₋ctxt->mode = digitAltsignAltPeriod; break;
-     case digitsperiod: break;
-     default: ;
-     }
+     s₋ctxt->mode = fractional;
    }
-   else if (s₋ctxt->mode == initial && unicode == U',') {
+   else if (s₋ctxt->mode == integer && period(unicode)) {
+     s₋ctxt->mode = fractional;
+   }
+   else if (s₋ctxt->mode == fractional && !digit(unicode)) {
+     
+   }
+   else if (s₋ctxt->mode == integer && !digit(unicode)) {
+     /* rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ); */
+   }
+   else if (unicode == U',') {
      *kind = comma₋0x2c;
-     detail->ref=(void *)NULL;
-     confess(token); token₋sep(); }
-   else if (s₋ctxt->mode == initial && unicode == U'␜') { s₋ctxt->mode = unicodes; } /* ⬷ a․𝘬․a 'e2 90 9c' and U+241c. */
-   else if (s₋ctxt->mode == unicodes && unicode != U'␜') {
-     if (assistant₂(record,unicode)) { confess(pool₋error); }
+     presentable₋token();
+     confess(token);
+   } /* s₋ctxt->mode == initial alt. regular, ... and no coroutines in C. */
+   else if (s₋ctxt->mode == initial && letter/*₋alt₋digit*/(unicode)) {
+     append₋to₋regular(unicode);
+     s₋ctxt->mode = regular;
    }
-   else if (s₋ctxt->mode == unicodes && unicode == U'␜') { assistant₁(); token₋sep(); }
+   else if (s₋ctxt->mode == regular && letter₋alt₋digit(unicode)) {
+     append₋to₋regular(unicode);
+   }
+   else if (s₋ctxt->mode == base16₋image₋text && base₋16₋character(unicode)) { }
+   else if (s₋ctxt->mode == base16₋image₋text && !base₋16₋character(unicode)) { }
+   else if (s₋ctxt->mode == initial && unicode == U'␜') { s₋ctxt->mode = raw₋unicode₋text; }
+   else if (s₋ctxt->mode == raw₋unicode₋text && unicode != U'␜') { /* accumulate unicodes */ }
+   else if (s₋ctxt->mode == raw₋unicode₋text && unicode == U'␜') { presentable₋token(); }
    else { confess(scanner₋error); }
-   
+   s₋ctxt->idx₋unicode += 1;
    goto again;
 }
 
-int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u2s[], semantics truly₋yours)
+typedef void (^Regular𝘖rIdent)(int symbols, char32_t * start);
+
+int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
+ struct Scanner₋ctxt * s₋ctxt, semantics truly₋yours)
 {
-  struct fifo symbol₋lookahead, detail₋lookahead; /* ⬷ Artwork₋symbol₋token and union₋max₋builtin₋bytes. */
-  
-  /* ⬷ icke-antagonst imateriellt sett antimaterial snarare uppfattas förbättrad samtidig löpande
-   rumirat. Omgivning relevant samt språkvård etablerats som kompromitterad. */
+  struct fifo symbol₋lookahead, detail₋lookahead;
+  /* ⬷ enum Artwork₋token₋symbol * kind and union Artwork₋symbol₋token₋detail * detail */
   
   typedef void (^recieved₋symbol)(enum Artwork₋token₋symbol, union Artwork₋symbol₋token₋detail);
   typedef void (^lookahead)(unsigned retrospect, 
@@ -313,6 +410,12 @@ int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u2s[], semantics trul
    /* case completion: return -3; */
   }
   
+  enum Artwork₋token₋symbol kind;
+  union Artwork₋symbol₋token₋detail hearken;
+  𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
+  Regular𝘖rIdent regident = ^(int symbols, char32_t * start) { ident.start=start; ident.symbols=symbols; };
+  if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regident)) { return -1; }
+  
   /* typedef struct Artwork₋token (^mass₋reading₋saddle)(void); 
   typedef void (^mass₋reading₋saddle)(struct Artwork₋symbol₋token dante);
   struct Artwork₋symbol₋token 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 next₋token;
@@ -330,19 +433,13 @@ int Parse₋Artwork(__builtin_int_t bytes, uchar program₋u2s[], semantics trul
   }; */
   
   return 0;
-}
+} /* ⬷ read errors from left to right when correcting both syntactic and semantic errors. */
 
-/* int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
-  struct Scanner₋ctxt * s₋ctxt, void (*semantic)(int instruction, 
-  union Artwork₋instruction₋detail parameters)) */
-int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[], 
-  struct Scanner₋ctxt * const s₋ctxt, semantics truly₋your)
+int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
+  struct Scanner₋ctxt * s₋ctxt, semantics truly₋your)
 {
+   struct Scanner₋ctxt ctxt;
    struct Artwork₋symbol₋token 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 lookahead;
-   /* __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 idx₋u8c=0; */
-   /* enum Artwork₋instruction instr = (enum Artwork₋instruction)artwork₋instruction; */
-   
-   if (init₋context(bytes,s₋ctxt)) { return -1; }
    
    🧵(zerolength,lex₋error,grammar₋error,completion) {
     case zerolength: return -1;
@@ -351,18 +448,26 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[],
     case completion: return 0;
    }
    
-   if (bytes <= 0) { confess(zerolength); }
+   if (init₋context(symbols,&ctxt)) { return -1; }
+   if (symbols <= 0) { confess(zerolength); }
+   
+   /* Artwork₋instruction₋detail param; truly₋yours(place₋text, param); */
    
    typedef void (^action)(void);
    
-   action consume = ^{ __builtin_int_t nonabsolute; Stringpool record; 
-     enum Artwork₋token₋symbol kind; union Artwork₋symbol₋token₋detail detail; 
-     if (Lookahead₋scan₋Artwork(bytes,u8s₋program,&kind,&detail,s₋ctxt,record)) 
+   action consume = ^{
+     __builtin_int_t nonabsolute;
+     enum Artwork₋token₋symbol kind;
+     union Artwork₋symbol₋token₋detail hearken;
+     𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
+     Regular𝘖rIdent regular𝘖rIdent = ^(int symbols, char32_t * start) { 
+      ident.symbols=symbols; ident.start=start; };
+     if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regular𝘖rIdent)) 
      { confess(lex₋error); }
      if (kind == END₋OF₋TRANSMISSION) { confess(completion); }
      /* lookahead = { kind, detail }; */
-     lookahead.kind = kind; /* e․g add₋line */
-     lookahead.detail = detail; /* e․g { .ref = (void *)NULL } */
+     lookahead.kind = kind; /* 𝘦․𝘨 'add₋line'. */
+     lookahead.detail = hearken; /* 𝘦․𝘨 { .ref = (void *)NULL }. */
    };
    
    typedef void (^pattern)(enum Artwork₋token₋symbol ensure);
@@ -393,6 +498,35 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t bytes, uchar u8s₋program[],
    program();
    
    return 0;
-}
+} /* ⬷ icke-antagonst imateriellt sett antimaterial snarare uppfattas förbättrad samtidig löpande 
+   rumirat. Omgivning relevant samt språkvård etablerats som kompromitterad. */
+
+/* func c₊₊₋render₋an₋illustration(width: Double, height: Double, artwork: Artwork) -> CGImage {
+   guard let image₂: CGImage = Renderimage(width: width, height: height) { 
+     (context: NSGraphicsContext) -> Void in 
+       let path = NSBezierPath()
+       path.move(to: .init(x: 10.5, y: 10.5))
+       path.line(to: .init(x: 10.5, y: 10.5))
+       path.lineWidth = 1
+       path.lineCapStyle = .round
+       NSColor.blue.set()
+       path.stroke()
+   } else { return nil }
+ } */
+ 
+/* func render₋attractive₋frame₁(width: Double, height: Double) -> CGImage? {
+   let output = {
+     let path = NSBezierPath()
+     path.move(to: .init(x: 10.5, y: 10.5))
+     path.line(to: .init(x: 10.5, y: 10.5))
+     path.lineWidth = 1
+     path.lineCapStyle = .round
+     NSColor.blue.set()
+     path.stroke()
+     let string = "```\nlet x = 5\nprint(x)\n```"
+     self.render(text: string, width: width, height: height) }
+   return Renderimage(width: width, height: height, process: output)
+ } */
+
 
 

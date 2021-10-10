@@ -5,111 +5,245 @@ import ClibTwinbeam
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
 class Rendition {
-  
-  static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
-   crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
-   paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
-  static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
-  static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
-   coarse₋grid = NSColor(calibratedWhite: 0.88, alpha: 1.0)
-  static let systemfont = NSFont.systemFont(ofSize: 30.0), 
-   textfont = NSFont(name: "SF Mono", size: 9)
-  static let zinkwhite = NSColor(calibratedWhite: 0.99, alpha: 1.0), 
-   Ti₋white = NSColor(calibratedWhite: 0.90, alpha: 1.0), 
-   textcolor = NSColor.labelColor, 
-   textcolor₂ = NSColor.secondaryLabelColor, 
-   ⁻¹textcolor = zinkwhite, ⁻¹textcolor₂ = Ti₋white
-  static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
-  
-  var theme₋idx: Int = -1; struct theme { var ink: NSColor; var isDark: Bool }
-  var themes = [ theme(ink: textcolor, isDark: false), theme(ink: ⁻¹textcolor, 
-   isDark: true) ]
-  
-  var default₋textattrs: [NSAttributedString.Key: Any] {
-    get {
-      guard let font = Rendition.textfont else { return [:] }
-      let ink = themes[theme₋idx].ink.cgColor
-      return [.font: font, .foregroundColor: ink]
-    }
-  }
-  
-  /* …for visible work and for non-visible work respectively ⤐ */
-  let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
-  let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
-  /* ⬷ samgörande alt․ schemalaggda (▚). */
-  
-  var original = ᴮʳTektron() /* ⬷ textual text may have been machine-read. (Not Array<CChar32>) */
-  var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
-  var patchwork = Quilt() /* ⬷ graphic text definitely machine-read. */
-  
-  struct layers {
-   var layers₋with₋illustrations = Dictionary<UUID,CALayer>()
-   var rendered₋images = Dictionary<UUID,CGImage>()
-   var layers₋with₋realtime = Dictionary<UUID,CAMetalLayer>()
-   var scribbles = Dictionary<UUID,feedback>()
-   class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() }
-  }
-  
-  var assemble₋pieces = layers()
-  let composition₋with₋scribbles = CALayer()
-  
-  var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
-  var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
-  var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
-  var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
-  
-  enum anchor { case middle; case ul; case ll; case ur; case lr }
-  enum type₋of₋layer { case simulation₋interaction; case illustration }
-  
-  let post₋init₋layer = { (_ layer: inout CALayer) -> Void in 
-    layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
-    layer.contentsScale = 2.0 /* for retina. */
-    layer.backgroundColor = NSColor.clear.cgColor
-    layer.contentsGravity = .center
-    layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
-    layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
-    layer.isOpaque = false
-    layer.needsDisplayOnBoundsChange = true
-    layer.drawsAsynchronously = true
-  }
-  
-  func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, 
-   canvas₋initial: NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: 
-   anchor) -> UUID {
-    var sublayer: CALayer? = nil
-    let ident = UUID()
-    switch layer₋type {
-    case .simulation₋interaction:
-     let layer = CAMetalLayer()
-     self.assemble₋pieces.layers₋with₋realtime.updateValue(layer, forKey: ident)
-     sublayer = layer
-    case .illustration: /* ₋and₋photography. */
-     let layer = CALayer()
-     self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-     sublayer = layer
-    } /* ⬷ note 'doublesided' defaults to true. */
-    if var addition = sublayer {
-      addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, 
-       width: canvas₋size.width, height: canvas₋size.height)
-      switch origo₋relative₋superlayer {
-      case .middle:
-        addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-      case .ul:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      case .ll:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
-      case .ur:
-        addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
-      case .lr:
-        addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
-      }
-      addition.name = name
-      post₋init₋layer(&addition)
-      addition.isGeometryFlipped = true
-      composition₋with₋scribbles.addSublayer(addition)
-    }
-    return ident
-  }
+   var original = Array<UInt32>() /* ⬷ textual text may have been machine-read. */
+   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
+   typealias Graphicstext = UnsafeMutableBufferPointer<UInt32>
+   var graphics = Array<Graphicstext>()
+   
+   static let paper = NSColor(calibratedWhite: 0.95, alpha: 1.0), 
+    crepe = NSColor(calibratedWhite: 0.05, alpha: 1.0), 
+    paperborder = NSColor(calibratedWhite: 0.75, alpha: 1.0)
+   static let cropmarks = NSColor(calibratedWhite: 0.70, alpha: 1.0)
+   static let fine₋grid = NSColor(calibratedWhite: 0.92, alpha: 1.0), 
+    coarse₋grid = NSColor(calibratedWhite: 0.88, alpha: 1.0)
+   static let systemfont = NSFont.systemFont(ofSize: 30.0), 
+    textfont = NSFont(name: "SF Mono", size: 9)!
+   static let zinkwhite = NSColor(calibratedWhite: 0.99, alpha: 1.0), 
+    Ti₋white = NSColor(calibratedWhite: 0.90, alpha: 1.0), 
+    textcolor = NSColor.labelColor, 
+    textcolor₂ = NSColor.secondaryLabelColor, 
+    ⁻¹textcolor = zinkwhite, ⁻¹textcolor₂ = Ti₋white
+   static let frame₋anfang = NSRect(x: 120.0, y: 50.0, width: 48.0, height: 48.0)
+   
+   var theme₋idx: Int = -1; struct theme { var ink: NSColor; var isDark: Bool }
+   var themes = [ theme(ink: textcolor, isDark: false), theme(ink: ⁻¹textcolor, 
+    isDark: true) ]
+   
+   var default₋textattrs: [NSAttributedString.Key: Any] {
+     get {
+       let ink = themes[theme₋idx].ink.cgColor
+       return [.font: Rendition.textfont, .foregroundColor: ink]
+     }
+   }
+   
+   /* …for visible work and for non-visible work respectively ⤐ */
+   let operations₁ = DispatchQueue(label: "myops", attributes: .concurrent)
+   let operations₂ = DispatchQueue(label: "myjobs" /* , attributes: .serial */)
+   /* ⬷ samgörande alt․ schemalaggda (▚). */
+   
+   struct layers {
+    var illustrations = Array<Artworklayer>()
+    var layers₋with₋realtime = Array<Simulationlayer>()
+    var still₋images = Array<CGImage>()
+    /* var scribbles = Dictionary<UUID,feedback>()
+    class feedback { var explained=CAShapeLayer(); var symbols=CATextLayer() } */
+   }
+   
+   var assemble₋pieces = layers()
+   let composition₋with₋scribbles = CALayer()
+   
+   var pointerIsOver: Bool = false /* ⬷ you should hit₋test this on init. */
+   var hasPointerEntered: Bool = false /* ⬷ you should hit₋test this on init. */
+   var y₋offset: CGFloat = 0.0 /* ⬷ visible rect, overdraw and underdraw. */
+   var x₋offset: CGFloat = 0.0 /* ⬷ allows for horizontal scrolling including max line length in document. */
+   
+   enum anchor { case middle; case ul; case ll; case ur; case lr }
+   enum type₋of₋layer { case simulation₋interaction; case illustration }
+   
+   /* let post₋init₋layer = { (_ layer: inout CALayer) -> Void in 
+     layer.transform = CATransform3DIdentity /* …and not CGAffineTransform.identity. */
+     layer.contentsScale = 2.0 /* for retina. */
+     layer.backgroundColor = NSColor.clear.cgColor
+     layer.contentsGravity = .center
+     layer.contentsCenter = CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0)
+     layer.contentsFormat = CALayerContentsFormat.RGBA8Uint
+     layer.isOpaque = false
+     layer.needsDisplayOnBoundsChange = true
+     layer.drawsAsynchronously = true
+   }
+   
+   func add₋rendition₋layer(layer₋type: type₋of₋layer, name: String, 
+    canvas₋initial: NSPoint, canvas₋size: NSSize, origo₋relative₋superlayer: 
+    anchor) -> UUID {
+     var sublayer: CALayer? = nil
+     let ident = UUID()
+     switch layer₋type {
+     case .simulation₋interaction:
+      let layer = CAMetalLayer()
+      self.assemble₋pieces.layers₋with₋realtime.updateValue(layer, forKey: ident)
+      sublayer = layer
+     case .illustration: /* ₋and₋photography. */
+      let layer = CALayer()
+      self.assemble₋pieces.illustrations.updateValue(layer, forKey: ident)
+      sublayer = layer
+     } /* ⬷ note 'doublesided' defaults to true. */
+     if var addition = sublayer {
+       addition.frame = CGRect(x: canvas₋initial.x, y: canvas₋initial.y, 
+        width: canvas₋size.width, height: canvas₋size.height)
+       switch origo₋relative₋superlayer {
+       case .middle:
+         addition.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+       case .ul:
+         addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+       case .ll:
+         addition.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+       case .ur:
+         addition.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+       case .lr:
+         addition.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+       }
+       addition.name = name
+       post₋init₋layer(&addition)
+       addition.isGeometryFlipped = true
+       composition₋with₋scribbles.addSublayer(addition)
+     }
+     return ident
+   } */
+   
+   func attribute₋text₋in₋window(count: Int, 
+    material: Reference<UInt32>) -> NSAttributedString {
+     let raw = UnsafeMutableRawPointer(material)
+     let invariant = String(bytesNoCopy: raw, length: 4*count, encoding: 
+      .utf32LittleEndian, freeWhenDone: false)
+     let attributed = NSAttributedString(string: invariant!, attributes: 
+      default₋textattrs)
+     return attributed
+   }
+   func typeset(_ attributed: NSAttributedString, frame: NSRect, context: CGContext) -> Void {
+     let framesetter = CTFramesetterCreateWithAttributedString(attributed)
+     let symbols = CFRangeMake(0,attributed.length)
+     let box = frame.insetBy(dx: 2, dy: 2).offsetBy(dx: 1, dy: 1)
+     let path = CGPath(rect: box.insetBy(dx: 1, dy: 1), transform: nil)
+     let textframe = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
+     CTFrameDraw(textframe,context)
+   }
+   func interpret(count: Int, textual: Reference<UInt32>, height: inout CGFloat) throws -> CALayer {
+     var artwork₁ = Artwork₋swift(text: ".width-and-height 50.0, 50.0 ")
+     var artwork₂ = Artwork₋swift(text: 
+"""
+.width-and-height 100.0, 100.0
+start-line 50.0 50.0 last-line 75.0 75.0
+next
+.width-and-height 100.0 100.0
+start-line 10.0 10.0 last-line 20.0 20.0
+""")
+     var artwork = artwork₂
+     var s₋ctxt = Scanner₋ctxt()
+     let unicodes = UnsafeMutablePointer<UInt32>(mutating: textual)
+     let y = Parse₋Artwork₋LL₍1₎(Int64(count),unicodes,&s₋ctxt,Append₋instruction)
+     let layer = Artworklayer()
+     layer.contents = artwork
+     guard let directive: Artwork₋dirctive = artwork.directives[pixel₋height] else { return layer }
+  /*   let height: sequent = directive.Scalar
+     let height2 = ToDouble(sequent: height)
+     let height4: Float16 = Float16(height2) / * ⬷ a․𝘬․a ToHalf. */
+     let height: Float16 = directive.Scalar
+     let height₂: Double = Double(height)
+     layer.bounds = CGRect(x: 0, y: 0, width: 400.0, height: height₂)
+     layer.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+     layer.position = CGPoint()
+     return layer
+   }
+   func illustrations(unicodes text: Graphicstext, height: inout CGFloat) {
+     let layer = CALayer(); let ident = UUID()
+     let width = Rendition.textfont.boundingRectForFont.width * 83
+     var size=CGSize(width: width, height: 0.0)
+     do {
+       let layer: CALayer = try interpret(count: text.count, textual: 
+        text.baseAddress!, height: &size.height)
+     } catch _ { print("render exception") }
+     /* self.assemble₋pieces.illustrations.updateValue(layer, forKey: ident) */
+     self.assemble₋pieces.illustrations.append(layer)
+      
+  /*  var parent₋cursor₋X=topLeftNextGround.left
+      var parent₋cursor₋Y=topLeftNextGround.top
+      let machine = Drawings₁(); var max₋height=0.0; var colno=1
+      
+      print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
+      
+      do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
+        guard let address = ⁸textual.baseAddress else { return }
+      /* let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
+         figure₋utf8: address, nil, size: &size, name: &name) */
+        layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
+        max₋height = max(layer.frame.height,max₋height)
+        layer.name = name
+        colno = (colno + 1) % columns
+        if colno == 0 {
+          parent₋cursor₋X = topLeftNextGround.left
+          parent₋cursor₋Y += max₋height
+          max₋height = 0.0
+        }
+        else {
+          parent₋cursor₋X = size.width + topLeftNextGround.right
+        }
+        controller.rendition.composition₋with₋scribbles.addSublayer(layer)
+      } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
+       */
+   }
+   
+   var unicode₋count = 0
+   var text₋is₋graphics = false
+   var start₋graphics = 0
+   
+   func tektron(_ unicode: UInt32) {
+     self.original.append(unicode)
+     if unicode == 0x0a { self.linebreaks.append(unicode₋count) }
+     if unicode == 0x8a { text₋is₋graphics = !text₋is₋graphics
+       if text₋is₋graphics { start₋graphics = unicode₋count }
+       else { /* graphics ended ⤐ */
+         let symbols = unicode₋count - start₋graphics
+         let pointer = Reference<UInt32>.allocate(capacity: symbols)
+         let text = Graphicstext(start: pointer, count: symbols)
+         for i in 0..<symbols {
+           text[i] = self.original[start₋graphics+i]
+         }
+         self.graphics.append(text)
+       }
+     }
+     unicode₋count += 1
+   }
+}
+
+func Type₋continuing₋character(_ uc: UInt32) -> Bool
+{
+   return (0x300 <= uc && uc <= 0x360) || /* ⬷ combining diacritical marks. */
+    (0x1AB0 <= uc && uc <= 0x1AFF) || /* ⬷ combining diacritical marks extended. */
+    (0x1DC0 <= uc && uc <= 0x1DFF) || /* ⬷ combining diacritical marks supplement. */
+    (0x20D0 <= uc && uc <= 0x20FF) || /* ⬷ combining diacritical marks for symbols. */
+    (0xFE20 <= uc && uc <= 0xFE2F) /* ⬷ combining half marks. */
+} /* ⬷ documented to be 'identic to the Mc Unicode Character 
+ Property' consisting of 445 characters and not equal to the U+1F16A Unicode. In 
+ Swift named 'extended grapheme cluster' a․𝘬․a Character 𝘦․𝘨 \u{E9}\u{20DD} and in 
+ UAX #29 legacy/extended is base followed by zero or more continuing characters. 
+ A basic unit may consist of multiple Unicode code points. */
+
+func Type₋private₋use(_ uc: UInt32) -> Bool
+{
+   return (0xE000 <= uc && uc <= 0xF8FF) || 
+    (0xF0000 <= uc && uc <= 0xFFFFD) || 
+    (0x100000 <= uc && uc <= 0x10FFFD)
+}
+
+func Append₋opt₋allocate() -> Reference<UInt32>
+{
+   let pointer = Reference<UInt32>.allocate(capacity: 5)
+   pointer[0] = 0x0041
+   pointer[1] = 0x0042
+   pointer[2] = 0x0043
+   pointer[3] = 0x0044
+   pointer[4] = 0x1f610
+   return pointer
 }
 
 class Minimumwindow: NSWindow {
@@ -145,7 +279,6 @@ class Minimumwindow: NSWindow {
    }
    
    override func noResponder(for event: Selector) { print("no responder for \(event)") }
-   
 }
 
 class Minimumview: NSView {
@@ -181,136 +314,48 @@ class Minimumview: NSView {
   
 }
 
-func Type₋continuing₋character(_ uc: UInt32) -> Bool
-{
-   return (0x300 <= uc && uc <= 0x360) || /* ⬷ combining diacritical marks. */
-    (0x1AB0 <= uc && uc <= 0x1AFF) || /* ⬷ combining diacritical marks extended. */
-    (0x1DC0 <= uc && uc <= 0x1DFF) || /* ⬷ combining diacritical marks supplement. */
-    (0x20D0 <= uc && uc <= 0x20FF) || /* ⬷ combining diacritical marks for symbols. */
-    (0xFE20 <= uc && uc <= 0xFE2F) /* ⬷ combining half marks. */
-} /* ⬷ documented to be 'identic to the Mc Unicode Character 
- Property' consisting of 445 characters and not equal to the U+1F16A Unicode. In 
- Swift named 'extended grapheme cluster' a․𝘬․a Character 𝘦․𝘨 \u{E9}\u{20DD} and in 
- UAX #29 legacy/extended is base followed by zero or more continuing characters. 
- A basic unit may consist of multiple Unicode code points. */
-
-func Type₋private₋use(_ uc: UInt32) -> Bool
-{
-   return (0xE000 <= uc && uc <= 0xF8FF) || 
-    (0xF0000 <= uc && uc <= 0xFFFFD) || 
-    (0x100000 <= uc && uc <= 0x10FFFD)
-}
-
-func Append₋opt₋allocate() -> Reference<UInt32>
-{
-   let pointer = Reference<UInt32>.allocate(capacity: 5)
-   pointer[0] = 0x0041
-   pointer[1] = 0x0042
-   pointer[2] = 0x0043
-   pointer[3] = 0x0044
-   pointer[4] = 0x1f610
-   return pointer
-}
-
-extension Minimumview {
-  func attribute₋text₋in₋window(count: Int, 
-   material: Reference<UInt32>) -> NSAttributedString {
-    let raw = UnsafeMutableRawPointer(material)
-    let invariant = String(bytesNoCopy: raw, length: 4*count, encoding: 
-     .utf32LittleEndian, freeWhenDone: false)
-    let attributed = NSAttributedString(string: invariant!, attributes: 
-     controller.rendition.default₋textattrs)
-    return attributed
+extension Minimumview { /* ⬷ text drawing. */
+  
+  var total₋twopass₋and₋height₋and₋width₋in₋O₍n₎: NSPoint {
+    get {
+      let linecount = CGFloat(controller.rendition.linebreaks.count); let vspace=5.0
+      let textfont = Rendition.textfont
+      let lineheight = textfont.xHeight + textfont.ascender + textfont.descender
+      let height: CGFloat = linecount*lineheight + (linecount - 1)*vspace + 2
+      let everyfit = textfont.boundingRectForFont
+      let width₋visible = 2 + everyfit.size.width*83 + (82*2)
+      return self.convertFromBacking(NSMakePoint(width₋visible,height))
+    }
   }
-  func typeset₋83(_ attributed: NSAttributedString, 
-   context: CGContext) -> Void {
-    let framesetter = CTFramesetterCreateWithAttributedString(attributed)
-    let symbols = CFRangeMake(0,attributed.length)
-    let box = self.bounds.insetBy(dx: 16, dy: 16).offsetBy(dx: 16, dy: -16)
-    let path = CGPath(rect: box.insetBy(dx: 8, dy: 8), transform: nil)
-    let textframe = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
-    CTFrameDraw(textframe,context)
+  func textlines(onebased number: Int, first: inout Nonabsolute, 
+   last: inout Nonabsolute) {
+    let start = number - 1, end=number
+    if start < 0 { first=0 } else {
+      first = Nonabsolute(controller.rendition.linebreaks[start])
+    }
+    last = Nonabsolute(controller.rendition.linebreaks[end])
   }
-  func render₋illustrations(from₋wire textual: Array<Reference<UInt32>>) {
-     let layer = CALayer()
-     let ident = UUID()
-     self.assemble₋pieces.layers₋with₋illustrations.updateValue(layer, forKey: ident)
-     
- /*  var parent₋cursor₋X=topLeftNextGround.left
-     var parent₋cursor₋Y=topLeftNextGround.top
-     let machine = Drawings₁(); var max₋height=0.0; var colno=1
-     
-     print("render \(columns) columns, inset \(topLeftNextGround) with \(⁸textual)")
-     
-     do { var size = CGSize(width: 0.0, height: 0.0); var name: String = "" 
-       guard let address = ⁸textual.baseAddress else { return }
-     /* let layer: CALayer = try /* await */ machine.interpret(bytes: ⁸textual.count, 
-        figure₋utf8: address, nil, size: &size, name: &name) */
-       layer.frame = NSRect(x: parent₋cursor₋X, y: parent₋cursor₋Y, width: size.width, height: size.height)
-       max₋height = max(layer.frame.height,max₋height)
-       layer.name = name
-       colno = (colno + 1) % columns
-       if colno == 0 {
-         parent₋cursor₋X = topLeftNextGround.left
-         parent₋cursor₋Y += max₋height
-         max₋height = 0.0
-       }
-       else {
-         parent₋cursor₋X = size.width + topLeftNextGround.right
-       }
-       
-       
-       
-       controller.rendition.composition₋with₋scribbles.addSublayer(layer)
-     } catch _ /* Drawings₁.Anomality.Rendition */ { print("render: exception") }
-    /* for (idx,figure) in illusts.enumerated() { /* ⬷ a․𝘬․a figures. */ } */
-    */
-  }
-  func snapshot₋rendition() -> NSBitmapImageRep? {
-    let rectangle = controller.rendition.assemble₋pieces.text.frame 
-    let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rectangle)
-    return bitmap
-  } /* bitmap.planar, bitmap.samplesPerPixels, ... */
-  func total₋twopass₋and₋height₋and₋width₋in₋O₍n₎() -> NSPoint {
-    let linecount = CGFloat(controller.rendition.linebreaks.count); let vspace=5.0
-    guard let textfont = Rendition.textfont else { return NSMakePoint(0,0) }
-    let lineheight = textfont.xHeight + textfont.ascender + textfont.descender
-    let height: CGFloat = linecount*lineheight + (linecount - 1)*vspace + 2
-    let everyfit = textfont.boundingRectForFont
-    let width₋visible = 2 + everyfit.size.width*83 + (82*2)
-    return self.convertFromBacking(NSMakePoint(width₋visible,height))
+  func visibles(offset: CGFloat, tiles: inout Array<UInt32>) {
   }
   override func draw(_ dirty: CGRect) {
     print("draw-rect: \(dirty) self.frame now is \(self.frame)")
     guard let context = NSGraphicsContext.current?.cgContext else { return }
+    var tiles = Array<Reference<UInt32>>()
+    visibles(offset: controller.rendition.y₋offset, tiles: &controller.rendition.original)
     let pointer = Append₋opt₋allocate()
-    if let ref: Reference<UInt32> = controller.rendition.original.tile(﹟: 0) {
-      
-    }
-    let attributed = attribute₋text₋in₋window(count: 5, material: pointer)
-    typeset₋83(attributed, context: context)
+    let attributed = controller.rendition.attribute₋text₋in₋window(count: 5, material: pointer)
+    controller.rendition.typeset(attributed, frame: self.frame, context: context)
     super.draw(dirty)
+  }
+  func snapshot₋rendition() -> NSBitmapImageRep? {
+    /* let uuid = UUID() */
+    let rectangle = controller.rendition.assemble₋pieces.illustrations[0].frame
+    let bitmap: NSBitmapImageRep? = self.bitmapImageRepForCachingDisplay(in: rectangle)
+    return bitmap
   }
 }
 
-/* extension Minimumview {
-  func loupe₋overlayed(_ sender: AnyObject) {
-    /* let bounds = CGContextConvertRectToDeviceSpace() */
-    /* composition.minificationFilter = CALayer.trilinear 
-    composition.magnificationFilter = CALayer.trilinear */
-    /* CALayerContentsFilter */
-  } /* ⬷ protocol-􀤎. */
-  enum Perspective { case undo; case redo; case hidden₋detailed }
-  func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
-  /* Prefix-suffix .swift alt. object-ive-se. */
-  /* Shanghainese mutually unintelligible with 𝘦․𝘨 Mandarin. */
-} */
-
-extension Rendition { /* ⬷ interaction */
-  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
-}
-
-extension Minimumview { /* ⬷ decoration */
+extension Minimumview { /* ⬷ decoration. */
   func apply₋ornaments() {
     self.letgo₋all₋ornaments()
     let rect = NSRect(x: 10, y: 10, width: 100, height: 100)
@@ -333,10 +378,25 @@ extension Minimumview { /* ⬷ decoration */
   func letgo₋all₋ornaments() { for area in self.trackingAreas { self.removeTrackingArea(area) } }
 }
 
+extension Rendition { /* ⬷ interaction. */
+  func hit₋test(point: CGPoint) -> CALayer? { return composition₋with₋scribbles.hitTest(point) }
+}
+
+/* extension Minimumview {
+  func loupe₋overlayed(_ sender: AnyObject) {
+    /* let bounds = CGContextConvertRectToDeviceSpace() */
+    /* composition.minificationFilter = CALayer.trilinear 
+    composition.magnificationFilter = CALayer.trilinear */
+    /* CALayerContentsFilter */
+  } /* ⬷ protocol-􀤎. */
+  enum Perspective { case undo; case redo; case hidden₋detailed }
+  func perspective₋toggled(_ sender: AnyObject) { } /* ⬷ 􀢅􀢇􀌆􀒱􀎮􀆔􀊅􀟪􀋘􀱀􀙟􀘽􀆃=􀃌. */
+  /* Prefix-suffix .swift alt. object-ive-se. */
+  /* Shanghainese mutually unintelligible with 𝘦․𝘨 Mandarin. */
+} */
+
 class Viewcontroller: NSViewController {
-  
   init() { print("viewcontroller-init"); super.init(nibName: nil, bundle: nil) }
-  
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   
   override func loadView() { print("Loading View") 
@@ -548,9 +608,6 @@ class Windowcontroller: NSWindowController {
      self.window = window
    }
    
-   /* CAAction: func run(forKey event: String, object anObject: Any, 
-    arguments dict: [AnyHashable : Any]?) { } */
-   
    let viewctrl = Viewcontroller()
    var shell = Interact()
    var recorder = UndoManager() /* ⬷ duplicate undo-manager incorrectly 
@@ -559,21 +616,6 @@ class Windowcontroller: NSWindowController {
    var minimumwindow: Minimumwindow { self.window as! Minimumwindow }
    var minimumview: Minimumview { viewctrl.view as! Minimumview }
    var rendition: Rendition { viewctrl.representedObject as! Rendition }
-   
-   var graphics₋not₋text = false
-   var tektron₋count = 0
-   var read₋graphics: (@convention(c) (UInt32) -> Void)?
-   
-   func tektron(_ unicode: UInt32) {
-     rendition.original.append(unicode)
-     if unicode == 0x0a { rendition.linebreaks.append(tektron₋count) }
-     tektron₋count += 1
-     if unicode == 0x8a {
-       if self.graphics₋not₋text { rendition.patchwork.graphics₋ended() }
-       else { rendition.patchwork.graphics₋begin() }
-       self.graphics₋not₋text = !self.graphics₋not₋text
-     } else if graphics₋not₋text { read₋graphics!(unicode) }
-   }
    
    @available(macOS 12.0.0, *)
    func corout₋textual₋and₋graphical₋output() async {
@@ -597,7 +639,7 @@ class Windowcontroller: NSWindowController {
          } else {
            unicode = UInt32(leadOr8Bit)
          }
-         tektron(unicode)
+         rendition.tektron(unicode)
          idx += followers₋and₋lead
        }
        self.o₋material.removeFirst()
@@ -623,7 +665,7 @@ class Windowcontroller: NSWindowController {
            unicodes.forEach { (symbol: Character) -> Void in 
              for possibly₋canonic in symbol.unicodeScalars {
                let uc = possibly₋canonic.value
-               self.tektron(uc)
+               self.rendition.tektron(uc)
                let s = String(format: "%02x ", uc); print("storing \(s)")
              }
            }
@@ -645,7 +687,6 @@ class Windowcontroller: NSWindowController {
    func windowWillReturnUndoManager(_ window: NSWindow) -> UndoManager? { return recorder }
    
    @objc func reloadUi(sender: NSNotification) { print("reloadUi") 
-     guard let window = self.window else { return }
      if NSApp.effectiveAppearance.name != .aqua 
      { rendition.theme₋idx = 1 } else { rendition.theme₋idx = 0 }
    }
@@ -675,5 +716,93 @@ extension Windowcontroller { /* ⬷ for keyboard. */
      }
    }
 }
+
+class Artwork₋swift {
+  init(text: String) { self.text = text 
+   directives[pixel₋height] = Artwork₋directive.Count = 100.0
+   directives[place₋origo] = Artwork₋directive.Point = A₋point(x: 50.0, y: 50.0)
+   directives[offset₋drawing₋on] = Artwork₋directive.Size = A₋size(x: 0.0, y: 0.0) }
+  convenience init() { self.init(text: "") }
+  var directives = Dictionary<Artwork₋instruction,Artwork₋directive>()
+  typealias Artwork₋parameters = (Double,Double,Double,Double,Double,Double)
+  struct operation { var instruction: Artwork₋instruction 
+   var params: Artwork₋parameters; var texts: (String,String)? }
+  var instructions = Array<operation>()
+  var size = CGSize(width: 100, height: 100)
+  var text: String
+}
+
+func Append₋instruction(_ instruction: Int32, detail: 
+ Artwork₋instruction₋detail, ctx: UnsafeMutableRawPointer?)
+{
+   let recorder = ctx!.load(as: Artwork₋swift.self)
+   let instr = Artwork₋instruction(rawValue: UInt32(instruction))
+   /* let cpointer: UnsafeMutablePointer<CDouble> = detail.four₋parameters!
+   let rawpointer = UnsafeMutableRawPointer(cpointer)
+   let ⁴doubles: UnsafeMutablePointer<CDouble> = rawpointer.bindMemory(to: 
+    CDouble.self, capacity: 4) */
+   let ⁴doubles = UnsafeBufferPointer(start: detail.four₋parameters, count: 4)
+   if instr == height || instr == place₋origo || instr == offset₋drawing₋on {
+     recorder.directives[instr] = (⁴doubles[0],⁴doubles[1])
+   } else {
+     let params: Artwork₋swift.Artwork₋parameters = (⁴doubles[0],⁴doubles[1], 
+      ⁴doubles[2],⁴doubles[3],⁴doubles[4],⁴doubles[5])
+     let op = Artwork₋swift.operation(instruction: instr, params: params, texts: nil)
+     recorder.instructions.append(op)
+   }
+}
+
+extension Artwork₋instruction: Hashable {
+  public func hash(into hasher: inout Hasher) { hasher.combine(self.rawValue) }
+  static func == (lhs: Artwork₋instruction, rhs: Artwork₋instruction) -> Bool { return lhs.rawValue == rhs.rawValue }
+}
+
+class Artworklayer: CALayer {
+  enum Anomality: Error { case Image }
+  override func draw(in omgivning: CGContext) {
+    let figure: Artwork₋swift = self.contents as! Artwork₋swift
+    for op in figure.instructions {
+      let params = op.params
+      switch op.instruction {
+       case beziercurve₋initial:
+         omgivning.beginPath()
+         let x=op.params.0, y=op.params.1
+         omgivning.move(to: CGPoint(x: x, y: y))
+       case beziercurve₋add:
+         var x1=params.0,y1=params.1,x2=params.2,y2=params.3,x3=params.4,y3=params.5
+         omgivning.addCurve(to: CGPoint(x: x1, y: y1), control1: CGPoint(x: x2, y: y2), control2: CGPoint(x: x3, y: y3))
+       case beziercurve₋last:
+         var x1=params.0,y1=params.1,x2=params.2,y2=params.3,x3=params.4,y3=params.5
+         omgivning.addCurve(to: CGPoint(x: x1, y: y1), control1: CGPoint(x: x2, y: y2), control2: CGPoint(x: x3, y: y3))
+       case bezier₋alt₋line₋close: omgivning.closePath()
+       case base16₋encoded₋later₋layered₋png:
+        do {
+          if let (identifer,material₋text) = op.texts {
+            let material₋data = try Data(base16Encoded: material₋text)
+            /* guard let plate = NSImage(data: material₋data) else { throw Anomality.Image }
+            let image: CGImage? = Renderimage(width: Double, height: Double) { 
+             process: (NSGraphicsContext)
+            }
+            layer.contents = plate / * ⬷ CGImageRef alternatively NSImage. */
+            /* further details written in 'CGImageSource.h'. */
+          }
+        }
+        catch Base16EncodingError.invalidLength { print("length-error when decoding base-16 material") }
+        catch Base16EncodingError.invalidByteString(_) { print("material-error when decoding base-16 material") }
+        catch Base16EncodingError.invalidStringEncoding { print("utf8-string encoding error") }
+        catch { print("generic handling") }
+    default: print("default")
+       } /* ⬷ nowdays as agreed, not strict, bezier=spaghetti-letters however are. */
+    }
+  }
+}
+
+class Simulationlayer: CAMetalLayer { }
+
+func Encode(image: NSImage) -> String {
+  let material₋data = image.tiffRepresentation
+  let serial = material₋data!.base16EncodedString(options: [.uppercase])
+  return serial
+} /* ...for inclusion on web pages: base64. */
 
 
