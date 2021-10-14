@@ -33,13 +33,13 @@ int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 int Details_in_C(uint64_t pid, int32_t cross);
 #endif
 
+#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
+
 #if defined __cpp
 #define EXT₋C extern "C"
 #else
 #define EXT₋C
 #endif
-
-#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
 struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
@@ -90,6 +90,7 @@ struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
 struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
 void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, struct sequent * y₋hi);
 struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent reciproc_sequent(struct sequent yb);
 struct sequent div_sequent(struct sequent x₁, struct sequent x₂); /* the symbol 'div' requires __attribute__((overloadable)); */
 struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 struct sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
@@ -106,10 +107,10 @@ int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t,
  struct sequent t₋acc, int * stop));
 struct intel₋sequent₋pair { struct sequent inner[2]; };
 typedef struct intel₋sequent₋pair simd_tᵦ;
-typedef _Float16 half; /* ⬷ in Swift already named Float16. */
-typedef long long __m128i __attribute__ ((__vector_size__(16), __aligned__(16)));
-/* typedef __m256 __attribute__ ((__vector_size__(32))); */
-/* typedef __v8hf __attribute__ ((__vector_size__(16), __aligned__(16))); */
+typedef _Float16 half; /* ⬷ in Swift already named Float16 and made unavailable in macOS. */
+typedef _Float16 __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
+typedef __v8hf __m128i;
+typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
 typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
 /* Överhandsavtal och underhandsuppfattning: 
  
@@ -212,7 +213,7 @@ enum Artwork₋scanner₋mode { initial, regular,
 struct Scanner₋ctxt {
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t idx₋unicode; /* ⬷ and not idx₋u8s. */
-  Artnumerical ongoing; int negative;
+  struct sequent ongoing; int negative;
   char32_t regular[1024]; short symbols₋in₋regular;
   enum Artwork₋scanner₋mode mode;
 };

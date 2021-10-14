@@ -145,6 +145,7 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 #define 𝟶ᐧ𝟶 { .detail.frac=0, 1 }
 #define 𝟷𝟶ᐧ𝟶 { .detail.frac = (__int128_t)0x00000110 | 0x00000000, 1 }
 #define 𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
+#define 𝟸ᐧ𝟶 { .detail.frac = (__int128_t)0x00000001<<64 | 0x00000000, 1 }
 #define ₋𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0xFFFFFFFF<<64 | 0x80000000, 1 }
 
 /* int CastTˣᵗToSequent(
@@ -169,16 +170,16 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 } */
 
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ)
-{ int neg = 0;
+{/* int neg = 0;
     if (neg) { }
     uint64_t
   struct sequent 𝟷ᐧ𝟶 = { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
    if (neg) {
-     /* twos-complement */
+     / * twos-complement * /
    }
    uint128_t 
    
-   *ℝ = 
+   *ℝ = */
 }
 
 void rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ)
@@ -206,38 +207,75 @@ struct sequent minus_sequent(struct sequent x₁, struct sequent x₂)
   return diff;
 }
 
-struct void multiply(struct sequent x₁, struct sequent x₂, 
- struct sequent * y₋lo, struct sequent * y₋hi)
-{
-  struct sequent x₁ =; struct sequent x₂ = ;
-  struct sequent x₁ =; struct sequent x₂ = ;
-  
+void multiply(struct sequent x₁, struct sequent x₂, 
+ struct sequent * product₋lo, struct sequent * product₋hi)
+{ int lneg=0, rneg=0;
+  if (x₁.detail.frac < 0) { lneg = 1; x₁.detail.frac = -x₁.detail.frac; }
+  if (x₂.detail.frac < 0) { lneg = 1; x₂.detail.frac = -x₂.detail.frac; }
+  __uint128_t int₋mask = (__int128_t)0xFFFFFFFF<<64 | 0x80000000;
+  __uint128_t integer₁ = (x₁.detail.bits>>30) & int₋mask, 
+   integer₂ = (x₂.detail.bits>>30) & int₋mask; /* ⬷ arithmetic shift. */
+  __uint128_t fractional₋mask = 0x7fffffff;
+  __uint128_t fractional₁ = x₁.detail.bits & fractional₋mask, 
+   fractional₂ = x₂.detail.bits & fractional₋mask;
+  __uint128_t f₋sum = (fractional₁ * fractional₂)>>62;
+  __uint128_t i₋sum = (integer₁ * integer₂);
+  __int128_t sum = (i₋sum<<62) | f₋sum;
+  if (lneg) { sum = -sum; }
+  if (rneg) { sum = -sum; }
+  int64_t hi₋product = i₋sum>>1;
+  product₋lo->detail.bits = sum;
+  product₋lo->valid = 1;
+  int₋to₋sequent(hi₋product,product₋hi);
 }
 
 struct sequent mult_sequent(struct sequent x₁, struct sequent x₂)
 {
-	multiply(struct sequent x₁, struct sequent x₂, 
-	 struct sequent * y₋lo, struct sequent * y₋hi)
- // struct sequent mult = { .detail = { x₁.detail.frac * x₂.detail.frac }, .valid=1 };
-  return mult;
+  struct sequent y₋lo,y₋hi;
+  multiply(x₁,x₂,&y₋lo,&y₋hi);
+  return y₋lo;
 }
 
+struct sequent reciproc_sequent(struct sequent bd)
+{ struct sequent focus, xn=𝟷ᐧ𝟶, two=𝟸ᐧ𝟶; int n=0;
+again:
+  if (n > 28) { return xn; }
+  focus = minus_sequent(two, mult_sequent(xn,bd));
+  xn = mult_sequent(focus,xn); /* start with x₀=1, x_n+1 = x_n*(2 - b*x_n). */
+  n += 1;
+  goto again;
+} /* knipa 𝘦․𝘨 al-coda alt. ː ⤪ and the text '⬷ non-subscript actually correct'. */
+/*
+   computational f = ^(struct sequent x) { return 1/x; }, 
+    f₋prim = ^(struct sequent x) { return -1/x^2; };
+   / * enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done }; * /
+   void (^ping)(enum Newtoncontrol * ctrl) = ^(enum Newtoncontrol * ctrl) { *ctrl = Newton₋done; };
+  if (Newton(f,f₋prim,&x₀,ping)) { return accumulative₋zero(); }
+*/
+
 struct sequent div_sequent(struct sequent x₁, struct sequent x₂)
-{ /* newton 1/x1 mult x2 */ }
+{ struct sequent x₀=x₁, x₃=reciproc_sequent(x₁);
+  return mult_sequent(x₃,x₂);
+}
 struct sequent product₋abelian() { struct sequent one = 𝟷ᐧ𝟶; return one; }
 struct sequent accumulative₋zero() { struct sequent zero = 𝟶ᐧ𝟶; return zero; }
 struct sequent negative₋infinity() {
   struct sequent y = accumulative₋zero();
   y.valid = 0; return y; }
-/* struct sequent operator_minus(struct sequent ℝ);
-typedef struct sequent (^computational)(struct sequent x);
+struct sequent operator_minus(struct sequent ℝ)
+{
+  struct sequent y = ℝ;
+  y.detail.frac = -y.detail.frac;
+  return y;
+}
+/* typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 int Newton(computational f, computational f₋prim, struct sequent * x₀, 
- void (^ping)(enum Newtoncontrol * ctrl));
- struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
+ void (^ping)(enum Newtoncontrol * ctrl)) { }
+ struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x) { }
 int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
  struct sequent min, void (^memory)(struct sequent integrale, 
- struct sequent t₋acc, int * stop)); */
+ struct sequent t₋acc, int * stop)) { } */
 
 unionᵢ Artwork₋symbol₋token₋detail {
   double parameter;                                                /*  (1) */
@@ -248,7 +286,7 @@ unionᵢ Artwork₋symbol₋token₋detail {
 
 structᵢ Artwork₋symbol₋token {
   enum Artwork₋token₋symbol kind;
-  union Artwork₋symbol₋token₋detail detail;
+  union Artwork₋symbol₋token₋detail one₋detail;
 }; /* ⬷ preferable 𝟽₋bit₋possibly₋truncated₋symbol. */
 
 inexorable int init₋context(__builtin_int_t unicode₋program₋symbols, struct Scanner₋ctxt * ctx)
@@ -433,7 +471,8 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[],
   }; */
   
   return 0;
-} /* ⬷ read errors from left to right when correcting both syntactic and semantic errors. */
+} /* ⬷ read errors from left to right when correcting both syntactic and 
+ semantic errors. */
 
 int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
   struct Scanner₋ctxt * s₋ctxt, semantics truly₋your)
@@ -467,7 +506,7 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[],
      if (kind == END₋OF₋TRANSMISSION) { confess(completion); }
      /* lookahead = { kind, detail }; */
      lookahead.kind = kind; /* 𝘦․𝘨 'add₋line'. */
-     lookahead.detail = hearken; /* 𝘦․𝘨 { .ref = (void *)NULL }. */
+     lookahead.one₋detail = hearken; /* 𝘦․𝘨 { .ref = (void *)NULL }. */
    };
    
    typedef void (^pattern)(enum Artwork₋token₋symbol ensure);
