@@ -142,6 +142,131 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 #define FALSE 0
 #define TRUE (! FALSE)
 
+/* Base𝕟, Critic, Utf8Terminal, TetrasUntilNull, BUILTIN₋INT₋MAX, print(out), 
+ 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡, max, Vt99-constants. */
+
+inexorable
+void
+NumberformatCatalogue₋Present(struct Bitfield * field, 
+  uint32_t numerics, uint32_t init, 
+  int is₋𝟷𝟼₋bits, 
+  int maxwidth, 
+  void (^out)(char32_t uc)
+)
+{
+   typedef void (^Out)(char8_t *, __builtin_int_t);
+   Out out = ^(char8_t * u8s, __builtin_int_t bytes) { Present(term,u8s,bytes); };
+   unsigned spaces = maxwidth - TetrasUntilNull(Critic(field.ident), BUILTIN₋INT₋MAX);
+   while (spaces--) { print(out," "); }
+   
+   Present(term,Critic(field.ident)); print(out, " ");
+   
+   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 bool masking=false; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned pos=31;
+   Base𝕟((__builtin_uint_t)(field.mask), 2, 32, ^(char 𝟶to𝟿) {
+     if (is₋𝟷𝟼₋bits && pos > 15) { print(out, "﹟"); }
+     if (!is₋𝟷𝟼₋bits && 𝟶to𝟿 == '1' && !masking) { masking = true; }
+     if (!is₋𝟷𝟼₋bits && masking && 𝟶to𝟿 == '0') { masking = false; }
+     if (!is₋𝟷𝟼₋bits && masking) { print(out, value & (0b1<<pos) ? "1" : "0"); }
+     if (!is₋𝟷𝟼₋bits && !masking) { print(out, "␣"); }
+     if (pos % 4 == 0) print(out, "|"); --pos;
+   });
+   
+   Present(term,Critic(field.text)); print(out,"\n");
+}
+
+FOCAL
+void
+NumberformatCatalogue₋Present(
+  struct AnnotatedRegister /* Explained */ * ar, 
+  uint32_t numerics, 
+  int is₋𝟷𝟼₋bits, 
+  void (^out)(char32_t uc)
+)
+{
+   auto out = ^(char8_t * utf8, __builtin_int_t bytes) { Present(term,utf8,bytes); };
+   auto present = ^(int count, Bitfield * regs, uint32_t val, 
+        uint32_t init) { __builtin_int_t maxwidth=0; 
+      for (int i=0; i<count; ++i) {
+         const Bitfield * reg = regs + i; maxwidth = max(maxwidth, 
+          TetrasUntilNull(Critic(reg->ident), BUILTIN₋INT₋MAX));
+      }
+      for (int i=0; i<count; ++i) {
+         Present(*(regs + i), val, init, is₋𝟷𝟼₋bits, maxwidth);
+      }
+   };
+   print(out, "⬚\n", ﹟s(Vt99::bright));
+   Present(term,Critic(ar.header));
+   print(out, "⬚ = ⬚ 0x", ﹟s(Vt99::reset), ﹟s(Vt99::reverse));
+   Base𝕟((__builtin_uint_t)numerics, 16, 8, ^(char 𝟶to𝟿) { print(out,"⬚", ﹟c(𝟶to𝟿)); });
+   print(out, "⬚\n\n", ﹟s(Vt99::reset));
+   present(ar.regcnt, ar.regs, value, ar.init);
+   Present(term,Critic(ar.footnote));
+   print(out,"\n\n");
+}
+
+#pragma mark 16-bit half precision and conversions
+
+float
+__attribute__ ((target("f16c")))
+half₋to₋float(half /* unsigned short */ 𝟷𝟼₋bits)
+{
+  /* float again = _cvtsh_ss(pythagorean_double { .location=𝟷𝟼₋bits }.bits);
+  return again; */
+  __v8hf v = { (short)𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
+  typedef float __attribute__ ((__vector_size__(32), __aligned__(16))) __v44f;
+  __m128 non₋double = (__m128)__builtin_ia32_vcvtph2ps(v);
+  return non₋double[0];
+}
+
+double
+/* __attribute__ ((target("f16c"))) */
+To₋doubleprecision(unsigned short /* half */ 𝟷𝟼₋bits)
+{
+  return (double)half₋to₋float(𝟷𝟼₋bits);
+}
+
+/* formerly register */ Explained Binary16 = {
+  { U"Binary16_SGN", Binary16_SGN, U"sign bit" },
+  { U"Binary16_EXP", Binary16_EXP, U"signed exponent -126 to 127" },
+  { U"Binary16_MAN", Binary16_MAN, U"fraction/mantissa/significand" }
+}; /* E𝘨. pct., meters and inches. */
+
+AnnotatedRegister AR_Binary16 = {
+  U"Binary16: The Ieee 754-2008 half precision type", 
+  3, Binary16, 0x00000000, 
+  U"Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴."
+};
+
+void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc))
+{
+  uint32_t bits = pythagorean_double { .location=val }.bits;
+  extern AnnotatedRegister AR_Binary16;
+  Present(term, AR_Binary16, bits, true, out);
+}
+
+BITMASK (uint64_t) { /* Sse flags and 0b1xx for MXCSR.RC rounding. */
+  Round₋to₋nearest₋even = 0b00, 
+  Round₋down₋toward₋neginf = 0b01, 
+  Round₋up₋toward₋inf = 0b10, 
+  Round₋toward₋zero₋truncate = 0b11 /* ⬷ identical to the SSE flag register. */
+};
+
+half
+__attribute__ ((target("f16c")))
+float₋to₋half(float 𝟹𝟸₋bits)
+{
+  /* int const f16imm = Round₋to₋nearest₋even; */
+ #define f16imm Round₋to₋nearest₋even
+  __m128 four₋floats = (__m128){𝟹𝟸₋bits,0,0,0};
+  __v8hf eight₋floats = __builtin_ia32_vcvtps2ph(four₋floats,f16imm);
+  uint16_t a₋half = (unsigned short)eight₋floats[0];
+  return pythagorean_double { .bits=a₋half }.location;
+}
+
+/* 8 times is named __builtin_ia32_vcvtph2ps256 and __builtin_ia32_vcvtps2ph256. */
+
+#pragma mark neither Ieee 754 nor Ieee 754-2008
+
 #define 𝟶ᐧ𝟶 { .detail.frac=0, 1 }
 #define 𝟷𝟶ᐧ𝟶 { .detail.frac = (__int128_t)0x00000110 | 0x00000000, 1 }
 #define 𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
@@ -255,8 +380,7 @@ again:
 
 struct sequent div_sequent(struct sequent x₁, struct sequent x₂)
 { struct sequent x₀=x₁, x₃=reciproc_sequent(x₁);
-  return mult_sequent(x₃,x₂);
-}
+  return mult_sequent(x₃,x₂); }
 struct sequent product₋abelian() { struct sequent one = 𝟷ᐧ𝟶; return one; }
 struct sequent accumulative₋zero() { struct sequent zero = 𝟶ᐧ𝟶; return zero; }
 struct sequent negative₋infinity() {
@@ -289,7 +413,8 @@ structᵢ Artwork₋symbol₋token {
   union Artwork₋symbol₋token₋detail one₋detail;
 }; /* ⬷ preferable 𝟽₋bit₋possibly₋truncated₋symbol. */
 
-inexorable int init₋context(__builtin_int_t unicode₋program₋symbols, struct Scanner₋ctxt * ctx)
+inexorable int init₋context(__builtin_int_t unicode₋program₋symbols, 
+ struct Scanner₋ctxt * ctx)
 {
    ctx->lineno₋first=1, ctx->lineno₋last=1;
    ctx->idx₋unicode=0;

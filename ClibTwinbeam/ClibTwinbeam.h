@@ -1,8 +1,9 @@
-/*  􀪀 ClibTwinbeam.h | bridging Swift and Twinbeam. */
+/*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge. */
 
 #define structᵢ struct
 #define unionᵢ union
 #define inexorable
+typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
 typedef unsigned long long  uint64_t;
 typedef long long           int64_t;
@@ -24,14 +25,108 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 /* #define 𝟷𝟸𝟾₋bit₋integers */
 #endif
 
-typedef unsigned char char8_t; typedef uint32_t char32_t;
-/* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
-
 #if defined 𝟷𝟸𝟾₋bit₋swift₋integers
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 #else
 int Details_in_C(uint64_t pid, int32_t cross);
 #endif
+
+#pragma mark precision and the 128-bits physical bound
+
+union Q6463 { __uint128_t bits; __int128_t frac; };
+struct sequent { union Q6463 detail; int valid; };
+/* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
+inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
+inexorable void rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ);
+/* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
+void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
+ void (^zero)(), void (^neginf)(), void (^nonvalid)());
+/* ⬷ TeX 103 §. */
+struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
+void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, struct sequent * y₋hi);
+struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
+struct sequent reciproc_sequent(struct sequent yb);
+struct sequent div_sequent(struct sequent x₁, struct sequent x₂); /* the symbol 'div' requires __attribute__((overloadable)); */
+struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
+struct sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
+struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
+struct sequent operator_minus(struct sequent ℝ);
+typedef struct sequent (^computational)(struct sequent x);
+enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
+int Newton(computational f, computational f₋prim, struct sequent * x₀, 
+ void (^ping)(enum Newtoncontrol * ctrl));
+/* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
+struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
+int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
+ struct sequent min, void (^memory)(struct sequent integrale, 
+ struct sequent t₋acc, int * stop));
+struct intel₋sequent₋pair { struct sequent inner[2]; };
+typedef struct intel₋sequent₋pair simd256_t;
+
+#pragma mark pythagorean-euclidean and the half type
+
+/*** Ieee 754 base-2 half with double-zero (-1)ˢ(1+m*2⁻¹⁰)×2ˣ⁻¹5 ***
+                                                                             
+ Binary16_SGN ⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|x␣␣␣|␣␣␣␣|␣␣␣␣|␣␣␣␣| Sign bit
+ Binary16_EXP ⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|␣xxx|xx␣␣|␣␣␣␣|␣␣␣␣| Signed ex̳ponent -16 to 16 (biased)
+ Binary16_MAN ⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|⌗⌗⌗⌗|␣␣␣␣|␣␣xx|xxxx|xxxx| Fraction/mantissa/significand (10 bits)
+                                                                             
+ The significand encodes the serie 1 + ∑ k⁻ⁱ where 1 <= k < 11.  (...and not k ∈ [0,9].)
+                                                                             
+*/
+
+typedef unsigned short half; /* ⬷ not 'typedef _Float16 half' and 
+ not 'typedef pythagorean_double half', in Swift already named Float16 and 
+ made unavailable in macos. */
+
+#define BITMASK(type) enum : type
+
+BITMASK (half) {
+  Binary16_SGN = 0x8000, /* sign bit. */
+  Binary16_EXP = 0b11111<<10, /* signed exponent -16 to 16. */
+  Binary16_MAN = 0x3ff /* fraction/mantissa/significand. */
+};
+
+typedef half __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
+typedef __v8hf __m128i;
+typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
+typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
+
+#define IEEE754BASE2_16BIT_PZERO 0b0000000000000000
+#define IEEE754BASE2_16BIT_NZERO 0b1000000000000000
+#define IEEE754BASE2_16BIT_ONE   0b0011110000000000
+/* IEEE754BASE2_16BIT_SNAN and IEEE754BASE2_16BIT_QNAN n/a. */
+#define IEEE754BASE2_16BIT_PINF  0b0111110000000000
+#define IEEE754BASE2_16BIT_NINF  0b1111110000000000
+#define IEEE754BASE2_16BIT_MAX   0b0111101111111111 /* 𝟲𝟱𝟱𝟬𝟰 (i․𝘦 𝗠𝗔𝗫 when `half` precision.) */
+typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴. */
+   struct { int8_t lsh; uint8_t msh; } signed_little_endian;
+   struct { uint8_t msh; int8_t lsh; } unsigned_big_endian;
+   struct {
+     unsigned mantissa : 10;
+     unsigned exponent :  5;
+     unsigned sign     :  1;
+   } binary16; /* ⬷ a․𝘬․a `ieee754_2008`. */
+   unsigned short bits;
+#if defined __x86_64__
+   half location;
+#endif
+} pythagorean_double;
+
+/* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
+
+double To₋doubleprecision(unsigned short /* half */ x);
+
+typedef unsigned char char8_t; typedef uint32_t char32_t;
+
+/* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
+
+void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc));
+
+struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
+struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; };
+typedef struct AnnotatedRegister Explained[];
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
@@ -76,42 +171,8 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
 
-union Q6463 { __uint128_t bits; __int128_t frac; };
-struct sequent { union Q6463 detail; int valid; };
-/* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
-inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
-inexorable void rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ);
-/* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
-void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
- void (^zero)(), void (^neginf)(), void (^nonvalid)());
-/* ⬷ TeX 103 §. */
-struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
-struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
-void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, struct sequent * y₋hi);
-struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
-struct sequent reciproc_sequent(struct sequent yb);
-struct sequent div_sequent(struct sequent x₁, struct sequent x₂); /* the symbol 'div' requires __attribute__((overloadable)); */
-struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
-struct sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
-struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-struct sequent operator_minus(struct sequent ℝ);
-typedef struct sequent (^computational)(struct sequent x);
-enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
-int Newton(computational f, computational f₋prim, struct sequent * x₀, 
- void (^ping)(enum Newtoncontrol * ctrl));
-/* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
-struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
-int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
- struct sequent min, void (^memory)(struct sequent integrale, 
- struct sequent t₋acc, int * stop));
-struct intel₋sequent₋pair { struct sequent inner[2]; };
-typedef struct intel₋sequent₋pair simd_tᵦ;
-typedef _Float16 half; /* ⬷ in Swift already named Float16 and made unavailable in macOS. */
-typedef _Float16 __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
-typedef __v8hf __m128i;
-typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
-typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
+
 /* Överhandsavtal och underhandsuppfattning: 
  
  ━━━   ━━━
@@ -119,6 +180,7 @@ typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS a
  ━━━   ━━━
  
  samtalar utan uppmärksamhet kvicknar. */
+
 
 /*
   
@@ -170,21 +232,21 @@ typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS a
 struct Unicodes { __builtin_int_t symbols; char32_t * start; };
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
+typedef half Artnumerical;
+/* ⬷ and neither 'struct sequent' nor 'struct Artnumerical { half value; }' for Swift half literal. */
 
-typedef half Artnumerical; /* ⬷ and not struct sequent. */
-struct A₋point { Artnumerical x,y; };
-struct Illustration { Artnumerical size, place₋origo, offset₋drawing₋on; };
+struct A₋point { double x,y; };
+struct Illustration { double size, place₋origo, offset₋drawing₋on; };
 int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
 /* ⬷ arbitrary number of other points. ⤐ */
 int Place₋text(struct Unicodes symbols, struct A₋point start, int mode);
 int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
 int Place₋image(struct 𝟽bit₋text regular, struct A₋point, int mode);
-
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
 union Artwork₋directive {
   int Count; /* ar: short. */
-  Artnumerical Scaler;
+  double Scalar;
   /* struct */ A₋size Size;
   struct A₋point Point;
 };
@@ -194,7 +256,7 @@ enum Artwork₋token₋symbol { dotsize, dotorigo, dotoffset, real, comma₋0x2c
  utf8₋text, rawtext₋sentinel, text, next, END₋OF₋TRANSMISSION };
 
 union Artwork₋instruction₋detail {
-  half * four₋parameters;                                          /*  (1) */
+  double * four₋parameters;                                        /*  (1) */
   Nonabsolute symbol;                                              /*  (2) */
   struct Unicodes identifier;                                      /*  (3) */
   union Artwork₋directive various₋signatures;                      /*  (4) */
