@@ -168,7 +168,7 @@ EXT₋C struct Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; 
 /* EXT₋C Argᴾ ﹟s(const char8_t * u8s) { return Argᴾ { { .u8s=Critic(u8s) }, 4 }; } */
 EXT₋C struct Argᴾ ﹟s(char8_t * u8s) { return Argᴾ { { .u8s=u8s }, 4 }; }
 EXT₋C struct Argᴾ ﹟l(const /* signed */ char * s) { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
-EXT₋C struct Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * uc) { return Argᴾ { { .ucs={ uc, tetras } }, 5 }; }
+EXT₋C struct Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * uc) { return Argᴾ { { .ucs={ tetras, uc } }, 5 }; }
 /* EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32_t * uc) { return Argᴾ { { .ucs={ Critic(uc), tetras } }, 5 }; } */
 /* EXT₋C Argᴾ ﹟c(char8_t c) { return Argᴾ { { .c=c }, 6 }; } */
 EXT₋C struct Argᴾ ﹟c(/* signed */ char c) { return Argᴾ { { .c=(char8_t)c }, 6 }; }
@@ -179,7 +179,7 @@ EXT₋C struct Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
 #endif
 EXT₋C struct Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
-EXT₋C struct Argᴾ ﹟λ(Argᴾ::Output scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; }
+/* EXT₋C struct Argᴾ ﹟λ(Argᴾ₋output scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; } */
 
 inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char32_t * ucs)
 {
@@ -189,10 +189,17 @@ inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char3
 
 EXT₋C Argᴾ ﹟S₂(char32_t * uc) {
   __builtin_int_t tetras = TetrasUntilNull(uc,BUILTIN₋INT₋MAX);
-  return Argᴾ { { .ucs={ uc, tetras } }, 5 };
+  return Argᴾ { { .ucs={ tetras, uc } }, 5 };
 }
 
 DISORDERABLE extern void register₋reflect(__builtin_uint_t mask) { }
+
+DISORDERABLE extern void Anfang(
+  void (^out)(char8_t * u8s, __builtin_int_t bytes),
+  char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, uint8_t * image) 
+{
+ print(out,"⬚",﹟C(*prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶));
+} /* See --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
 
 #pragma mark - in /retrospect/, hidden yet simple:
 
@@ -254,17 +261,17 @@ again:
       case 2: out𝕟(a.value.x); break;                                           \
       case 3: 𝟷𝟶𝟷𝟷𝟶₋out(a.value.b); break;                                       \
       case 4: u8c₋stream(a.value.u8s); break;                                   \
-      case 5: unicode₋stream(a.value.ucs.tetras, a.value.ucs.unicodes); break;  \
+      case 5: unicode₋stream(a.value.ucs.tetras, a.value.ucs.start); break;     \
       case 6: eight₋bit₋symbol(a.value.c); break;                               \
       case 7: unicode₋symbol(a.value.uc); break;                                
 #ifndef UNEXISTING₋IEEE754
       case 8: out𝕕(double(a.value.f₂)); break;                                  \
       case 9: out𝕕(a.value.f₁); break;                                          
 #endif
-      case 10: { Argᴾ::Unicode set = ^(bool anfang, char32_t& prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, \
-       void * context) { if (!anfang) { print("⬚", ﹟C(prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶)); }    \
-       else { Anfang(prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, NULL); } }; a.value.λ.scalar(set,        \
-       a.value.λ.context); break; }
+/*      case 10: { Argᴾ₋Unicode set = ^(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, \
+       void * context) { if (!anfang) { print(out,"⬚",﹟C(*prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶)); } \
+       else { Anfang(out,prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶,NULL); } }; a.value.λ.scalar(set,     \
+       a.value.λ.context); break; } */
 #ifdef 𝟷𝟸𝟾₋bit₋integers
       case 11: 𝟷𝟸𝟾₋out𝕟(a.value.U); break;                                      \
       case 12: 𝟷𝟸𝟾₋out𝕫(a.value.I); break;
@@ -288,19 +295,17 @@ mfprint(
   const char * utf8format, 
   ...
 )
-{ int y; va_prologue(utf8format);
+{ int y; 
 #ifdef __x86_64__
-   bool original = false;
-   int 🥇 descript = original ? 1 /* stdout */ : 2 /* stderr */;
+   bool original = false; int 🥇 descript = original ? 1 /* stdout */ : 2 /* stderr */;
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(descript, (const void *)u8s, bytes); };
 #elif defined __armv8a__ || defined __mips__ || defined espressif || defined __armv6__
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Trace₁(u8s,bytes); };
 #endif
+   va_prologue(utf8format);
    y = print﹟(out,utf8format,__various);
    va_epilogue return y;
-}
-
-/* int mfprint(const char * utf8format,...)
+} /* int mfprint(const char * utf8format,...)
 {
    int printedBytesExcept0; va_prologue(utf8format);
    printedBytesExcept0 = vfprintf(stderr,utf8format,__various);

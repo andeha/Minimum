@@ -13,8 +13,7 @@ import Stdio; */ /* ⬷ rename later to 'std.io'. */
 /* ⬷ enter 'import std.core;' to include the standard C++ library. */
 /* todo: add -enable-experimental-cxx-interop and base-16 mangling. */
 
-/* extern "C" */
-#if defined 𝟷𝟸𝟾₋bit₋integers
+#if defined 𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all) { return -1; }
 #else
 int Details_in_C(uint64_t pid, int32_t cross) { return -1; }
@@ -74,6 +73,9 @@ pid_t Twinbeam₋spawn(
 #include <sys/mman.h>
 
 __builtin_int_t Syspagesize() { return 4096; }
+
+#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
+#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
 
 inexorable
 void *
@@ -149,23 +151,25 @@ To₋doubleprecision(unsigned short /* half */ 𝟷𝟼₋bits)
   return (double)half₋to₋float(𝟷𝟼₋bits);
 }
 
-/* formerly register */ Explained Binary16 = {
+struct /* formerly register */ Bitfield Binary16[] = {
   { U"Binary16_SGN", Binary16_SGN, U"sign bit" },
   { U"Binary16_EXP", Binary16_EXP, U"signed exponent -126 to 127" },
   { U"Binary16_MAN", Binary16_MAN, U"fraction/mantissa/significand" }
 }; /* E𝘨. pct., meters and inches. */
 
-AnnotatedRegister AR_Binary16 = {
+struct AnnotatedRegister AR_Binary16 = {
   U"Binary16: The Ieee 754-2008 half precision type", 
   3, Binary16, 0x00000000, 
   U"Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴."
 };
 
-void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc))
+void NumberformatCatalogue₋Presentᵧ(half val, /* void (^out)(char32_t uc) */ 
+ void (^out)(char8_t * u8s, __builtin_int_t bytes))
 {
-  uint32_t bits = pythagorean_double { .location=val }.bits;
+  pythagorean_double dbl = { .location=val };
+  uint32_t bits = dbl.bits;
   extern struct AnnotatedRegister AR_Binary16;
-  Present(term, AR_Binary16, bits, true, out);
+  NumberformatCatalogue₋Present(&AR_Binary16,bits,true,out);
 }
 
 BITMASK (uint64_t) { /* Sse flags and 0b1xx for MXCSR.RC rounding. */
@@ -184,7 +188,8 @@ float₋to₋half(float 𝟹𝟸₋bits)
   __m128 four₋floats = (__m128){𝟹𝟸₋bits,0,0,0};
   __v8hf eight₋floats = __builtin_ia32_vcvtps2ph(four₋floats,f16imm);
   uint16_t a₋half = (unsigned short)eight₋floats[0];
-  return pythagorean_double { .bits=a₋half }.location;
+  pythagorean_double dbl = { .bits=a₋half };
+  return dbl.location;
 }
 
 /* 8 times is named __builtin_ia32_vcvtph2ps256 and __builtin_ia32_vcvtps2ph256. */
@@ -500,7 +505,7 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[],
   enum Artwork₋token₋symbol kind;
   union Artwork₋symbol₋token₋detail hearken;
   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
-  Regular𝘖rIdent regident = ^(int symbols, char32_t * start) { ident.start=start; ident.symbols=symbols; };
+  Regular𝘖rIdent regident = ^(int symbols, char32_t * start) { ident.start=start; ident.tetras=symbols; };
   if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regident)) { return -1; }
   
   /* typedef struct Artwork₋token (^mass₋reading₋saddle)(void); 
@@ -549,7 +554,7 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[],
      union Artwork₋symbol₋token₋detail hearken;
      𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
      Regular𝘖rIdent regular𝘖rIdent = ^(int symbols, char32_t * start) { 
-      ident.symbols=symbols; ident.start=start; };
+      ident.tetras=symbols; ident.start=start; };
      if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regular𝘖rIdent)) 
      { confess(lex₋error); }
      if (kind == END₋OF₋TRANSMISSION) { confess(completion); }

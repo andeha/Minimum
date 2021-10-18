@@ -38,7 +38,7 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 #endif /* ~0b0>>1 */
 /* ⬷ the constant INT₋MAX is an odd number. */
 
-#if defined(𝟷𝟸𝟾₋bit₋swift₋integers) && defined(𝟷𝟸𝟾₋bit₋integers)
+#if defined(𝟷𝟸𝟾₋bit₋swift₋integers) && defined(𝟷𝟸𝟾₋bit₋integers) && defined(𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions)
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 #else
 int Details_in_C(uint64_t pid, int32_t cross);
@@ -102,7 +102,7 @@ typedef unsigned short half; /* ⬷ not 'typedef _Float16 half' and
 
 #define BITMASK(type) enum : type
 
-BITMASK (half) {
+BITMASK (uint32_t /* and not 'unsigned short' */) {
   Binary16_SGN = 0x8000, /* sign bit. */
   Binary16_EXP = 0b11111<<10, /* signed exponent -16 to 16. */
   Binary16_MAN = 0x3ff /* fraction/mantissa/significand. */
@@ -150,33 +150,50 @@ EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, 
 double To₋doubleprecision(unsigned short /* half */ x);
 
 #if !defined(__cplusplus)
-typedef unsigned char char8_t; typedef uint32_t char32_t;
+typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
 #endif
 
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
-EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc));
+EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, 
+/* void (^out)(char32_t uc) */ void (^out)(char8_t * u8s, __builtin_int_t bytes));
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
 struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
  uint32_t init; const char32_t * footnote; };
-typedef struct AnnotatedRegister Explained[];
+typedef struct Bitfield Explained[];
+
+EXT₋C void NumberformatCatalogue₋Present(
+  struct AnnotatedRegister /* Explained */ * ar, 
+  uint32_t numerics, 
+  int is₋𝟷𝟼₋bits, 
+  /* void (^output)(char32_t uc), */
+  void (^out)(char8_t * u8s, __builtin_int_t bytes)
+);
 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...);
 
+struct Unicodes { __builtin_int_t tetras; char32_t * start; };
+#ifndef __cplusplus
+typedef int bool;
+#endif
+typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, void * context);
+typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x000, void * context₁, void * context₂);
+/* ⬷ PRO|29|17. See also PRO|3|30. */
+typedef void (^Argᴾ₋output)(Argᴾ₋Unicode set, void * context);
+typedef void (^Argᴾ₋output₂)(Argᴾ₋Unicode₂ set, void * context);
+
 struct Argᴾ {
- typedef void (^Unicode)(bool anfang, char32_t& prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, void * context);
- typedef void (^Output)(Unicode set, void * context);
- union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
-  struct /* Unicodes */ { char32_t * unicodes; __builtin_int_t tetras; } ucs; 
-  char8_t c; char32_t uc; double f₁; float f₂; uint8_t bytes[16];
+ union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; struct Unicodes ucs; 
+  char8_t c; char32_t uc; double f₁; float f₂; uint8_t paddingbytes[16];
 #if defined 𝟷𝟸𝟾₋bit₋integers
   __uint128_t U; __int128_t I;
 #endif
-  uint64_t pair[2];
-  struct { Output scalar; void * context; } λ;
+  uint64_t hi₋and₋lo₋128bits[2];
+  /* struct { Argᴾ₋output scalar; void * context; } λ; */
+  /* struct { Argᴾ₋output₂ scalart; void * context; }  λ₂; */
  } value;
  int kind;
 };
@@ -193,7 +210,7 @@ EXT₋C struct Argᴾ ﹟C(char32_t C);
 EXT₋C struct Argᴾ ﹟U(__uint128_t U);
 EXT₋C struct Argᴾ ﹟I(__int128_t I);
 #endif
-EXT₋C struct Argᴾ ﹟λ(Argᴾ::Output scalar, void * context);
+EXT₋C struct Argᴾ ﹟λ(Argᴾ₋output scalar, void * context);
 EXT₋C struct Argᴾ ﹟S₂(char32_t * uc);
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
@@ -295,7 +312,6 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 /* Typechecked in your military-project: */
 
-struct Unicodes { __builtin_int_t symbols; char32_t * start; };
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 typedef half Artnumerical;
