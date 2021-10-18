@@ -4,9 +4,10 @@ appname = Minimum
 twinbeamroot = /Users/<User- alt project name>/Monitor/Apps
 # libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
 # libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
+# -std=c2x
 
 cpp-optflags = -g -I ../Apps/
-swift-flags = -g -D DEBUG -I .
+swift-flags = -g -D DEBUG -I . -lc++
 # ⬷ the -I directory flag to tell 'swiftc' where to find a file named 
 # 'module.modulemap' file and its c-only-functions to be used in Swift.
 objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname

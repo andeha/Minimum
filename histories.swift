@@ -127,14 +127,14 @@ class Rendition {
      let textframe = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
      CTFrameDraw(textframe,context)
    }
-   func interpret(count: Int, textual: Reference<UInt32>, height: inout CGFloat) throws -> CALayer {
+   func interpret(count: Int, textual: Reference<UInt32>, height: inout CGFloat) throws -> Artworklayer {
      var artwork₁ = Artwork₋swift(text: ".width-and-height 50.0, 50.0 ")
      var artwork₂ = Artwork₋swift(text: 
 """
-.width-and-height 100.0, 100.0
+.pixel-height 100.0
 start-line 50.0 50.0 last-line 75.0 75.0
 next
-.width-and-height 100.0 100.0
+.pixel-height 100.0
 start-line 10.0 10.0 last-line 20.0 20.0
 """)
      var artwork = artwork₂
@@ -143,23 +143,20 @@ start-line 10.0 10.0 last-line 20.0 20.0
      let y = Parse₋Artwork₋LL₍1₎(Int64(count),unicodes,&s₋ctxt,Append₋instruction)
      let layer = Artworklayer()
      layer.contents = artwork
-     guard let directive: Artwork₋dirctive = artwork.directives[pixel₋height] else { return layer }
-  /*   let height: sequent = directive.Scalar
-     let height2 = ToDouble(sequent: height)
-     let height4: Float16 = Float16(height2) / * ⬷ a․𝘬․a ToHalf. */
-     let height: Float16 = directive.Scalar
-     let height₂: Double = Double(height)
-     layer.bounds = CGRect(x: 0, y: 0, width: 400.0, height: height₂)
+     guard let directive: Artwork₋directive = artwork.directives[pixel₋height] else { return layer }
+     let height: Double = directive.Scalar
+     /* let height: Double = To₋doubleprecision(height) */
+     layer.bounds = CGRect(x: 0, y: 0, width: 400.0, height: height)
      layer.anchorPoint = CGPoint(x: 0.0, y: 0.0)
      layer.position = CGPoint()
      return layer
    }
    func illustrations(unicodes text: Graphicstext, height: inout CGFloat) {
-     let layer = CALayer(); let ident = UUID()
+     let layer = Artworklayer(); let ident = UUID()
      let width = Rendition.textfont.boundingRectForFont.width * 83
      var size=CGSize(width: width, height: 0.0)
      do {
-       let layer: CALayer = try interpret(count: text.count, textual: 
+       let layer: Artworklayer = try interpret(count: text.count, textual: 
         text.baseAddress!, height: &size.height)
      } catch _ { print("render exception") }
      /* self.assemble₋pieces.illustrations.updateValue(layer, forKey: ident) */
@@ -719,9 +716,12 @@ extension Windowcontroller { /* ⬷ for keyboard. */
 
 class Artwork₋swift {
   init(text: String) { self.text = text 
-   directives[pixel₋height] = Artwork₋directive.Count = 100.0
-   directives[place₋origo] = Artwork₋directive.Point = A₋point(x: 50.0, y: 50.0)
-   directives[offset₋drawing₋on] = Artwork₋directive.Size = A₋size(x: 0.0, y: 0.0) }
+   let default₋pixel₋height = 100.0
+   let default₋pixel₋origo = A₋point(x: 50.0, y: 50.0)
+   let default₋offset₋drawing₋on = A₋size(x: 0.0, y: 0.0)
+   directives[pixel₋height] = Artwork₋directive(Scalar: default₋pixel₋height)
+   directives[place₋origo] = Artwork₋directive(Point: default₋pixel₋origo)
+   directives[offset₋drawing₋on] = Artwork₋directive(Size: default₋offset₋drawing₋on) }
   convenience init() { self.init(text: "") }
   var directives = Dictionary<Artwork₋instruction,Artwork₋directive>()
   typealias Artwork₋parameters = (Double,Double,Double,Double,Double,Double)
@@ -742,8 +742,12 @@ func Append₋instruction(_ instruction: Int32, detail:
    let ⁴doubles: UnsafeMutablePointer<CDouble> = rawpointer.bindMemory(to: 
     CDouble.self, capacity: 4) */
    let ⁴doubles = UnsafeBufferPointer(start: detail.four₋parameters, count: 4)
-   if instr == height || instr == place₋origo || instr == offset₋drawing₋on {
-     recorder.directives[instr] = (⁴doubles[0],⁴doubles[1])
+   if instr == pixel₋height {
+     recorder.directives[instr] = Artwork₋directive(Scalar: ⁴doubles[0])
+   } else if instr == place₋origo {
+     recorder.directives[instr] = Artwork₋directive(Point: A₋point(x: ⁴doubles[0], y: ⁴doubles[1]))
+   } else if instr == offset₋drawing₋on {
+     recorder.directives[instr] = Artwork₋directive(Size: A₋size(x: ⁴doubles[0], y: ⁴doubles[1]))
    } else {
      let params: Artwork₋swift.Artwork₋parameters = (⁴doubles[0],⁴doubles[1], 
       ⁴doubles[2],⁴doubles[3],⁴doubles[4],⁴doubles[5])
