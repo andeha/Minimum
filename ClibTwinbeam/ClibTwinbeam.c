@@ -20,15 +20,6 @@ int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all) { return -1; }
 int Details_in_C(uint64_t pid, int32_t cross) { return -1; }
 #endif
 
-#define va_prologue(symbol) __builtin_va_list __various; __builtin_va_start(__various,symbol);
-
-int mfprint(const char * utf8format,...)
-{
-   int printedBytesExcept0; va_prologue(utf8format);
-   printedBytesExcept0 = vfprintf(stderr,utf8format,__various);
-   return printedBytesExcept0;
-}
-
 /* int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
 void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵); */
 int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words)
@@ -142,67 +133,7 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 #define FALSE 0
 #define TRUE (! FALSE)
 
-/* Base𝕟, Critic, Utf8Terminal, TetrasUntilNull, BUILTIN₋INT₋MAX, print(out), 
- 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡, max, Vt99-constants. */
-
-inexorable
-void
-NumberformatCatalogue₋Present(struct Bitfield * field, 
-  uint32_t numerics, uint32_t init, 
-  int is₋𝟷𝟼₋bits, 
-  int maxwidth, 
-  void (^out)(char32_t uc)
-)
-{
-   typedef void (^Out)(char8_t *, __builtin_int_t);
-   Out out = ^(char8_t * u8s, __builtin_int_t bytes) { Present(term,u8s,bytes); };
-   unsigned spaces = maxwidth - TetrasUntilNull(Critic(field.ident), BUILTIN₋INT₋MAX);
-   while (spaces--) { print(out," "); }
-   
-   Present(term,Critic(field.ident)); print(out, " ");
-   
-   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 bool masking=false; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned pos=31;
-   Base𝕟((__builtin_uint_t)(field.mask), 2, 32, ^(char 𝟶to𝟿) {
-     if (is₋𝟷𝟼₋bits && pos > 15) { print(out, "﹟"); }
-     if (!is₋𝟷𝟼₋bits && 𝟶to𝟿 == '1' && !masking) { masking = true; }
-     if (!is₋𝟷𝟼₋bits && masking && 𝟶to𝟿 == '0') { masking = false; }
-     if (!is₋𝟷𝟼₋bits && masking) { print(out, value & (0b1<<pos) ? "1" : "0"); }
-     if (!is₋𝟷𝟼₋bits && !masking) { print(out, "␣"); }
-     if (pos % 4 == 0) print(out, "|"); --pos;
-   });
-   
-   Present(term,Critic(field.text)); print(out,"\n");
-}
-
-FOCAL
-void
-NumberformatCatalogue₋Present(
-  struct AnnotatedRegister /* Explained */ * ar, 
-  uint32_t numerics, 
-  int is₋𝟷𝟼₋bits, 
-  void (^out)(char32_t uc)
-)
-{
-   auto out = ^(char8_t * utf8, __builtin_int_t bytes) { Present(term,utf8,bytes); };
-   auto present = ^(int count, Bitfield * regs, uint32_t val, 
-        uint32_t init) { __builtin_int_t maxwidth=0; 
-      for (int i=0; i<count; ++i) {
-         const Bitfield * reg = regs + i; maxwidth = max(maxwidth, 
-          TetrasUntilNull(Critic(reg->ident), BUILTIN₋INT₋MAX));
-      }
-      for (int i=0; i<count; ++i) {
-         Present(*(regs + i), val, init, is₋𝟷𝟼₋bits, maxwidth);
-      }
-   };
-   print(out, "⬚\n", ﹟s(Vt99::bright));
-   Present(term,Critic(ar.header));
-   print(out, "⬚ = ⬚ 0x", ﹟s(Vt99::reset), ﹟s(Vt99::reverse));
-   Base𝕟((__builtin_uint_t)numerics, 16, 8, ^(char 𝟶to𝟿) { print(out,"⬚", ﹟c(𝟶to𝟿)); });
-   print(out, "⬚\n\n", ﹟s(Vt99::reset));
-   present(ar.regcnt, ar.regs, value, ar.init);
-   Present(term,Critic(ar.footnote));
-   print(out,"\n\n");
-}
+/* Critic, Utf8Terminal, max, Vt99-constants. */
 
 #pragma mark 16-bit half precision and conversions
 
@@ -240,7 +171,7 @@ AnnotatedRegister AR_Binary16 = {
 void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc))
 {
   uint32_t bits = pythagorean_double { .location=val }.bits;
-  extern AnnotatedRegister AR_Binary16;
+  extern struct AnnotatedRegister AR_Binary16;
   Present(term, AR_Binary16, bits, true, out);
 }
 

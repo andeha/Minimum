@@ -13,7 +13,7 @@ objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
 gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
  -fno-signed-char -fno-builtin -Wno-c++20-designator -Wno-c99-designator     $
  -Wincomplete-umbrella -Wmodule-conflict -Wno-nullability-completeness
-moduleflags = -fmodules-ts -fimplicit-modules -fmodule-map-file=../Apps/🗿.modules
+moduleflags = -fmodules-ts -fimplicit-modules -fmodule-map-file=./ClibTwinbeam/module.modulemap
 commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 tmacr-version = 
 # -mmacosx-version-min=11.5
@@ -74,7 +74,8 @@ rule library
   printf $sha1git
 
 build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
-build libClibTwinbeam: library $objs/ClibTwinbeam.o
+build $objs/ClibTwinbm-2.o: cc ClibTwinbeam/ClibTwinbm-2.cpp
+build libClibTwinbeam: library $objs/ClibTwinbm-2.o $objs/ClibTwinbeam.o
 build $appname: primary-compile-macswift histories.swift enriching.swift     $
  main.swift Data+Base16.swift
 build Minimum.app: assemble-macapp $appname

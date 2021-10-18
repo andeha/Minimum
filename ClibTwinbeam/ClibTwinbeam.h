@@ -1,8 +1,12 @@
-/*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge. */
+/*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge for Si and O₂. */
 
 #define structᵢ struct
 #define unionᵢ union
-#define inexorable
+#if defined (__cplusplus)
+#define inexorable static __attribute__ ((internal_linkage)) /* see 'nm' for details. */
+#else
+#define inexorable /* static */
+#endif
 typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
 typedef unsigned long long  uint64_t;
@@ -21,11 +25,19 @@ typedef unsigned int        uint32_t;
 typedef int                 int32_t; /* ≢'long'. */
 typedef uint64_t            __builtin_uint_t;
 typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
-/* #define 𝟷𝟸𝟾₋bit₋swift₋integers */
-/* #define 𝟷𝟸𝟾₋bit₋integers */
+#define 𝟷𝟸𝟾₋bit₋swift₋integers
+#define 𝟷𝟸𝟾₋bit₋integers
 #endif
+#define FOCAL
 
-#if defined 𝟷𝟸𝟾₋bit₋swift₋integers
+#if defined  __mips__ || defined __armv6__ || defined espressif
+#define BUILTIN₋INT₋MAX 2147483647
+#elif defined __x86_64__ || defined __armv8a__ || defined Kirkbridge
+#define BUILTIN₋INT₋MAX 0x7FFFFFFFFFFFFFFF
+#endif /* ~0b0>>1 */
+/* ⬷ the constant INT₋MAX is an odd number. */
+
+#if defined(𝟷𝟸𝟾₋bit₋swift₋integers) && defined(𝟷𝟸𝟾₋bit₋integers)
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 #else
 int Details_in_C(uint64_t pid, int32_t cross);
@@ -116,25 +128,37 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
 
+#if defined __cplusplus
+#define EXT₋C extern "C"
+#else
+#define EXT₋C
+#endif
+
+FOCAL EXT₋C void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
+ short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
+ depending on word size! (Or set to `0` to skip leading zeros.) */ void
+ (^out)(char 𝟶to𝟿));
+
 double To₋doubleprecision(unsigned short /* half */ x);
 
+#if !defined(__cplusplus)
 typedef unsigned char char8_t; typedef uint32_t char32_t;
+#endif
 
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
-void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc));
+EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc));
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
 struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; };
 typedef struct AnnotatedRegister Explained[];
 
-#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
+EXT₋C int mfprint(const char * utf8format, ...);
+EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+ const char * utf8format, ...);
 
-#if defined __cpp
-#define EXT₋C extern "C"
-#else
-#define EXT₋C
-#endif
+#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
+#define Critic(x) x
 
 struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;

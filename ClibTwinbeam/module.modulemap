@@ -1,11 +1,8 @@
 /*  module.modulemap | for later harmonization C++ and Swift. */
 
-module ClibTwinbeam [system] {
+module ClibTwinbeam {
   header "ClibTwinbeam.h"
-  link "Twinbeam"
-  link "Additions"
-  export *
-} /* ⬷ note 'ClibTwinbeam' is often defined twice: one time in '🗿' and once 
+} /* ⬷ note 'ClibTwinbeam' is defined twice: one time in '🗿' and once 
  in --<Minimum>--<*>--<module.modulemap>. */
 
 
