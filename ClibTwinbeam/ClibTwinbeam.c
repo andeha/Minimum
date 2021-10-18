@@ -128,13 +128,6 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
   switch (__ctrl)
 #define 🧵(...) /* ✠ */ CARDINALS(__VA_ARGS__) NEARBYCROSS
 
-#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
-
-#define FALSE 0
-#define TRUE (! FALSE)
-
-/* Critic, Utf8Terminal, max, Vt99-constants. */
-
 #pragma mark 16-bit half precision and conversions
 
 float

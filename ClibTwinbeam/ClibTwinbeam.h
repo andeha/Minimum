@@ -28,6 +28,7 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 #define 𝟷𝟸𝟾₋bit₋swift₋integers
 #define 𝟷𝟸𝟾₋bit₋integers
 #endif
+#define DISORDERABLE __attribute__((weak))
 #define FOCAL
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
@@ -42,6 +43,13 @@ int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 #else
 int Details_in_C(uint64_t pid, int32_t cross);
 #endif
+
+#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
+
+#define false 0
+#define true (! false)
+
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
 
 #pragma mark precision and the 128-bits physical bound
 
@@ -134,7 +142,7 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 #define EXT₋C
 #endif
 
-FOCAL EXT₋C void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
+EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
  short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
  depending on word size! (Or set to `0` to skip leading zeros.) */ void
  (^out)(char 𝟶to𝟿));
@@ -150,15 +158,45 @@ typedef unsigned char char8_t; typedef uint32_t char32_t;
 EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char32_t uc));
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
-struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; };
+struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
+ uint32_t init; const char32_t * footnote; };
 typedef struct AnnotatedRegister Explained[];
 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...);
 
+struct Argᴾ {
+ typedef void (^Unicode)(bool anfang, char32_t& prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, void * context);
+ typedef void (^Output)(Unicode set, void * context);
+ union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
+  struct /* Unicodes */ { char32_t * unicodes; __builtin_int_t tetras; } ucs; 
+  char8_t c; char32_t uc; double f₁; float f₂; uint8_t bytes[16];
+#if defined 𝟷𝟸𝟾₋bit₋integers
+  __uint128_t U; __int128_t I;
+#endif
+  uint64_t pair[2];
+  struct { Output scalar; void * context; } λ;
+ } value;
+ int kind;
+};
+
+EXT₋C struct Argᴾ ﹟d(__builtin_int_t d);
+EXT₋C struct Argᴾ ﹟x(__builtin_uint_t x);
+EXT₋C struct Argᴾ ﹟b(__builtin_uint_t b);
+EXT₋C struct Argᴾ ﹟s(char8_t * u8s);
+EXT₋C struct Argᴾ ﹟l(const /* signed */ char * s);
+EXT₋C struct Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * uc);
+EXT₋C struct Argᴾ ﹟c(/* signed */ char c);
+EXT₋C struct Argᴾ ﹟C(char32_t C);
+#if defined(𝟷𝟸𝟾₋bit₋integers)
+EXT₋C struct Argᴾ ﹟U(__uint128_t U);
+EXT₋C struct Argᴾ ﹟I(__int128_t I);
+#endif
+EXT₋C struct Argᴾ ﹟λ(Argᴾ::Output scalar, void * context);
+EXT₋C struct Argᴾ ﹟S₂(char32_t * uc);
+
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
-#define Critic(x) x
 
 struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
@@ -184,6 +222,11 @@ int copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * materi
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
 __builtin_int_t bytes(struct structa * 🅢); /* __attribute__((overloadable)); */
 
+#define va_epilogue __builtin_va_end(__various);
+#define va_prologue(symbol)                                                 \
+ __builtin_va_list __various;                                               \
+ __builtin_va_start(__various, symbol);
+
 #define NULL 0
 typedef int pid_t;
 
@@ -195,7 +238,6 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
 
-struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
 
 /* Överhandsavtal och underhandsuppfattning: 
  
