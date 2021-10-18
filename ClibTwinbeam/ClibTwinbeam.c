@@ -29,13 +29,13 @@ int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, 
 
 /* int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
 
-int structat₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+int structa₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
 
-int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+int lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
 uint8_t * relative(__builtin_int_t byte₋offset);
-int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
+int copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t bytes(struct structat * 🅢); */
+__builtin_int_t bytes(struct structa * 🅢); */
 
 pid_t Twinbeam₋spawn(
   const char * pathandcommand₋u8s, 

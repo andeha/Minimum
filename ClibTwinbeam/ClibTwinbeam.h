@@ -169,20 +169,20 @@ void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
 int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
 int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
 
-struct structat {
+struct structa {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
 };
 
-int structat₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
 /* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); }; */
 /* -enable-experimental-cxx-interop */
 
-int lengthen(struct structat * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+int lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
 uint8_t * relative(__builtin_int_t byte₋offset); /* __attribute__((overloadable)); */
-int copy₋append(struct structat * 🅢, __builtin_int_t bytes, uint8_t * material, 
+int copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t bytes(struct structat * 🅢); /* __attribute__((overloadable)); */
+__builtin_int_t bytes(struct structa * 🅢); /* __attribute__((overloadable)); */
 
 #define NULL 0
 typedef int pid_t;
