@@ -226,14 +226,10 @@ float₋to₋half(float 𝟹𝟸₋bits)
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ)
 { int neg = 0;
    if (ℤ < +0) { ℤ = -ℤ; neg = 1; }
-   uint128_t shift = ℤ<<64;
-   /* ⤐ twos-complement below ⤐ */
-   if (neg) {
-     shift = ~shift;
-     shift += 1;
-   }
-   
-   ℝ->detail.frac = shift;
+   __uint128_t shift = ℤ; shift <<= 64;
+   if (neg) { shift = ~shift; shift += 1; }
+   /* ⬷ twos-complement above. */
+   ℝ->detail.bits = shift;
 }
 
 void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], struct sequent * ℝ)
