@@ -1,4 +1,4 @@
-/*  ClibTwinbeam.cpp | bridging Swift and Twinbeam. */
+/*  ClibTwinbeam.cpp | details on bridging Swift and Twinbeam. */
 
 /* #include <Twinbeam.h> */
 #include "ClibTwinbeam.h" /* ⬷ a․𝘬․a Twinbeam₋C.h and C-Twinbeam.h. */
@@ -224,21 +224,21 @@ float₋to₋half(float 𝟹𝟸₋bits)
 } */
 
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ)
-{/* int neg = 0;
-    if (neg) { }
-    uint64_t
-  struct sequent 𝟷ᐧ𝟶 = { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
+{ int neg = 0;
+   if (ℤ < +0) { ℤ = -ℤ; neg = 1; }
+   /* ⤐ twos-complement below ⤐ */
+   uint128_t shift = ℤ<<64;
    if (neg) {
-     / * twos-complement * /
+     shift += 1;
+     shift = ~shift;
    }
-   uint128_t 
-   
-   *ℝ = */
+
+   ℝ->detail.frac = shift;
 }
 
-void rounded₋fraction(int count₋upto𝟼𝟺, char 𝟶to𝟿s[], struct sequent * ℝ)
+void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], struct sequent * ℝ)
 {
-  
+   *R = (a + 1) / 2;
 }
 
 void print₋sequent(struct sequent 𝕏, 
