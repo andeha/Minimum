@@ -226,13 +226,13 @@ float₋to₋half(float 𝟹𝟸₋bits)
 void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ)
 { int neg = 0;
    if (ℤ < +0) { ℤ = -ℤ; neg = 1; }
-   /* ⤐ twos-complement below ⤐ */
    uint128_t shift = ℤ<<64;
+   /* ⤐ twos-complement below ⤐ */
    if (neg) {
-     shift += 1;
      shift = ~shift;
+     shift += 1;
    }
-
+   
    ℝ->detail.frac = shift;
 }
 
