@@ -49,7 +49,7 @@ int Details_in_C(uint64_t pid, int32_t cross);
 #define false 0
 #define true (! false)
 
-struct 𝟽bit₋text { __builtin_int_t bytes; signed char * segment; };
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
 
 #if !defined(__cplusplus)
 typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
@@ -69,19 +69,23 @@ struct sequent { union Q6463 detail; int valid; };
 inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
 inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], struct sequent * ℝ);
 /* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
-void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 𝟶to𝟿s, int ℕ₋﹟), 
- void (^zero)(), void (^neginf)(), void (^nonvalid)());
+void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text integers, 
+ struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), void (^nonvalid)());
 /* ⬷ TeX 103 §. */
 struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
 struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
-void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, struct sequent * y₋hi);
+void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, 
+ struct sequent * y₋hi);
 struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
 struct sequent reciproc_sequent(struct sequent yb);
-struct sequent div_sequent(struct sequent x₁, struct sequent x₂); /* the symbol 'div' requires __attribute__((overloadable)); */
+struct sequent div_sequent(struct sequent x₁, struct sequent x₂, int integer₋division); 
+/* the symbol 'div' requires __attribute__((overloadable)); */
 struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 struct sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
 struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-struct sequent operator_minus(struct sequent ℝ);
+struct sequent sequent₋floor(struct sequent x);
+struct sequent operator_minus(struct sequent x);
+struct sequent mod_sequent(struct sequent x₁, struct sequent x₂);
 typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 int Newton(computational f, computational f₋prim, struct sequent * x₀, 
@@ -202,7 +206,6 @@ struct Argᴾ {
  int kind;
 };
 
-
 EXT₋C struct Argᴾ ﹟d(__builtin_int_t d);
 EXT₋C struct Argᴾ ﹟x(__builtin_uint_t x);
 EXT₋C struct Argᴾ ﹟b(__builtin_uint_t b);
@@ -322,11 +325,13 @@ typedef half Artnumerical;
 
 struct A₋point { double x,y; };
 struct Illustration { double size, place₋origo, offset₋drawing₋on; };
+struct Plate { };
 int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
 /* ⬷ arbitrary number of other points. ⤐ */
-int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, void (^plates)(CALayer layer, bool * stop));
+typedef void (^Visual)(struct Plate layer, bool * stop);
+int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, Visual plates);
 int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
-int Place₋image(struct 𝟽bit₋text regular, struct A₋point₁, struct A₋point₂, int mode);
+int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
 union Artwork₋directive {
