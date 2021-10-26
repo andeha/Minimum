@@ -68,7 +68,7 @@ Base𝕟( /* TeX §64, §65 and §67. */
      output); } } else { k = 63; while (cycle[k] == 0 && k > 0) { k--; }
       for (; k >= 0; k--) { 𝟬to𝗙(cycle[k], output); }
    }
-} /*  ⬷ note 128-bit duplicate in --<🥽 𝙋𝙧𝙞𝙣𝙩⁺.cpp> and --<Print.cpp>. */
+} /*  ⬷ note 128-bit duplicate earlier in text. */
 
 __builtin_int_t TetrasUntilNull(char32_t * ucs, __builtin_int_t maxtetras)
 { __builtin_int_t i=0;
@@ -162,44 +162,47 @@ template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
 
 #pragma mark - Inte₋ger₋s
 
-EXT₋C struct Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
-EXT₋C struct Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
-EXT₋C struct Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
+EXT₋C Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
+EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
+EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
 /* EXT₋C Argᴾ ﹟s(const char8_t * u8s) { return Argᴾ { { .u8s=Critic(u8s) }, 4 }; } */
-EXT₋C struct Argᴾ ﹟s(char8_t * u8s) { return Argᴾ { { .u8s=u8s }, 4 }; }
-EXT₋C struct Argᴾ ﹟l(const /* signed */ char * s) { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
-EXT₋C struct Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * uc) { return Argᴾ { { .ucs={ tetras, uc } }, 5 }; }
+EXT₋C Argᴾ ﹟s(char8_t * u8s) { return Argᴾ { { .u8s=u8s }, 4 }; }
+EXT₋C Argᴾ ﹟l(const /* signed */ char * s) { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
 /* EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32_t * uc) { return Argᴾ { { .ucs={ Critic(uc), tetras } }, 5 }; } */
 /* EXT₋C Argᴾ ﹟c(char8_t c) { return Argᴾ { { .c=c }, 6 }; } */
-EXT₋C struct Argᴾ ﹟c(/* signed */ char c) { return Argᴾ { { .c=(char8_t)c }, 6 }; }
-EXT₋C struct Argᴾ ﹟C(char32_t C) { return Argᴾ { { .uc=C }, 7 }; }
+EXT₋C Argᴾ ﹟c(/* signed */ char c) { return Argᴾ { { .c=(char8_t)c }, 6 }; }
+EXT₋C Argᴾ ﹟C(char32_t C) { return Argᴾ { { .uc=C }, 7 }; }
 #if defined 𝟷𝟸𝟾₋bit₋integers
-EXT₋C struct Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
-EXT₋C struct Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
+EXT₋C Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
+EXT₋C Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
 #endif
-EXT₋C struct Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
+EXT₋C Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
-/* EXT₋C struct Argᴾ ﹟λ(Argᴾ₋output scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; } */
+/* EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; } */
 
-inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char32_t * ucs)
+inexorable void Coalesc₋present(void (^out)(int count, char32_t * unterminated₋ucs), int count, char32_t * unterminated₋ucs)
 {
-   __builtin_int_t tetras = TetrasUntilNull(ucs,BUILTIN₋INT₋MAX);
-   print(out, "⬚", ﹟S₁(tetras,ucs));
+   
+} /* ⬷ two 'async'-job alt. written coroutines alt. threads for example. */
+
+inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char32_t * terminated₋ucs)
+{
+   __builtin_int_t tetras = TetrasUntilNull(terminated₋ucs,BUILTIN₋INT₋MAX);
+   print(out, "⬚", ﹟S₁(tetras,terminated₋ucs));
 }
 
-EXT₋C Argᴾ ﹟S₂(char32_t * uc) {
-  __builtin_int_t tetras = TetrasUntilNull(uc,BUILTIN₋INT₋MAX);
-  return Argᴾ { { .ucs={ tetras, uc } }, 5 };
+EXT₋C Argᴾ ﹟S₂(char32_t * terminated₋uc) {
+  __builtin_int_t tetras = TetrasUntilNull(terminated₋uc,BUILTIN₋INT₋MAX);
+  return Argᴾ { { .ucs={ tetras, terminated₋uc } }, 5 };
 }
 
-DISORDERABLE extern void register₋reflect(__builtin_uint_t mask) { }
+void Register₋reflect(__builtin_uint_t /* mask */) { }
 
-DISORDERABLE extern void Anfang(
-  void (^out)(char8_t * u8s, __builtin_int_t bytes),
-  char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, uint8_t * image) 
+/* EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 {
- print(out,"⬚",﹟C(*prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶));
-} /* See --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
+  return Argᴾ { { .ingress={ anfang, ingress } }, 88 };
+} / * ⬷ see --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
 
 #pragma mark - in /retrospect/, hidden yet simple:
 
@@ -268,16 +271,15 @@ again:
       case 8: out𝕕(double(a.value.f₂)); break;                                  \
       case 9: out𝕕(a.value.f₁); break;                                          
 #endif
-/*      case 10: { Argᴾ₋Unicode set = ^(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, \
-       void * context) { if (!anfang) { print(out,"⬚",﹟C(*prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶)); } \
-       else { Anfang(out,prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶,NULL); } }; a.value.λ.scalar(set,     \
-       a.value.λ.context); break; } */
+/*    case 10: { Argᴾ₋Unicode set = ^(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, \
+       void * context) { }; a.value.λ.scalar(set, a.value.λ.context); break; } */
 #ifdef 𝟷𝟸𝟾₋bit₋integers
       case 11: 𝟷𝟸𝟾₋out𝕟(a.value.U); break;                                      \
       case 12: 𝟷𝟸𝟾₋out𝕫(a.value.I); break;
 #endif
-      case 13: register₋reflect(a.value.x); break;                              \
-      default: /* if (a.kind >= 0) imprint[a.kind](a); else */                  \
+      case 13: Register₋reflect(a.value.x); break;                              \
+      /* case 88: break;                                                        \
+      */ default: /* if (a.kind >= 0) imprint[a.kind](a); else */               \
         unicode₋symbol(U'?'); break; }
     }
     i += incr; goto again;
@@ -337,7 +339,8 @@ Present(struct Bitfield * field,
   uint32_t numerics, uint32_t init, 
   int is₋𝟷𝟼₋bits, 
   int maxwidth, 
-  /* void (^output)(char32_t uc), */
+  /* void (^output)(char32_t uc) */
+  /* void (^sometime)(int count, char32_t * terminated₋ucs) */
   void (^out)(char8_t * u8s, __builtin_int_t bytes)
 )
 {
@@ -365,7 +368,8 @@ NumberformatCatalogue₋Present(
   struct AnnotatedRegister /* Explained */ * ar, 
   uint32_t numerics, 
   int is₋𝟷𝟼₋bits, 
-  /* void (^output)(char32_t uc), */
+  /* void (^output)(char32_t uc) */
+  /* void (^sometime)(int count, char32_t * terminated₋ucs) */
   void (^out)(char8_t * u8s, __builtin_int_t bytes)
 )
 {
@@ -389,4 +393,44 @@ NumberformatCatalogue₋Present(
    print(out,"\n\n");
 }
 
+namespace __cxxabiv1 {
+EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
+  __builtin_uint_t expected[1] = { 0 }, desired[1] = { 1 };
+  const int relaxed=0;
+  int success_order=relaxed, failure_order=relaxed;
+  bool locked = __atomic_compare_exchange(p, expected, desired, 0, 
+   success_order, failure_order);
+  return locked; }
+EXT₋C int __cxa_guard_release(__builtin_uint_t * p) {
+  __builtin_uint_t desired[1] = { 0 }, expected[1] = { 1 };
+  const int relaxed=0;
+  int success_order=relaxed, failure_order=relaxed;
+  bool unlocked = __atomic_compare_exchange(p, expected, desired, 0, 
+   success_order, failure_order);
+  return unlocked;
+}
+EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
+  __builtin_uint_t desired[1] = { 0 };
+  const int relaxed=0;
+  int ordering=relaxed;
+  __atomic_store(p,desired,ordering);
+}
+} /* ⬷ a․𝘬․a coroutine and async 'yield'. */
+
+int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it) TROKADERO SELDOM
+{
+   return 0;
+}
+
+EXT₋C int momentary₋always₋swap(struct Peekey * p) LEAF TROKADERO
+{
+  /* return __cxa_guard_release(p); */
+  return OptimisticSwap(&p->board₁, &p->palm₂, JustSwap);
+}
+
+EXT₋C int momentary₋swap₋if₋decreased(struct Peekey * p) TROKADERO LEAF
+{
+  /* return __cxa_guard_acquire(p); */
+  return OptimisticSwap(&p->board₁, &p->palm₂, MustBeOrdered);
+}
 

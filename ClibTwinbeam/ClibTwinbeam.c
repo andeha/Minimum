@@ -716,21 +716,4 @@ Symbols(
     }
 }
 
-namespace __cxxabiv1 {
-EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
-  size_t size = sizeof(__builtin_uint_t);
-  __builtin_uint_t expected[1] = { 0 }, desired[1] = { 1 };
-  bool locked = __atomic_compare_exchange(size, (void *)p, void *expected, void *desired, int success_order, int failure_order);
-  return locked; }
-EXT₋C void __cxa_guard_release(__builtin_uint_t * p) {
-  size_t size = sizeof(__builtin_uint_t);
-  __builtin_uint_t desired[1] = { 0 }, expected[1] = { 1 };
-  __atomic_compare_exchange(size, (void *)p, void *expected, void *desired, int success_order, int failure_order);
-}
-EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
-  size_t size = sizeof(__builtin_uint_t);
-  __builtin_uint_t desired[1] = { 0 };
-  __atomic_store(size, (void *)p, void *val, int ordering);
-}
-} /* ⬷ a․𝘬․a coroutine and async 'yield'. */
 

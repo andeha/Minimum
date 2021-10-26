@@ -31,7 +31,14 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 /* #define 𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions */
 #endif
 typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
-#define FOCAL
+#define FOCAL /* ⬷ embossed inexorable. */
+#define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */ 
+#define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
+#define ATOMIC /* will be executed without task switch and does not effect yield. */
+#define SELDOM /* long-running and will be executed without task switch and uncontaining 'yield'. */
+enum Impediment { MustBeOrdered, JustSwap };
+int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it); TROKADERO SELDOM
+struct Peekey { __builtin_int_t board₁, palm₂; };
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
 #define BUILTIN₋INT₋MAX 2147483647
@@ -233,8 +240,9 @@ typedef struct Arg₋𝓟 {
   __uint128_t U; __int128_t I;
 #endif
   uint64_t hi₋and₋lo₋128bits[2];
-  struct { Argᴾ₋output scalar; void * context; } λ;
-  struct { Argᴾ₋output₂ scalar; void * context; } λ₂;
+/*  struct { Argᴾ₋output scalar; void * context; } λ₂;
+  struct { Argᴾ₋output₂ scalar; void * context; } λ;
+  struct { struct Plate * anfang; struct Unicodes ingress; } chapter; */
  } value;
  int kind;
 } Argᴾ;
@@ -251,10 +259,10 @@ EXT₋C Argᴾ ﹟C(char32_t C);
 EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
-EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
-EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
-EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
+/* EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
+EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang); */
 /* ⬷ PRO|29|17. See also PRO|3|30. */
+EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
@@ -278,7 +286,9 @@ EXT₋C uint8_t * structa₋relative(__builtin_int_t byte₋offset);
 EXT₋C int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
 EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
-/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); }; */
+/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); };
+ let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
+ as @convention(block) (__builtin_uint_t) -> Void */
 /* __attribute__((overloadable)) is not yet executed in swift code. */
 
 #define va_epilogue __builtin_va_end(__various);
