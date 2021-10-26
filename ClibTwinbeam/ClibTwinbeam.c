@@ -155,7 +155,7 @@ struct /* formerly register */ Bitfield Binary16[] = {
   { U"Binary16_SGN", Binary16_SGN, U"sign bit" },
   { U"Binary16_EXP", Binary16_EXP, U"signed exponent -126 to 127" },
   { U"Binary16_MAN", Binary16_MAN, U"fraction/mantissa/significand" }
-}; /* E𝘨. pct., meters and inches. */
+}; /* E𝘨․ pct․, meters and inches. */
 
 struct AnnotatedRegister AR_Binary16 = {
   U"Binary16: The Ieee 754-2008 half precision type", 
@@ -674,5 +674,63 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[],
    return Renderimage(width: width, height: height, process: output)
  } */
 
+#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
+#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"
 
+void
+Symbols(
+  const char * utf8exepath,
+  void (^each₋symbol)(const char * sym, uint64_t addr, bool * stop))
+{ __builtin_int_t bytesActual;
+    uint8_t * obj = (uint8_t *)mapfileʳᵚ(utf8exepath, 0, 0, 0, &bytesActual);
+    uint8_t * obj_p = obj;
+   
+    struct mach_header_64 * header = (struct mach_header_64 *)obj_p;
+    obj_p += sizeof *header;
+    struct section * sections = 0;
+    uint32_t nsects;
+   
+    bool 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 outer₋stop = false;
+   
+    for (int i=0; i<header->ncmds; ++i) {
+      struct load_command *lc = (struct load_command *)obj_p;
+      if (lc->cmd == LC_SYMTAB) {
+         struct symtab_command *symtab = (struct symtab_command *)obj_p;
+         obj_p += sizeof *symtab;
+         struct nlist_64 *ns = (struct nlist_64 *)(obj + symtab->symoff);
+         char * strtable = (char *)(obj + symtab->stroff);
+         for (int i=0; i<symtab->nsyms; ++i) {
+            struct nlist_64 *entry = ns + i;
+            uint32_t idx = entry->n_un.n_strx;
+            if ((entry->n_type & N_TYPE) == N_SECT) { each₋symbol(strtable + idx, 
+              entry->n_value, &outer₋stop); }
+            if (outer₋stop) { return; }
+         }
+      } else if (lc->cmd == LC_SEGMENT) {
+         struct segment_command * segment = (struct segment_command *)obj_p;
+         obj_p += sizeof *segment;
+         nsects = segment->nsects;
+         sections = (struct section *)obj_p;
+         obj_p += nsects * sizeof *sections;
+      } else { obj_p += lc->cmdsize; }
+    }
+}
+
+namespace __cxxabiv1 {
+EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
+  size_t size = sizeof(__builtin_uint_t);
+  __builtin_uint_t expected[1] = { 0 }, desired[1] = { 1 };
+  bool locked = __atomic_compare_exchange(size, (void *)p, void *expected, void *desired, int success_order, int failure_order);
+  return locked; }
+EXT₋C void __cxa_guard_release(__builtin_uint_t * p) {
+  size_t size = sizeof(__builtin_uint_t);
+  __builtin_uint_t desired[1] = { 0 }, expected[1] = { 1 };
+  __atomic_compare_exchange(size, (void *)p, void *expected, void *desired, int success_order, int failure_order);
+}
+EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
+  size_t size = sizeof(__builtin_uint_t);
+  __builtin_uint_t desired[1] = { 0 };
+  __atomic_store(size, (void *)p, void *val, int ordering);
+}
+} /* ⬷ a․𝘬․a coroutine and async 'yield'. */
 

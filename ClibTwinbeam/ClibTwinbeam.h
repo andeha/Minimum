@@ -3,7 +3,8 @@
 #define structᵢ struct
 #define unionᵢ union
 #if defined (__cplusplus)
-#define inexorable static __attribute__ ((internal_linkage)) /* see 'nm' for details. */
+#define inexorable static __attribute__ ((internal_linkage))
+/* ⬷ see 'nm' for details. */
 #else
 #define inexorable /* static */
 #endif
@@ -27,8 +28,9 @@ typedef uint64_t            __builtin_uint_t;
 typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 #define 𝟷𝟸𝟾₋bit₋swift₋integers
 #define 𝟷𝟸𝟾₋bit₋integers
+/* #define 𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions */
 #endif
-#define DISORDERABLE __attribute__((weak))
+typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
 #define FOCAL
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
@@ -55,8 +57,19 @@ struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
 typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
 #endif
 
-char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
+#if defined __cplusplus
+#define EXT₋C extern "C"
+#define EXT₋C₂ EXT₋C {
+#define EXT₋C₋FROM }
+#else
+#define EXT₋C₋FROM
+#define EXT₋C₂
+#define EXT₋C
+#endif
 
+EXT₋C char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
+EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8_t *u8s, short bytes));
+EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 struct Unicodes { __builtin_int_t tetras; char32_t * start; };
@@ -65,40 +78,43 @@ struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
-/* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
-inexorable void int₋to₋sequent(int64_t ℤ, struct sequent * ℝ);
-inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], struct sequent * ℝ);
-/* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
-void print₋sequent(struct sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text integers, 
- struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), void (^nonvalid)());
-/* ⬷ TeX 103 §. */
-struct sequent add_sequent(struct sequent x₁, struct sequent x₂);
-struct sequent minus_sequent(struct sequent x₁, struct sequent x₂);
-void multiply(struct sequent x₁, struct sequent x₂, struct sequent * y₋lo, 
- struct sequent * y₋hi);
-struct sequent mult_sequent(struct sequent x₁, struct sequent x₂);
-struct sequent reciproc_sequent(struct sequent yb);
-struct sequent div_sequent(struct sequent x₁, struct sequent x₂, int integer₋division); 
-/* the symbol 'div' requires __attribute__((overloadable)); */
-struct sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
-struct sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
-struct sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-struct sequent sequent₋floor(struct sequent x);
-struct sequent operator_minus(struct sequent x);
-struct sequent mod_sequent(struct sequent x₁, struct sequent x₂);
 typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
-int Newton(computational f, computational f₋prim, struct sequent * x₀, 
- void (^ping)(enum Newtoncontrol * ctrl));
 /* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
-struct sequent 𝟷𝟸𝟹𝟺₋atan(struct sequent y, struct sequent x);
-int trapezoid(struct sequent (^f)(struct sequent), struct sequent delta₋t, 
- struct sequent min, void (^memory)(struct sequent integrale, 
- struct sequent t₋acc, int * stop));
+/* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
+typedef struct sequent Sequent;
+EXT₋C₂
+inexorable void int₋to₋sequent(int64_t ℤ, Sequent * ℝ);
+inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], Sequent * ℝ);
+/* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
+void print₋sequent(Sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
+ integers, struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), 
+ void (^nonvalid)()); /* ⬷ TeX 103 §. */
+Sequent add_sequent(Sequent x₁, Sequent x₂);
+Sequent minus_sequent(Sequent x₁, Sequent x₂);
+void multiply(Sequent x₁, Sequent x₂, Sequent * y₋lo, Sequent * y₋hi);
+Sequent mult_sequent(Sequent x₁, Sequent x₂);
+Sequent reciproc_sequent(Sequent yb);
+Sequent div_sequent(Sequent x₁, Sequent x₂, int integer₋division); 
+/* the symbol 'div' requires __attribute__((overloadable)); */
+Sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
+Sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
+Sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
+Sequent sequent₋floor(Sequent x);
+Sequent operator_minus(Sequent x);
+Sequent mod_sequent(Sequent x₁, Sequent x₂);
+int Newton(computational f, computational f₋prim, Sequent * x₀, 
+ void (^ping)(enum Newtoncontrol * ctrl));
+Sequent 𝟷𝟸𝟹𝟺₋atan(Sequent y, Sequent x);
+int trapezoid(Sequent (^f)(Sequent), Sequent delta₋t, 
+ Sequent min, void (^memory)(Sequent integrale, 
+ Sequent t₋acc, int * stop));
+EXT₋C₋FROM
+
 struct intel₋sequent₋pair { struct sequent inner[2]; };
 typedef struct intel₋sequent₋pair simd256_t;
 
-#pragma mark pythagorean-euclidean and the half type
+#pragma mark pythagorean-euclidean and the half type as described in Ieee754-2008
 
 /*** Ieee 754 base-2 half with double-zero (-1)ˢ(1+m*2⁻¹⁰)×2ˣ⁻¹5 ***
                                                                              
@@ -115,6 +131,12 @@ typedef unsigned short half; /* ⬷ not 'typedef _Float16 half' and
  made unavailable in macos. */
 
 #define BITMASK(type) enum : type
+#define UNITTEST(symbol) extern "C" void Unittest_##symbol()
+#define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
+  ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
+#define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
+EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
+ sym, uint64_t addr, int * stop));
 
 BITMASK (uint32_t /* and not 'unsigned short' */) {
   Binary16_SGN = 0x8000, /* sign bit. */
@@ -130,10 +152,13 @@ typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS a
 #define IEEE754BASE2_16BIT_PZERO 0b0000000000000000
 #define IEEE754BASE2_16BIT_NZERO 0b1000000000000000
 #define IEEE754BASE2_16BIT_ONE   0b0011110000000000
-/* IEEE754BASE2_16BIT_SNAN and IEEE754BASE2_16BIT_QNAN n/a. */
 #define IEEE754BASE2_16BIT_PINF  0b0111110000000000
 #define IEEE754BASE2_16BIT_NINF  0b1111110000000000
 #define IEEE754BASE2_16BIT_MAX   0b0111101111111111 /* 𝟲𝟱𝟱𝟬𝟰 (i․𝘦 𝗠𝗔𝗫 when `half` precision.) */
+#define IEEE754BASE2_16BIT_EARLY 0b1111101111111111 /* ⬷ -65504. */
+/* IEEE754BASE2_16BIT_SNAN and IEEE754BASE2_16BIT_QNAN n/a. */
+#define HALF_EPS1 1.0009765625 /* 1+2⁻¹⁰ …maybe 2⁻¹¹. */
+
 typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴. */
    struct { int8_t lsh; uint8_t msh; } signed_little_endian;
    struct { uint8_t msh; int8_t lsh; } unsigned_big_endian;
@@ -150,21 +175,16 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
 
-#if defined __cplusplus
-#define EXT₋C extern "C"
-#else
-#define EXT₋C
-#endif
-
 EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
  short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
  depending on word size! (Or set to `0` to skip leading zeros.) */ void
  (^out)(char 𝟶to𝟿));
 
-double To₋doubleprecision(unsigned short /* half */ x);
+EXT₋C double To₋doubleprecision(unsigned short /* half */ x);
 
-EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, void (^out)(char8_t * u8s, 
- __builtin_int_t bytes)); /* void (^out)(char32_t uc) */
+EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, 
+ /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
+ void (^out)(char8_t * u8s, __builtin_int_t bytes));
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
 struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
@@ -175,9 +195,20 @@ EXT₋C void NumberformatCatalogue₋Present(
   struct AnnotatedRegister /* Explained */ * ar, 
   uint32_t numerics, 
   int is₋𝟷𝟼₋bits, 
-  /* void (^output)(char32_t uc), */
+  /* void (^sometime)(int count, char32_t * terminated₋ucs) */
   void (^out)(char8_t * u8s, __builtin_int_t bytes)
 );
+
+struct distance { half length; int unit; };
+enum Image₋kind { PNGrgba8 };
+struct PngRGBA8Pixel { uint8_t R,G,B,A; };
+union Image₋rectangle { struct PngRGBA8Pixel * pngRgba8; /* ⬷ 𝘤𝘧․ Scatter. */ };
+struct Image { int scanlines, columns, pixelsize; int unpurged; 
+ union Image₋rectangle material; int kind; /* ∈[1,7] */ };
+struct Cropped₋image { struct Image picture; };
+struct Plate { struct Cropped₋image image; int unit; };
+int Init₋image(struct Image * image, int secure);
+int Release₋image(struct Image * image);
 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
@@ -186,13 +217,15 @@ EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes),
 #ifndef __cplusplus
 typedef int bool;
 #endif
-typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, void * context);
-typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x000, void * context₁, void * context₂);
-/* ⬷ PRO|29|17. See also PRO|3|30. */
-typedef void (^Argᴾ₋output)(Argᴾ₋Unicode set, void * context);
-typedef void (*Argᴾ₋output₂)(Argᴾ₋Unicode₂ set, void * context);
 
-struct Argᴾ {
+typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, 
+ void * context);
+typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x0000, 
+ void * context₁, void * context₂);
+typedef void (^Argᴾ₋output)(Argᴾ₋Unicode set, void * context); /* ⬷ C and C++. */
+typedef void (*Argᴾ₋output₂)(Argᴾ₋Unicode₂ set, void * context); /* ⬷ C, C++ and Swift. */
+
+typedef struct Arg₋𝓟 {
  union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
   char8_t c; char32_t uc; double f₁; float f₂; struct Unicodes ucs;
   uint8_t paddingbytes[16];
@@ -200,26 +233,28 @@ struct Argᴾ {
   __uint128_t U; __int128_t I;
 #endif
   uint64_t hi₋and₋lo₋128bits[2];
-  /* struct { Argᴾ₋output scalar; void * context; } λ; */
+  struct { Argᴾ₋output scalar; void * context; } λ;
   struct { Argᴾ₋output₂ scalar; void * context; } λ₂;
  } value;
  int kind;
-};
+} Argᴾ;
 
-EXT₋C struct Argᴾ ﹟d(__builtin_int_t d);
-EXT₋C struct Argᴾ ﹟x(__builtin_uint_t x);
-EXT₋C struct Argᴾ ﹟b(__builtin_uint_t b);
-EXT₋C struct Argᴾ ﹟s(char8_t * u8s);
-EXT₋C struct Argᴾ ﹟l(const /* signed */ char * s);
-EXT₋C struct Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * uc);
-EXT₋C struct Argᴾ ﹟c(/* signed */ char c);
-EXT₋C struct Argᴾ ﹟C(char32_t C);
+EXT₋C Argᴾ ﹟d(__builtin_int_t d);
+EXT₋C Argᴾ ﹟x(__builtin_uint_t x);
+EXT₋C Argᴾ ﹟b(__builtin_uint_t b);
+EXT₋C Argᴾ ﹟s(char8_t * u8s);
+EXT₋C Argᴾ ﹟l(const /* signed */ char * s);
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc);
+EXT₋C Argᴾ ﹟c(/* signed */ char c);
+EXT₋C Argᴾ ﹟C(char32_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
-EXT₋C struct Argᴾ ﹟U(__uint128_t U);
-EXT₋C struct Argᴾ ﹟I(__int128_t I);
+EXT₋C Argᴾ ﹟U(__uint128_t U);
+EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
-EXT₋C struct Argᴾ ﹟λ(Argᴾ₋output scalar, void * context);
-EXT₋C struct Argᴾ ﹟S₂(char32_t * uc);
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
+EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
+EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
+/* ⬷ PRO|29|17. See also PRO|3|30. */
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
@@ -227,24 +262,23 @@ struct fifo {
  __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
 };
 
-int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
-void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
-int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
-int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
+EXT₋C int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
+EXT₋C void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
+EXT₋C int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
+EXT₋C int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
 
 struct structa {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
 };
 
-int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
-/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); }; */
-
-int structa₋lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-uint8_t * struct₋relative(__builtin_int_t byte₋offset);
-int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
+EXT₋C int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+EXT₋C int structa₋lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+EXT₋C uint8_t * structa₋relative(__builtin_int_t byte₋offset);
+EXT₋C int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t structa₋bytes(struct structa * 🅢); 
+EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
+/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); }; */
 /* __attribute__((overloadable)) is not yet executed in swift code. */
 
 #define va_epilogue __builtin_va_end(__various);
@@ -325,15 +359,13 @@ typedef half Artnumerical;
 
 struct A₋point { double x,y; };
 struct Illustration { double size, place₋origo, offset₋drawing₋on; };
-struct Plate { };
-int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
+EXT₋C int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
 /* ⬷ arbitrary number of other points. ⤐ */
 typedef void (^Visual)(struct Plate layer, bool * stop);
-int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, Visual plates);
-int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
-int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
+EXT₋C int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, Visual plates);
+EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
+EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
-
 union Artwork₋directive {
   int Count; /* ar: short. */
   double Scalar;
@@ -370,9 +402,9 @@ struct Scanner₋ctxt {
   enum Artwork₋scanner₋mode mode;
 };
 
-int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
+EXT₋C int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
  struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
-int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
+EXT₋C int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
  struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
 
 typedef enum Artwork₋instruction { columned=1, 
