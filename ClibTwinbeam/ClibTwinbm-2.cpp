@@ -165,13 +165,14 @@ template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
 EXT₋C Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
-/* EXT₋C Argᴾ ﹟s(const char8_t * u8s) { return Argᴾ { { .u8s=Critic(u8s) }, 4 }; } */
-EXT₋C Argᴾ ﹟s(char8_t * u8s) { return Argᴾ { { .u8s=u8s }, 4 }; }
-EXT₋C Argᴾ ﹟l(const /* signed */ char * s) { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
-/* EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32_t * uc) { return Argᴾ { { .ucs={ Critic(uc), tetras } }, 5 }; } */
-/* EXT₋C Argᴾ ﹟c(char8_t c) { return Argᴾ { { .c=c }, 6 }; } */
-EXT₋C Argᴾ ﹟c(/* signed */ char c) { return Argᴾ { { .c=(char8_t)c }, 6 }; }
+EXT₋C Argᴾ ﹟s(const char8_t * u8s) a⃝ { return Argᴾ { { .u8s=(char8_t *)u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s(char8_t * u8s) a⃝ { return Argᴾ { { .u8s=u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, (char32_t *)unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟c(char8_t c) a⃝ { return Argᴾ { { .c=c }, 6 }; }
+EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝ { return Argᴾ { { .c=(char8_t)c }, 6 }; }
 EXT₋C Argᴾ ﹟C(char32_t C) { return Argᴾ { { .uc=C }, 7 }; }
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
@@ -314,6 +315,20 @@ mfprint(
    return printedBytesExcept0;
 } */
 
+FOCAL
+EXT₋C
+int
+print(const char * utf8format, ...) a⃝ /* Here all variable args are of the type `Argᴾ`. */
+{ int y; va_prologue(utf8format);
+#ifdef __x86_64__
+   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1, (const void *)u8s, bytes); };
+#elif defined __armv8a__ || defined __mips__ || defined espressif || defined __armv6__
+   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Putₒ(u8s,bytes); };
+#endif
+   y = print﹟(out,utf8format,__various);
+   va_epilogue return y;
+}
+
 EXT₋C
 FOCAL
 int
@@ -321,12 +336,12 @@ print(
   void (^out)(char8_t * u8s, __builtin_int_t bytes), 
   const char * utf8format, 
   ...
-)
+) a⃝
 { int y; va_prologue(utf8format);
    y = print﹟(out,utf8format,__various);
    va_epilogue
    return y;
-} /* ⬷ a․𝘬․a `print⁺⁺`. See --<🥽 𝙋𝙧𝙞𝙣𝙩⁺.cpp> for more details. */
+}
 
 template <typename T> T max(T x₁, T x₂) { return x₁ < x₂ ? x₂ : x₁; }
 namespace Vt99 { const /* signed */ char * bright = "\x1B[1m", *dim = "\x1B[2m", 
@@ -383,17 +398,19 @@ NumberformatCatalogue₋Present(
          Present((regs + i), val, init, is₋𝟷𝟼₋bits, maxwidth, out);
       }
    };
-   print(out, "⬚\n", ﹟l(Vt99::bright));
+   print(out, "⬚\n", ﹟s(Vt99::bright));
    Present(out,Critic(ar->header));
-   print(out, "⬚ = ⬚ 0x", ﹟l(Vt99::reset), ﹟l(Vt99::reverse));
+   print(out, "⬚ = ⬚ 0x", ﹟s(Vt99::reset), ﹟s(Vt99::reverse));
    Base𝕟((__builtin_uint_t)numerics, 16, 8, ^(char 𝟶to𝟿) { print(out,"⬚", ﹟c(𝟶to𝟿)); });
-   print(out, "⬚\n\n", ﹟l(Vt99::reset));
+   print(out, "⬚\n\n", ﹟s(Vt99::reset));
    present(ar->regcnt,ar->regs,numerics,ar->init);
    Present(out,Critic(ar->footnote));
    print(out,"\n\n");
 }
 
-namespace __cxxabiv1 {
+#pragma mark blue, white and something (🌍)
+
+/* namespace __cxxabiv1 { */
 EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
   __builtin_uint_t expected[1] = { 0 }, desired[1] = { 1 };
   const int relaxed=0;
@@ -415,7 +432,7 @@ EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
   int ordering=relaxed;
   __atomic_store(p,desired,ordering);
 }
-} /* ⬷ a․𝘬․a coroutine and async 'yield'. */
+/* } / * ⬷ a․𝘬․a coroutine and async 'yield'. */
 
 int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it) TROKADERO SELDOM
 {

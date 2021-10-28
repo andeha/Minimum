@@ -36,9 +36,6 @@ typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
 #define SELDOM /* long-running and will be executed without task switch and uncontaining 'yield'. */
-enum Impediment { MustBeOrdered, JustSwap };
-int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it); TROKADERO SELDOM
-struct Peekey { __builtin_int_t board₁, palm₂; };
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
 #define BUILTIN₋INT₋MAX 2147483647
@@ -80,6 +77,15 @@ EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 struct Unicodes { __builtin_int_t tetras; char32_t * start; };
+
+#define UNITTEST(symbol) extern "C" void Unittest_##symbol()
+#define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
+  ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
+#define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
+EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
+ sym, uint64_t addr, int * stop));
+
+#define BITMASK(type) enum : type
 
 #pragma mark precision and the 128-bits physical bound
 
@@ -137,14 +143,6 @@ typedef unsigned short half; /* ⬷ not 'typedef _Float16 half' and
  not 'typedef pythagorean_double half', in Swift already named Float16 and 
  made unavailable in macos. */
 
-#define BITMASK(type) enum : type
-#define UNITTEST(symbol) extern "C" void Unittest_##symbol()
-#define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
-  ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
-#define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
-EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
- sym, uint64_t addr, int * stop));
-
 BITMASK (uint32_t /* and not 'unsigned short' */) {
   Binary16_SGN = 0x8000, /* sign bit. */
   Binary16_EXP = 0b11111<<10, /* signed exponent -16 to 16. */
@@ -174,6 +172,11 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
      unsigned exponent :  5;
      unsigned sign     :  1;
    } binary16; /* ⬷ a․𝘬․a `ieee754_2008`. */
+   struct {
+     unsigned fraction : 7;
+     unsigned exponent : 8;
+     unsigned sign     : 1;
+   } bfloat16; /* ⬷ ubiquitous. */
    unsigned short bits;
 #if defined __x86_64__
    half location;
@@ -217,9 +220,12 @@ struct Plate { struct Cropped₋image image; int unit; };
 int Init₋image(struct Image * image, int secure);
 int Release₋image(struct Image * image);
 
+#define a⃝ __attribute__((overloadable))
+ 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
- const char * utf8format, ...);
+ const char * utf8format, ...) a⃝;
+EXT₋C int print(const char * utf8format, ...) a⃝;
 
 #ifndef __cplusplus
 typedef int bool;
@@ -250,10 +256,14 @@ typedef struct Arg₋𝓟 {
 EXT₋C Argᴾ ﹟d(__builtin_int_t d);
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x);
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b);
-EXT₋C Argᴾ ﹟s(char8_t * u8s);
-EXT₋C Argᴾ ﹟l(const /* signed */ char * s);
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc);
-EXT₋C Argᴾ ﹟c(/* signed */ char c);
+EXT₋C Argᴾ ﹟s(char8_t * u8s) a⃝;
+EXT₋C Argᴾ ﹟s(const char8_t * u8s) a⃝;
+EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝;
+EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝;
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝;
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝;
+EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝;
+EXT₋C Argᴾ ﹟c(char8_t c) a⃝;
 EXT₋C Argᴾ ﹟C(char32_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
 EXT₋C Argᴾ ﹟U(__uint128_t U);
@@ -306,6 +316,10 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
+
+enum Impediment { MustBeOrdered, JustSwap };
+struct Peekey { __builtin_int_t board₁, palm₂; };
+int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it); TROKADERO SELDOM
 
 /* Överhandsavtal och underhandsuppfattning: 
  
