@@ -1,13 +1,18 @@
 /*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge for Si and O₂. */
 
+
+#if !defined __cplusplus
+#define inexorable
 #define structᵢ struct
 #define unionᵢ union
-#if defined (__cplusplus)
-#define inexorable static __attribute__ ((internal_linkage))
-/* ⬷ see 'nm' for details. */
+#define MACRO INLINED
 #else
-#define inexorable /* static */
-#endif
+#define MACRO inline INLINED
+#define unionᵢ union __attribute__ ((internal_linkage))
+#define structᵢ struct __attribute__((internal_linkage))
+#define inexorable static __attribute__ ((internal_linkage))
+#endif /* ⬷ see 'nm' for details. */
+#define INLINED __attribute__((always_inline))
 typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
 typedef unsigned long long  uint64_t;
@@ -17,6 +22,9 @@ typedef unsigned long       uint32_t;
 typedef long                int32_t;
 typedef uint32_t            __builtin_uint_t;
 typedef int32_t             __builtin_int_t;
+#define TriboolUnknown 0xFFFFFFFF
+#define TriboolUninit 0xFFFFFFFE
+#define TriboolUnarbitrated 0xFFFFFFFD
 #define 𝟷𝟸𝟾₋bit₋integers /* ⬷ flag -fforce-enable-int128 when Mips. */
 #ifdef __MM__
 #undef 𝟷𝟸𝟾₋bit₋integers
@@ -26,11 +34,16 @@ typedef unsigned int        uint32_t;
 typedef int                 int32_t; /* ≢'long'. */
 typedef uint64_t            __builtin_uint_t;
 typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
-#define 𝟷𝟸𝟾₋bit₋swift₋integers
+/* #define 𝟷𝟸𝟾₋bit₋swift₋integers */
 #define 𝟷𝟸𝟾₋bit₋integers
 /* #define 𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions */
+#define TriboolUnknown 0xFFFFFFFFFFFFFFFF
+#define TriboolUninit 0xFFFFFFFFFFFFFFFE
+#define TriboolUnarbitrated 0xFFFFFFFFFFFFFFFD
 #endif
 typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
+typedef unsigned short      uint16_t; /* cf. Q16. */
+typedef __builtin_uint_t Tribool; /* ⬷ cf․ 'obekant', 'icke-lös' and 'embargo-₍im₎material'. */
 #define FOCAL /* ⬷ embossed inexorable. */
 #define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */ 
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
@@ -51,16 +64,38 @@ int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all);
 int Details_in_C(uint64_t pid, int32_t cross);
 #endif
 
-#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
+#define BITMASK(type) enum : type
+#if defined  __mips__
+#define Mips __asm__ __volatile__ (/* ".set noat   \n" */ ".set noreorder  \n" ".set nomacro    \n"
+#elif defined __x86_64__
+#define Intel👈 __asm { .intel_syntax noprefix /* ⬷ requires -fms-extensions */
+#define IntelPlusATT👉 asm { .att_syntax .text
+#elif defined __armv6__ || defined __armv8a__
+#define ArmDS1S2 asm {
+#endif
 
-#define false 0
-#define true (! false)
-
-struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
+MACRO __builtin_uint_t 🔎(__builtin_uint_t var) { return *((__builtin_uint_t 
+ /* volatile */ *) var); }
+#if defined __cplusplus
+MACRO __builtin_uint_t&  🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
+ *(__builtin_uint_t /* volatile */ *)var; }
+MACRO __builtin_uint_t TrailingZeros(__builtin_uint_t x) { if (x == 0) { return 
+ sizeof(x)*8; } x=(x^(x-1))>>1; int c=0; for (; x; c++) { x >>= 1; } return c; }
+MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask, 
+ void (^update)(__builtin_uint_t& shifted) = ^(__builtin_uint_t&) { } ) {
+ __builtin_uint_t word = *symbol, shift=TrailingZeros(mask), orig = mask&word,
+ shifted = orig>>shift; if (update) update(shifted); __builtin_uint_t fresh =
+ (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
+#endif
 
 #if !defined(__cplusplus)
 typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
 #endif
+
+struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
+struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
+ uint32_t init; const char32_t * footnote; };
+typedef struct Bitfield Explained[];
 
 #if defined __cplusplus
 #define EXT₋C extern "C"
@@ -72,24 +107,49 @@ typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
 #define EXT₋C
 #endif
 
+EXT₋C void NumberformatCatalogue₋Present(
+  struct AnnotatedRegister /* Explained */ * ar, 
+  uint32_t numerics, 
+  int is₋𝟷𝟼₋bits, 
+  /* void (^sometime)(int count, char32_t * terminated₋ucs) */
+  void (^out)(char8_t * u8s, __builtin_int_t bytes)
+);
+
+#define APPEND_PIMPL                                                         \
+  struct Internals;                                                          \
+  Internals * impl_;
+#define 😐 APPEND_PIMPL }
+
+#define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
+
+EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
+ short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
+ depending on word size! (Or set to `0` to skip leading zeros.) */ void
+ (^out)(char 𝟶to𝟿));
+
+#define false 0
+#define true (! false)
+
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
+struct Unicodes { __builtin_int_t tetras; char32_t * start; };
+
 EXT₋C char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8_t *u8s, short bytes));
 EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
-#define BITMASK(type) enum : type
-
-int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
-
-struct Unicodes { __builtin_int_t tetras; char32_t * start; };
+EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
   ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
+EXT₋C₂
+int atexit(void(*func)(void));
+void exit(int status);
+EXT₋C₋FROM
 EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
  sym, uint64_t addr, int * stop));
-EXT₋C void exit(int status);
 
 #pragma mark precision and the 128-bits physical bound
 
@@ -189,10 +249,20 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
 
-EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
- short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
- depending on word size! (Or set to `0` to skip leading zeros.) */ void
- (^out)(char 𝟶to𝟿));
+typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
+#define simd_init₈(x) { float16x8_t z = { x, 1,2,3,4,5,6,7 }; uint32_t y = vgetq_lane_f16(z,0); return y; }
+#define __builtin_simd_add₈ __arm_vaddq_f16
+#define __builtin_simd_sub₈ __arm_vsubq_f16
+#define __builtin_simd_mul₈ __arm_vmulq_f16 /* VMUL.F16 Qd,Qn,Qm */
+#define __builtin_simd_div₈ __arm_vdivq_f16
+#define __builtin_simd_rcp₈ __arm_vinvq_f16
+#define __builtin_simd_sqrt₈ __arm_vrsqrte_f16
+#define __builtin_simd_rsqrt₈ __arm_vinvsqrtq_f16
+#define __builtin_simd_fmadd₈(a,b,c) __arm_vfmaq_f16(b,c,a) /* ⬷ a₁ + a₂*a₃. */
+#define __builtin_simd_min₈ __arm_vminq_f16
+#define __builtin_simd_max₈ __arm_vmaxq_f16
+#define simd_scalar₈(x) __arm_vgetq_lane_f16(x,0)
+/* ⬷ arm_mve.h and __ARM_FEATURE_MVE=2. */
 
 EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
@@ -200,18 +270,30 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8_t * u8s, __builtin_int_t bytes));
 
-struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
-struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
- uint32_t init; const char32_t * footnote; };
-typedef struct Bitfield Explained[];
+EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fall⒪⒲)(void *);
 
-EXT₋C void NumberformatCatalogue₋Present(
-  struct AnnotatedRegister /* Explained */ * ar, 
-  uint32_t numerics, 
-  int is₋𝟷𝟼₋bits, 
-  /* void (^sometime)(int count, char32_t * terminated₋ucs) */
-  void (^out)(char8_t * u8s, __builtin_int_t bytes)
-);
+/* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
+struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
+/* ⬷ a․𝘬․a expeditionary and 'void * pages[]'/'uint32_t avails[]'. */
+int Acquire𝟷ᵈ(__builtin_int_t ﹟, struct 𝟺kbframes * one₋set, void (^every)(uint8_t 
+ * 𝟸ⁿ₋frame, int * stop));
+int Release𝟷ᵈ(void * 𝟸ⁿ₋frame, struct 𝟺kbframes * one₋set, int secure);
+void Init₋frames(unsigned count, unsigned expeditionaries[]);
+int ContiguousAcquire(unsigned expeditionary, void **𝟺kbframes, __builtin_int_t ﹟);
+int CoalescingAcquire(unsigned expeditionary, void **𝟺kbframes, __builtin_int_t ﹟);
+int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟);
+/* void intel₋/mips₋mzda₋Reservoir(unsigned expeditionary, 𝟺kbframes * one₋set, 
+ __builtin_int_t * pages₋in₋expedition); */
+
+EXT₋C void * nalloc(uint64_t); EXT₋C void free(void *);
+
+#define MEASURE_START(prefix) int64_t prefix##Start = __rdtsc();
+#define MEASURE_END(prefix)                                                  \
+ int64_t prefix##End = (int64_t)__rdtsc();                                   \
+ int64_t prefix##Nanos = prefix##End - prefix##Start;                        \
+ print(#prefix " measures ⬚ ns\n", ﹟d(prefix##Nanos));
+
+#define rt₋namespace namespace
 
 struct distance { half length; int unit; };
 enum Image₋kind { PNGrgba8 };
@@ -301,7 +383,7 @@ struct structa {
 };
 
 typedef void * (^Leaf₋alloc)(__builtin_int_t /* bytes */);
-typedef Structa struct structa;
+typedef struct structa Structa;
 EXT₋C int structa₋init(Structa * 🅢, Leaf₋alloc leaf₋alloc);
 EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
 EXT₋C uint8_t * structa₋relative(Structa * 🅢, __builtin_int_t byte₋offset);
@@ -312,6 +394,10 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
 /* __attribute__((overloadable)) is not yet executed in swift code. */
+
+struct radio₋editor { }; /* ⬷ a․𝘬․a remmingway. */
+struct debripaper { }; /* ⬷ a․𝘬․a bits₋on₋tiles. */
+struct two₋command₋queue { };
 
 #define va_epilogue __builtin_va_end(__various);
 #define va_prologue(symbol)                                                 \
@@ -457,5 +543,45 @@ typedef enum Artwork₋instruction { columned=1,
  set₋letterbox₋anchor, set₋letterbox₋origo, 
  place₋text /* p3₋color₋select */
 } Artwork₋instruction; /* ⬷ a․𝘬․a ¹directives and ¹instruction. */
+
+#if defined __mips__ && !defined NON₋SIMD
+extern v2f64 __builtin_msa_cast_to_vector_double(double);
+#define simd_initᵦ __builtin_msa_cast_to_vector_double
+#define __builtin_simd_addᵦ __builtin_msa_fadd_d
+#define __builtin_simd_subᵦ __builtin_msa_fsub_d
+#define __builtin_simd_mulᵦ __builtin_msa_fmul_d
+#define __builtin_simd_divᵦ __builtin_msa_fdiv_d
+#define __builtin_simd_rcpᵦ __builtin_msa_frcp_d
+#define __builtin_simd_sqrtᵦ __builtin_msa_fsqrt_d
+#define __builtin_simd_rsqrtᵦ __builtin_msa_frsqrt_d
+#define __builtin_simd_fmaddᵦ(a,b,c) __builtin_msa_fmadd_d(b,c,a) /* ⬷ a₁ + a₂*a₃. */
+#define __builtin_simd_minᵦ __builtin_msa_fmin_d
+#define __builtin_simd_maxᵦ __builtin_msa_fmax_d
+#elif defined __armv8a__ && !defined NON₋SIMD
+#define simd_initᵦ vmovq_n_f64
+#define __builtin_simd_addᵦ vaddq_f64
+#define __builtin_simd_subᵦ vsubq_f64
+#define __builtin_simd_mulᵦ vmulxq_f64
+#define __builtin_simd_divᵦ vdivq_f64
+#define __builtin_simd_rcpᵦ vrecpsq_f64
+#define __builtin_simd_sqrtᵦ vrsqsq_f64
+#define __builtin_simd_rsqrtᵦ vrsqrtsq_f64
+#define __builtin_simd_fmaddᵦ(a,b,c) vmlaq_f64(b,c,a) /* ⬷ a₁ + a₂*a₃. */
+#define __builtin_simd_minᵦ vminq_f64
+#define __builtin_simd_maxᵦ vmaxq_f64
+#elif defined __x86_64__
+#define simd_initᵦ _mm_set1_pd
+#define __builtin_simd_addᵦ _mm_add_pd
+#define __builtin_simd_subᵦ _mm_sub_pd
+#define __builtin_simd_mulᵦ _mm_mul_pd
+#define __builtin_simd_divᵦ _mm_div_pd
+#define __builtin_simd_rcpᵦ _mm_rcp_pd
+#define __builtin_simd_sqrtᵦ _mm_sqrt_pd
+#define __builtin_simd_rsqrtᵦ _mm_rsqrt_pd
+#define __builtin_simd_fmaddᵦ(a,b,c) _mm_fmadd_pd(a,b,c) /* ⬷ a₁*a₂ + a₃. */
+#define __builtin_simd_minᵦ _mm_min_pd
+#define __builtin_simd_maxᵦ _mm_max_pd
+#endif
+
 
 
