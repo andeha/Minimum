@@ -158,6 +158,26 @@ UnicodeToUtf8(
     return 0;
 }
 
+int
+IsPrefixOrEqual(
+  const char * 𝟽alt𝟾₋bitstring, /* ⬷ possibly 'normalizedUtf8' */
+  const char * 𝟽alt𝟾₋bitprefix  /* ⬷ smiley appears when 'prompt> nm'! */
+) /* ⬷ consider changing dwarf-'.elf' to 'trie' instead of 'table'. */
+{  const char *s=𝟽alt𝟾₋bitstring, *p=𝟽alt𝟾₋bitprefix;
+    if (*s == 0 && *p == 0) { return -1; }  /* Parameters `string` and `prefix` are both empty therefore equal. */
+    if (!*s) { return 0; } /* Non-equal since the string is empty and a prefix exists. */
+    if (!*p) { return *s; } /* The prefix is empty but not the string, return dist(0, non-end). */
+again:
+    if (*s == 0 && *p == 0) { return -1; }  /* Parameters 'string' and 'prefix' are non-empty and equal. */
+    if (*s == 0 && *p != 0) { return 0; }   /* The prefix continues after string. */
+    if (*s != 0 && *p == 0) { return *s; }  /* All characters in 'prefix' equal to 'string'. Return first character following 'eightbitPrefix'. */
+    /* *p != 0 && *s != 0 */
+    char diff = *s - *p;
+    if (diff) { return 0; } /* Savannah and Samura. */
+    s++, p++;
+    goto again;
+}
+
 template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
 
 #pragma mark - Inte₋ger₋s
@@ -180,12 +200,15 @@ EXT₋C Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
 #endif
 EXT₋C Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
-/* EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; } */
 
-inexorable void Coalesc₋present(void (^out)(int count, char32_t * unterminated₋ucs), int count, char32_t * unterminated₋ucs)
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; }
+
+EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 {
-   
-} /* ⬷ two 'async'-job alt. written coroutines alt. threads for example. */
+  return Argᴾ { { .chapter={ anfang, ingress } }, 88 };
+} /* ⬷ see --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
+
+void Register₋reflect(__builtin_uint_t /* mask */) { }
 
 inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char32_t * terminated₋ucs)
 {
@@ -198,12 +221,10 @@ EXT₋C Argᴾ ﹟S₂(char32_t * terminated₋uc) {
   return Argᴾ { { .ucs={ tetras, terminated₋uc } }, 5 };
 }
 
-void Register₋reflect(__builtin_uint_t /* mask */) { }
-
-/* EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
+inexorable void Coalesc₋present(void (^out)(int count, char32_t * unterminated₋ucs), int count, char32_t * unterminated₋ucs)
 {
-  return Argᴾ { { .ingress={ anfang, ingress } }, 88 };
-} / * ⬷ see --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
+   
+} /* ⬷ two 'async'-job alt. written coroutines alt. threads for example. */
 
 #pragma mark - in /retrospect/, hidden yet simple:
 
@@ -279,8 +300,9 @@ again:
       case 12: 𝟷𝟸𝟾₋out𝕫(a.value.I); break;
 #endif
       case 13: Register₋reflect(a.value.x); break;                              \
-      /* case 88: break;                                                        \
-      */ default: /* if (a.kind >= 0) imprint[a.kind](a); else */               \
+      case 88: unicode₋stream(a.value.chapter.ingress.tetras,                   \
+       a.value.chapter.ingress.start); break;                                   \
+      default: /* if (a.kind >= 0) imprint[a.kind](a); else */                  \
         unicode₋symbol(U'?'); break; }
     }
     i += incr; goto again;
@@ -366,11 +388,11 @@ Present(struct Bitfield * field,
    
    𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 bool masking=false; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned pos=31;
    Base𝕟((__builtin_uint_t)(field->mask), 2, 32, ^(char 𝟶to𝟿) {
-     if (is₋𝟷𝟼₋bits && pos > 15) { print(out, "﹟"); }
-     if (!is₋𝟷𝟼₋bits && 𝟶to𝟿 == '1' && !masking) { masking = true; }
-     if (!is₋𝟷𝟼₋bits && masking && 𝟶to𝟿 == '0') { masking = false; }
-     if (!is₋𝟷𝟼₋bits && masking) { print(out, numerics & (0b1<<pos) ? "1" : "0"); }
-     if (!is₋𝟷𝟼₋bits && !masking) { print(out, "␣"); }
+     if (is₋𝟷𝟼₋bits && pos > 15) { print(out, "x"); } else {
+      if (𝟶to𝟿 == '1' && !masking) { masking = true; }
+      if (masking && 𝟶to𝟿 == '0') { masking = false; }
+      if (masking) { print(out, numerics & (0b1<<pos) ? "1" : "0"); }
+      if (!masking) { print(out, "␣"); } }
      if (pos % 4 == 0) print(out, "|"); --pos;
    });
    

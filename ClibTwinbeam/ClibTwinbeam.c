@@ -1,17 +1,15 @@
-/*  ClibTwinbeam.cpp | details on bridging Swift and Twinbeam. */
+/*  ClibTwinbeam.c | details on bridging Swift and Twinbeam. */
 
-/* #include <Twinbeam.h> */
-#include "ClibTwinbeam.h" /* ⬷ a․𝘬․a Twinbeam₋C.h and C-Twinbeam.h. */
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-/* import Twinbeam;
+import ClibTwinbeam;
+import Types;
+import Stdio; /* ⬷ in c++ later renamed to 'std.io'. */
 import Unistd;
-import Stdio; */ /* ⬷ rename later to 'std.io'. */
-/* ⬷ enter 'import std.core;' to include the standard C++ library. */
+import Stdlib; /* ⬷ modules not only in c++ but in c as well. Enter 
+ 'import std.core;' to include the standard C++ library. */
 /* todo: add -enable-experimental-cxx-interop and base-16 mangling. */
+import Mapfile;
+import Setjmp;
+import Mach_O;
 
 #if defined 𝟷𝟸𝟾₋bit₋integers₋with₋calling₋conventions
 int Details_in_C(uint64_t pid, int32_t cross, __uint128_t all) { return -1; }
@@ -23,18 +21,39 @@ int Details_in_C(uint64_t pid, int32_t cross) { return -1; }
 void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵); */
 int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words)
 {
-  return 0;
+   return 0;
 }
 
-/* int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
+int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words)
+{
+   return 0;
+}
 
-int structa₋init(struct structat * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
+int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes))
+{
+   return 0;
+}
 
-int lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-uint8_t * relative(__builtin_int_t byte₋offset);
-int copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
- void (^inflate)(__builtin_int_t ﹟, int * cancel));
-__builtin_int_t bytes(struct structa * 🅢); */
+int structa₋lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[])
+{
+   return 0;
+}
+
+uint8_t * structa₋relative(struct structa * 🅢, __builtin_int_t byte₋offset)
+{
+   return 0;
+}
+
+int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
+ void (^inflate)(__builtin_int_t ﹟, int * cancel))
+{
+   return 0;
+}
+
+__builtin_int_t structa₋bytes(struct structa * 🅢)
+{
+   return 0;
+}
 
 pid_t Twinbeam₋spawn(
   const char * pathandcommand₋u8s, 
@@ -70,12 +89,7 @@ pid_t Twinbeam₋spawn(
    return pid;
 }
 
-#include <sys/mman.h>
-
 __builtin_int_t Syspagesize() { return 4096; }
-
-#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
-#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
 
 inexorable
 void *
@@ -87,16 +101,16 @@ mapfileʳᵚ( /* ⬷ a․𝘬․a 'findAndmap'. */
   __builtin_int_t * bytesActual
 )
 { void * p; __builtin_int_t bytesafterprune, readbytes;
+   typedef __builtin_int_t (^cmp)(__builtin_int_t,__builtin_int_t);
+   cmp min = ^(__builtin_int_t x, __builtin_int_t y) { return x < y ? x : y; };
    int fd = open(canonicalUtf8RegularOrLinkpath,O_RDONLY);
    if (fd == -1) { return NULL; } struct stat sb;
    if (fstat(fd,&sb) == -1) { goto err; }
-   if (!S_ISDIR(sb.st_mode)) { goto err; }
-   if (!S_ISLNK(sb.st_mode)) { goto err; }
+   if (S_ISDIR(sb.st_mode)) { goto err; }
+   if (S_ISLNK(sb.st_mode)) { goto err; }
    /* ⬷ not a regular file nor a soft link. */
    bytesafterprune = sb.st_size - bytesOffset;
    if (bytesafterprune < 0) { goto err; }
-   typedef __builtin_int_t (^cmp)(__builtin_int_t,__builtin_int_t);
-   cmp min = ^(__builtin_int_t x, __builtin_int_t y) { return x < y ? x : y; };
    *bytesActual = pages𝘖rZero == 0 ? bytesafterprune : 
      min(pages𝘖rZero*Syspagesize(), bytesafterprune);
    readbytes = bytesAugment + *bytesActual;
@@ -120,7 +134,6 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 #pragma mark cartetic-tektronic essentials:
 
-#include <setjmp.h>
 #define CARDINALS(...) enum Cardinal { __🄦hole=0, __VA_ARGS__ };           \
   static jmp_buf __snapshot;                                                \
   typedef void (^CSession)(enum Cardinal sin);                              \
@@ -136,17 +149,16 @@ float
 __attribute__ ((target("f16c")))
 half₋to₋float(half /* unsigned short */ 𝟷𝟼₋bits)
 {
-  /* float again = _cvtsh_ss(pythagorean_double { .location=𝟷𝟼₋bits }.bits);
-  return again; */
-  __v8hf v = { (short)𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
-  typedef float __attribute__ ((__vector_size__(32), __aligned__(16))) __v44f;
-  __m128 non₋double = (__m128)__builtin_ia32_vcvtph2ps(v);
+  __v8hf v = { 𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
+  typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __v44f;
+  __v44f non₋double = (__v44f)__builtin_ia32_vcvtph2ps(v);
   return non₋double[0];
-}
+}  /* float again = _cvtsh_ss(pythagorean_double { .location=𝟷𝟼₋bits }.bits);
+  return again; */
 
 double
 /* __attribute__ ((target("f16c"))) */
-To₋doubleprecision(unsigned short /* half */ 𝟷𝟼₋bits)
+To₋doubleprecision(/* unsigned short */ half 𝟷𝟼₋bits)
 {
   return (double)half₋to₋float(𝟷𝟼₋bits);
 }
@@ -229,13 +241,13 @@ void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], struct se
 
 struct sequent add_sequent(struct sequent x₁, struct sequent x₂)
 {
-  struct sequent sum = { .detail = { x₁.detail.frac + x₂.detail.frac }, .valid=1 };
+  struct sequent sum = { .detail.frac = x₁.detail.frac + x₂.detail.frac, .valid=1 };
   return sum;
 }
 
 struct sequent minus_sequent(struct sequent x₁, struct sequent x₂)
 {
-  struct sequent diff = { .detail = { x₁.detail.frac - x₂.detail.frac }, .valid=1 };
+  struct sequent diff = { .detail.frac = x₁.detail.frac - x₂.detail.frac , .valid=1 };
   return diff;
 }
 
@@ -673,9 +685,6 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[],
      self.render(text: string, width: width, height: height) }
    return Renderimage(width: width, height: height, process: output)
  } */
-
-#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
-#include "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"
 
 void
 Symbols(

@@ -35,7 +35,8 @@ typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
 #define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */ 
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
-#define SELDOM /* long-running and will be executed without task switch and uncontaining 'yield'. */
+#define SELDOM /* long-running and will be executed without task switch and is uncontaining 'yield'. */
+#define QUOTE(str) #str
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
 #define BUILTIN₋INT₋MAX 2147483647
@@ -76,6 +77,10 @@ EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8_t *u8s, sh
 EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 /* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
+#define BITMASK(type) enum : type
+
+int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
+
 struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
@@ -84,8 +89,7 @@ struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
 EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
  sym, uint64_t addr, int * stop));
-
-#define BITMASK(type) enum : type
+EXT₋C void exit(int status);
 
 #pragma mark precision and the 128-bits physical bound
 
@@ -167,7 +171,7 @@ typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS a
 typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴. */
    struct { int8_t lsh; uint8_t msh; } signed_little_endian;
    struct { uint8_t msh; int8_t lsh; } unsigned_big_endian;
-   struct {
+   struct { /* ⬷ surprisingly not big endian when using colon, in both cases little-endian. ⤐ */
      unsigned mantissa : 10;
      unsigned exponent :  5;
      unsigned sign     :  1;
@@ -190,7 +194,7 @@ EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, 
  depending on word size! (Or set to `0` to skip leading zeros.) */ void
  (^out)(char 𝟶to𝟿));
 
-EXT₋C double To₋doubleprecision(unsigned short /* half */ x);
+EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
 EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, 
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
@@ -238,6 +242,10 @@ typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x0000,
 typedef void (^Argᴾ₋output)(Argᴾ₋Unicode set, void * context); /* ⬷ C and C++. */
 typedef void (*Argᴾ₋output₂)(Argᴾ₋Unicode₂ set, void * context); /* ⬷ C, C++ and Swift. */
 
+struct Lambda₋2 { Argᴾ₋output scalar; void * context; };
+struct Lambda { Argᴾ₋output₂ scalar; void * context; };
+struct Chapter { struct Plate * anfang; struct Unicodes ingress; };
+
 typedef struct Arg₋𝓟 {
  union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
   char8_t c; char32_t uc; double f₁; float f₂; struct Unicodes ucs;
@@ -246,9 +254,9 @@ typedef struct Arg₋𝓟 {
   __uint128_t U; __int128_t I;
 #endif
   uint64_t hi₋and₋lo₋128bits[2];
-/*  struct { Argᴾ₋output scalar; void * context; } λ₂;
-  struct { Argᴾ₋output₂ scalar; void * context; } λ;
-  struct { struct Plate * anfang; struct Unicodes ingress; } chapter; */
+  struct Lambda₋2 λ₂;
+  struct Lambda λ;
+  struct Chapter chapter;
  } value;
  int kind;
 } Argᴾ;
@@ -269,8 +277,9 @@ EXT₋C Argᴾ ﹟C(char32_t C);
 EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
-/* EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
-EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang); */
+/* EXT₋C Argᴾ ﹟F(double f, int format); */
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
+EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
 /* ⬷ PRO|29|17. See also PRO|3|30. */
 EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
 
@@ -292,7 +301,7 @@ struct structa {
 
 EXT₋C int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
 EXT₋C int structa₋lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-EXT₋C uint8_t * structa₋relative(__builtin_int_t byte₋offset);
+EXT₋C uint8_t * structa₋relative(struct structa * 🅢, __builtin_int_t byte₋offset);
 EXT₋C int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
 EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
@@ -306,7 +315,7 @@ EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
  __builtin_va_list __various;                                               \
  __builtin_va_start(__various, symbol);
 
-#define NULL 0
+/* #define NULL 0 */
 typedef int pid_t;
 
 EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * command₋u8s, 

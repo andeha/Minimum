@@ -5,4 +5,40 @@ module ClibTwinbeam {
 } /* ⬷ note 'ClibTwinbeam' is defined twice: one time in '🗿' and once 
  in --<Minimum>--<*>--<module.modulemap>. */
 
+module Types [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h"
+}
 
+module Stdio [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h"
+}
+
+module Unistd [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+}
+
+module Stdlib [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
+}
+
+module Mapfile [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/mman.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
+}
+
+module Setjmp [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/setjmp.h"
+}
+
+module Mach_O [system]
+{ requires macos
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"
+}
