@@ -277,7 +277,7 @@ EXT₋C Argᴾ ﹟C(char32_t C);
 EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
-/* EXT₋C Argᴾ ﹟F(double f, int format); */
+EXT₋C Argᴾ ﹟F(double f, int format);
 EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
 EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
 /* ⬷ PRO|29|17. See also PRO|3|30. */
@@ -291,7 +291,8 @@ struct fifo {
 
 EXT₋C int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
 EXT₋C void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
-EXT₋C int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * words);
+EXT₋C int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, 
+ __builtin_uint_t * words);
 EXT₋C int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
 
 struct structa {
@@ -299,12 +300,14 @@ struct structa {
   void * treelist, *cached₋tile;
 };
 
-EXT₋C int structa₋init(struct structa * 🅢, void * (^leaf₋alloc)(__builtin_int_t bytes));
-EXT₋C int structa₋lengthen(struct structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-EXT₋C uint8_t * structa₋relative(struct structa * 🅢, __builtin_int_t byte₋offset);
-EXT₋C int structa₋copy₋append(struct structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
+typedef void * (^Leaf₋alloc)(__builtin_int_t /* bytes */);
+typedef Structa struct structa;
+EXT₋C int structa₋init(Structa * 🅢, Leaf₋alloc leaf₋alloc);
+EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
+EXT₋C uint8_t * structa₋relative(Structa * 🅢, __builtin_int_t byte₋offset);
+EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
-EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
+EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
 /* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); };
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
@@ -318,8 +321,8 @@ EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅢);
 /* #define NULL 0 */
 typedef int pid_t;
 
-EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * command₋u8s, 
- int * fd_p2c, int * fd_c2p /* ,const char * NULLterminatedEnv */);
+EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * 
+ command₋u8s, int * fd_p2c, int * fd_c2p /*, const char * NULLterminatedEnv */);
 
 EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
@@ -328,7 +331,8 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
 
 enum Impediment { MustBeOrdered, JustSwap };
 struct Peekey { __builtin_int_t board₁, palm₂; };
-int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it); TROKADERO SELDOM
+EXT₋C int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, 
+ enum Impediment it); TROKADERO SELDOM
 
 /* Överhandsavtal och underhandsuppfattning: 
  
