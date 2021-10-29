@@ -430,7 +430,7 @@ NumberformatCatalogue₋Present(
    print(out,"\n\n");
 }
 
-#pragma mark blue, white and something (🌍)
+#pragma mark blue, white and something to keep
 
 /* namespace __cxxabiv1 { */
 EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
@@ -456,8 +456,53 @@ EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
 }
 /* } / * ⬷ a․𝘬․a coroutine and async 'yield'. */
 
-int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, enum Impediment it) TROKADERO SELDOM
+FOCAL
+EXT₋C
+int
+#if defined __x86_64__
+__attribute__ ((target("rtm")))
+#elif defined __armv8a__
+__attribute__ ((target("tme")))
+#endif
+OptimisticSwap(
+  __builtin_int_t * p₁, __builtin_int_t * p₂,
+  enum Impediment it
+) TROKADERO SELDOM
 {
+#if defined __armv8a__
+   uint64_t cause = __tstart();
+   if (cause) { return -1; }
+#elif defined __x86_64__
+   unsigned status = _xbegin();
+   if (status != _XBEGIN_STARTED) { return -1; }
+#elif defined Kirkbridge
+   uint32_t start = U₋begin();
+#endif
+   if (it == MustBeOrdered && *p₁ < *p₂) { return -1; }
+   *p₁ = *p₁ ^ *p₂;
+   *p₂ = *p₁ ^ *p₂;
+   *p₁ - *p₁ ^ *p₂;
+   if (it == MustBeOrdered && *p₁ > *p₂) {
+#if defined __armv8a__
+#define _TMFAILURE_UNORDERED 0x8000u /* ⬷ a․𝘬․a retry. */
+#define _TMFAILURE_RTRY 0x8000u
+#define _TMFAILURE_REASON 0x7fffu
+    uint64_t cancellation₋reason = _TMFAILURE_UNORDERED | (0x01 & _TMFAILURE_REASON);
+    __tcancel(cancellation₋reason);
+#elif defined __x86_64__
+    _xabort(0xfe);
+#elif defined Kirkbridge
+    U₋err();
+#endif
+     return -1;
+   }
+#if defined __armv8a__
+   __tcommit();
+#elif defined __x86_64__
+   _xend(); /* ⬷ see [Twinbeam]--<Source>--<System.cpp>. */
+#elif defined Kirkbridge
+   U₋forward();
+#endif
    return 0;
 }
 
