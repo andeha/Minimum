@@ -1,15 +1,12 @@
 #  􀻒􀬭 build.ninja | artwork is the 'Minimum' application.
 
 appname = Minimum
-twinbeamroot = /Users/<User- alt project name>/Monitor/Apps
-# libtwinbeam = $twinbeamroot/Source/Releases/libTwinbeam_macOS.a
-# libadditions = $twinbeamroot/Additions/Releases/libAdditions_macOS.a
-# -std=c2x
 
 cpp-optflags = -g -I ../Apps/
-swift-flags = -g -D DEBUG -I . -lc++
+swift-flags = -g -D DEBUG -I . 
 # ⬷ the -I directory flag to tell 'swiftc' where to find a file named 
 # 'module.modulemap' file and its c-only-functions to be used in Swift.
+# ...and do no add -lc++ to swift-flags.
 objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
 gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
  -fno-signed-char -fno-builtin -Wno-c++20-designator -Wno-c99-designator     $
@@ -67,16 +64,35 @@ rule assemble-macapp
    cp macos-content/PkgInfo $appname.app/Contents/                         ; $
    cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
    mv Minimum $appname.app/Contents/MacOS/$appname
-# ⬷ to convert .png to .icns see for example http://cloudconvert.com/png-to-icns.
 
 rule library
   command = $librarian-mac rcs Releases/$out\_$sha1git.a $in               ; $
   ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
   printf $sha1git
 
-build $objs/ClibTwinbeam.o: c ClibTwinbeam/ClibTwinbeam.c
-build $objs/ClibTwinbm-2.o: cc ClibTwinbeam/ClibTwinbm-2.cpp
-build libClibTwinbeam: library $objs/ClibTwinbm-2.o $objs/ClibTwinbeam.o
+build $objs/amend-augment.o: c ClibTwinbeam/amend-augment.c
+build $objs/avant-garde.o: c ClibTwinbeam/avant-garde.c
+build $objs/float-short.o: c ClibTwinbeam/float-short.c
+build $objs/lock-arrange.o: c ClibTwinbeam/lock-arrange.c
+build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
+build $objs/partial-referen.o: c ClibTwinbeam/partial-referen.c
+build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
+build $objs/recoll-transmit.o: c ClibTwinbeam/recoll-transmit.c
+build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
+build $objs/search-seek.o: c ClibTwinbeam/search-seek.c
+build $objs/semantic-symbol.o: c ClibTwinbeam/semantic-symbol.c
+build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
+build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
+build $objs/decalogue.o: cc ClibTwinbeam/decalogue.cpp
+build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
+build $objs/endian-base.o: cc ClibTwinbeam/endian-base.cpp
+build $objs/present-print.o: cc ClibTwinbeam/present-print.cpp
+build libClibTwinbeam: library $objs/amend-augment.o $objs/avant-garde.o     $
+ $objs/float-short.o $objs/lock-arrange.o $objs/o-binary.o                   $
+ $objs/partial-referen.o $objs/queue-invent.o $objs/recoll-transmit.o        $
+ $objs/round-fixed.o $objs/search-seek.o $objs/semantic-symbol.o             $
+ $objs/thread-fork.o $objs/tiles-map.o $objs/decalogue.o $objs/eight-utf.o   $
+ $objs/endian-base.o $objs/present-print.o
 build $appname: primary-compile-macswift histories.swift enriching.swift     $
  main.swift Data+Base16.swift
 build Minimum.app: assemble-macapp $appname

@@ -1,74 +1,6 @@
-/*  􀈐 ClibTwinbm-2.cpp | 'det' blev icke-klart och presenterades som 'ordning olika'. */
+/* 􀣚 present-print.cpp | 'det' blev icke-klart och presenterades som 'ordning olika'. */
 
 import ClibTwinbeam;
-
-#if defined(𝟷𝟸𝟾₋bit₋integers)
-
-inexorable void Base𝕫(__int128_t ℤ, 
-  unsigned short base, unsigned short digitsOr0, 
-  void (^out)(char 𝟶to𝟿and₋)
-)
-{
-  if (ℤ < +0) { out('-'); ℤ = -ℤ; }
-  Base𝕟((__builtin_uint_t)ℤ, base, digitsOr0, out);
-}
-
-inexorable void
-Base𝕟(
-  __uint128_t ℕ, 
-  unsigned short base, 
-  unsigned short digitsOr0, 
-  void (^out)(char 𝟶to𝟿)
-)
-{
-   auto 𝟶to𝖥 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
-     out('0' + r) : out('a' - 10 + r); };
-   
-   unsigned short cycle[128] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-   
-   short k = 0;
-   
-   do { cycle[k] = ℕ % base; ℕ /= base; k++; } while (ℕ);
-   if (digitsOr0) { for (k = digitsOr0 - 1; k >= 0; k--) { 
-     𝟶to𝖥(cycle[k], out); } }
-   else { k = 127; while (cycle[k] == 0 && k > 0) { k--; }
-     for (; k >= 0; k--) { 𝟶to𝖥(cycle[k], out); }
-   }
-} /* ⬷ requires 128-bits-`fractions`, { `__umodti3`, `__udivti3` }, `__udivmodti4`. */
-
-#endif
-
-EXT₋C
-void
-Base𝕟( /* TeX §64, §65 and §67. */
-  __builtin_uint_t ℕ,
-  unsigned short base,
-  unsigned short digitsOr0, /* ⬷ not more than 32 or 64 digits depending on 
-    your machines' word size! (Or set to `0` to skip leading zeros.) */
-  void (^output)(char 𝟬to𝟵)
-) /* __attribute__ ((extern_c)) */
-{
-   auto 𝟬to𝗙 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
-     out('0' + r) : out('a' - 10 + r); };
-   
-   unsigned short cycle[64] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-     0, 0, 0, 0 }; short k = 0;
-   
-   do { cycle[k] = ℕ % base; ℕ /= base; k++; } while (ℕ);
-   
-   if (digitsOr0) { for (k = digitsOr0 - 1; k >= 0; k--) { 𝟬to𝗙(cycle[k], 
-     output); } } else { k = 63; while (cycle[k] == 0 && k > 0) { k--; }
-      for (; k >= 0; k--) { 𝟬to𝗙(cycle[k], output); }
-   }
-} /*  ⬷ note 128-bit duplicate earlier in text. */
 
 __builtin_int_t TetrasUntilNull(char32_t * ucs, __builtin_int_t maxtetras)
 { __builtin_int_t i=0;
@@ -78,107 +10,6 @@ again:
    if (*uc == 0x0000) { return i; }
    ++i; goto again;
 }
-
-#define WHEN_COMPILING constexpr static
-#define 🥈ᵢ WHEN_COMPILING __attribute__ ((internal_linkage))
-#define 🥈 WHEN_COMPILING /* ⬷ must be assigned to a 'const' and no inline assembler. */
-
-FOCAL
-short
-Utf8Followers(char8_t leadOr8Bit)
-{
-    if (leadOr8Bit < 128) { return 0; }
-    if (128 <= leadOr8Bit && leadOr8Bit < 192) return -1;
-    if (248 <= leadOr8Bit) return -1;
-    
-#if defined __mips__ || defined __armv6__ || defined __armv8a__
-    /* Mips: clz $a0, $v0, Arm: clz r0, r14. */
-    __builtin_int_t onesUntilZero = __builtin_clz(~((uint32_t)leadOr8Bit<<24));
-#elif defined __x86_64__ /* BSF, BSR, LZCNT, TZCNT, __lzcnt64 on Win64. */
-    __builtin_int_t onesUntilZero = __builtin_clzll(~((uint64_t)leadOr8Bit<<56));
-#else
-    auto clz = ^(uint8_t x) {
-      uint8_t 🥈ᵢ lookup[16] = { 4, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 
-        0, 0, 0 }, upper = x >> 4, lower = x & 0x0F;
-      return upper ? lookup[upper] : 4 + lookup[lower];
-    };
-    __builtin_int_t onesUntilZero = clz(~leadOr8Bit);
-#endif
-    
-    return (short)onesUntilZero - 1;
-}
-
-FOCAL
-char32_t
-Utf8ToUnicode(
-  char8_t *ξ,
-  __builtin_int_t bytes
-)
-{
-    char8_t first = *ξ;
-    if (248 <= first || (128 <= first && first < 192)) return 0x0000FFFF;
-    switch (bytes) { case 1: return (char32_t)(char8_t)*ξ; case 2: return 
-    (0b11111&*ξ) << 6 | (0b111111&(*(ξ + 1))); case 3: return (0b1111&*ξ) << 
-    12 | (0b111111&(*(ξ + 1))) << 6 | (0b111111&(*(ξ + 2))); case 4: return 
-    (0b111&*ξ) << 18 | (0b111111&(*(ξ + 1))) << 12 | (0b111111&(*(ξ + 2))) << 
-    6 | (0b111111&(*(ξ + 3))); } return 0x0000FFFE;
-}
-
-FOCAL
-int
-UnicodeToUtf8(
-  char32_t Ξ,
-  void (^sometime₋valid)(char8_t *u8s, short bytes)
-)
-{
-    unsigned char 🥈 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 
-      0xF8, 0xFC };
-    
-    char32_t 🥈 byteMask=0xBF, byteMark=0x80;
-    
-    short bytesToWrite=0;
-    
-    if (Ξ < 0x80L) { bytesToWrite=1; }
-    else if (Ξ < 0x800L) { bytesToWrite=2; }
-    else if (Ξ < 0x10000L) { bytesToWrite=3; }
-    else if (Ξ <= 0x0010FFFFL) { bytesToWrite=4; }
-    else { return 1; }
-    
-    char8_t target[4];
-    
-    switch (bytesToWrite) {
-    case 4: target[3] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 3: target[2] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 2: target[1] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 1: target[0] = (char8_t) (Ξ | firstByteMark[bytesToWrite]);
-    }
-    
-    sometime₋valid(target,bytesToWrite);
-    
-    return 0;
-}
-
-int
-IsPrefixOrEqual(
-  const char * 𝟽alt𝟾₋bitstring, /* ⬷ possibly 'normalizedUtf8' */
-  const char * 𝟽alt𝟾₋bitprefix  /* ⬷ smiley appears when 'prompt> nm'! */
-) /* ⬷ consider changing dwarf-'.elf' to 'trie' instead of 'table'. */
-{  const char *s=𝟽alt𝟾₋bitstring, *p=𝟽alt𝟾₋bitprefix;
-    if (*s == 0 && *p == 0) { return -1; }  /* Parameters `string` and `prefix` are both empty therefore equal. */
-    if (!*s) { return 0; } /* Non-equal since the string is empty and a prefix exists. */
-    if (!*p) { return *s; } /* The prefix is empty but not the string, return dist(0, non-end). */
-again:
-    if (*s == 0 && *p == 0) { return -1; }  /* Parameters 'string' and 'prefix' are non-empty and equal. */
-    if (*s == 0 && *p != 0) { return 0; }   /* The prefix continues after string. */
-    if (*s != 0 && *p == 0) { return *s; }  /* All characters in 'prefix' equal to 'string'. Return first character following 'eightbitPrefix'. */
-    /* *p != 0 && *s != 0 */
-    char diff = *s - *p;
-    if (diff) { return 0; } /* Savannah and Samura. */
-    s++, p++;
-    goto again;
-}
-
-template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
 
 #pragma mark - Inte₋ger₋s
 
@@ -311,8 +142,6 @@ unagain:
 }
 
 extern "C" long write(int fd, const void * s, long unsigned nbyte);
-#define NOT_EVERYTIME const static
-#define 🥇 NOT_EVERYTIME
 
 FOCAL EXT₋C
 int
@@ -321,10 +150,10 @@ mfprint(
   ...
 )
 { int y; 
-#ifdef __x86_64__
+#if defined __armv8a__ || defined __x86_64__
    bool original = false; int 🥇 descript = original ? 1 /* stdout */ : 2 /* stderr */;
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(descript, (const void *)u8s, bytes); };
-#elif defined __armv8a__ || defined __mips__ || defined espressif || defined __armv6__
+#elif defined __mips__ || defined espressif || defined __armv6__
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Trace₁(u8s,bytes); };
 #endif
    va_prologue(utf8format);
@@ -342,9 +171,9 @@ EXT₋C
 int
 print(const char * utf8format, ...) a⃝ /* Here all variable args are of the type `Argᴾ`. */
 { int y; va_prologue(utf8format);
-#ifdef __x86_64__
+#if defined __armv8a__ || defined __x86_64__
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1, (const void *)u8s, bytes); };
-#elif defined __armv8a__ || defined __mips__ || defined espressif || defined __armv6__
+#elif  defined __mips__ || defined espressif || defined __armv6__
    auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Putₒ(u8s,bytes); };
 #endif
    y = print﹟(out,utf8format,__various);
@@ -365,7 +194,6 @@ print(
    return y;
 }
 
-template <typename T> T max(T x₁, T x₂) { return x₁ < x₂ ? x₂ : x₁; }
 namespace Vt99 { const /* signed */ char * bright = "\x1B[1m", *dim = "\x1B[2m", 
  *fg₋blue = "\x1B[34m", *fg₋red = "\x1B[31m", *reset = "\x1B[0m", 
  *reverse = "\x1B[7m"; }
@@ -430,91 +258,5 @@ NumberformatCatalogue₋Present(
    print(out,"\n\n");
 }
 
-#pragma mark blue, white and something to keep
 
-/* namespace __cxxabiv1 { */
-EXT₋C int __cxa_guard_acquire(__builtin_uint_t * p) {
-  __builtin_uint_t expected[1] = { 0 }, desired[1] = { 1 };
-  const int relaxed=0;
-  int success_order=relaxed, failure_order=relaxed;
-  bool locked = __atomic_compare_exchange(p, expected, desired, 0, 
-   success_order, failure_order);
-  return locked; }
-EXT₋C int __cxa_guard_release(__builtin_uint_t * p) {
-  __builtin_uint_t desired[1] = { 0 }, expected[1] = { 1 };
-  const int relaxed=0;
-  int success_order=relaxed, failure_order=relaxed;
-  bool unlocked = __atomic_compare_exchange(p, expected, desired, 0, 
-   success_order, failure_order);
-  return unlocked;
-}
-EXT₋C void __cxa_guard_abort(__builtin_uint_t * p) {
-  __builtin_uint_t desired[1] = { 0 };
-  const int relaxed=0;
-  int ordering=relaxed;
-  __atomic_store(p,desired,ordering);
-}
-/* } / * ⬷ a․𝘬․a coroutine and async 'yield'. */
-
-FOCAL
-EXT₋C
-int
-#if defined __x86_64__
-__attribute__ ((target("rtm")))
-#elif defined __armv8a__
-__attribute__ ((target("tme")))
-#endif
-OptimisticSwap(
-  __builtin_int_t * p₁, __builtin_int_t * p₂,
-  enum Impediment it
-) TROKADERO SELDOM
-{
-#if defined __armv8a__
-   uint64_t cause = __tstart();
-   if (cause) { return -1; }
-#elif defined __x86_64__
-   unsigned status = _xbegin();
-   if (status != _XBEGIN_STARTED) { return -1; }
-#elif defined Kirkbridge
-   uint32_t start = U₋begin();
-#endif
-   if (it == MustBeOrdered && *p₁ < *p₂) { return -1; }
-   *p₁ = *p₁ ^ *p₂;
-   *p₂ = *p₁ ^ *p₂;
-   *p₁ - *p₁ ^ *p₂;
-   if (it == MustBeOrdered && *p₁ > *p₂) {
-#if defined __armv8a__
-#define _TMFAILURE_UNORDERED 0x8000u /* ⬷ a․𝘬․a retry. */
-#define _TMFAILURE_RTRY 0x8000u
-#define _TMFAILURE_REASON 0x7fffu
-    uint64_t cancellation₋reason = _TMFAILURE_UNORDERED | (0x01 & _TMFAILURE_REASON);
-    __tcancel(cancellation₋reason);
-#elif defined __x86_64__
-    _xabort(0xfe);
-#elif defined Kirkbridge
-    U₋err();
-#endif
-     return -1;
-   }
-#if defined __armv8a__
-   __tcommit();
-#elif defined __x86_64__
-   _xend(); /* ⬷ see [Twinbeam]--<Source>--<System.cpp>. */
-#elif defined Kirkbridge
-   U₋forward();
-#endif
-   return 0;
-}
-
-EXT₋C int momentary₋always₋swap(struct Peekey * p) LEAF TROKADERO
-{
-  /* return __cxa_guard_release(p); */
-  return OptimisticSwap(&p->board₁, &p->palm₂, JustSwap);
-}
-
-EXT₋C int momentary₋swap₋if₋decreased(struct Peekey * p) TROKADERO LEAF
-{
-  /* return __cxa_guard_acquire(p); */
-  return OptimisticSwap(&p->board₁, &p->palm₂, MustBeOrdered);
-}
 

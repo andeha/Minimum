@@ -16,6 +16,7 @@ UNITTEST(UnicodeToUtf8)
     ENSURE(u8s[1] == 0x9f, "second byte error");
     ENSURE(u8s[2] == 0x98, "third byte error");
     ENSURE(u8s[3] == 0x90, "fourth byte error");
+    ENSURE(bytes == 4, "incorrect byte count")
   };
   if (UnicodeToUtf8(Ξ,sometime₋valid)) { ENSURE(false, "Error in UnicodeToUtf8"); }
 }

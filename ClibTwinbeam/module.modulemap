@@ -1,9 +1,9 @@
 /*  module.modulemap | for later harmonization C++ and Swift. */
 
 module ClibTwinbeam {
-  header "ClibTwinbeam.h"
-} /* ⬷ note 'ClibTwinbeam' is defined twice: one time in '🗿' and once 
- in --<Minimum>--<*>--<module.modulemap>. */
+  header "header.h"
+  header "codex-cubist.h"
+} /* ⬷ note modulemap is defined for Swift also c⁺⁺. */
 
 module Types [system]
 { requires macos
@@ -30,6 +30,7 @@ module Mapfile [system]
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/mman.h"
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
 }
 
 module Setjmp [system]
@@ -37,7 +38,7 @@ module Setjmp [system]
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/setjmp.h"
 }
 
-module Mach_O [system]
+module Mach_O_binary [system]
 { requires macos
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"

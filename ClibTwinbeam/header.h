@@ -5,7 +5,7 @@
 #define inexorable
 #define structᵢ struct
 #define unionᵢ union
-#define MACRO INLINED
+#define MACRO static inline INLINED
 #else
 #define MACRO inline INLINED
 #define unionᵢ union __attribute__ ((internal_linkage))
@@ -50,6 +50,8 @@ typedef __builtin_uint_t Tribool; /* ⬷ cf․ 'obekant', 'icke-lös' and 'embar
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
 #define SELDOM /* long-running and will be executed without task switch and is uncontaining 'yield'. */
 #define QUOTE(str) #str
+#define ΨΛΩ ((void *)0)
+#define ᶿ﹡ *
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
 #define BUILTIN₋INT₋MAX 2147483647
@@ -120,17 +122,26 @@ EXT₋C void NumberformatCatalogue₋Present(
   Internals * impl_;
 #define 😐 APPEND_PIMPL }
 
+#define a⃝ __attribute__((overloadable))
+
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
 
 EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
  short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
  depending on word size! (Or set to `0` to skip leading zeros.) */ void
- (^out)(char 𝟶to𝟿));
+ (^out)(char 𝟶to𝟿)) a⃝;
+EXT₋C void Base𝕫(__int128_t ℤ, unsigned short base, unsigned short digitsOr0, 
+ void (^out)(char 𝟶to𝟿and₋)) a⃝;
+EXT₋C void Base𝕟(__uint128_t ℕ, unsigned short base, unsigned short digitsOr0, 
+ void (^out)(char 𝟶to𝟿)) a⃝;
+EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short digitsOr0,
+ void (^output)(char 𝟬to𝟵and₋)) a⃝;
 
 #define false 0
 #define true (! false)
 
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
+struct utf8₋text { __builtin_int_t bytes; char8_t * start; };
 struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 
 EXT₋C char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
@@ -144,10 +155,8 @@ EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * �
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
   ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
-EXT₋C₂
-int atexit(void(*func)(void));
-void exit(int status);
-EXT₋C₋FROM
+EXT₋C int atexit(void(*func)(void));
+EXT₋C void exit(int status);
 EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
  sym, uint64_t addr, int * stop));
 
@@ -169,13 +178,14 @@ void print₋sequent(Sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text
  void (^nonvalid)()); /* ⬷ TeX 103 §. */
 Sequent add_sequent(Sequent x₁, Sequent x₂);
 Sequent minus_sequent(Sequent x₁, Sequent x₂);
-void multiply(Sequent x₁, Sequent x₂, Sequent * y₋lo, Sequent * y₋hi);
+void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, uint64_t * int₋hi, uint64_t * hi₋prec);
 Sequent mult_sequent(Sequent x₁, Sequent x₂);
 Sequent reciproc_sequent(Sequent yb);
 Sequent div_sequent(Sequent x₁, Sequent x₂, int integer₋division); 
 /* the symbol 'div' requires __attribute__((overloadable)); */
 Sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 Sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
+Sequent piano₋ten(); /* ⬷ a․𝘬․a '10'. */
 Sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
 Sequent sequent₋floor(Sequent x);
 Sequent operator_minus(Sequent x);
@@ -187,6 +197,17 @@ int trapezoid(Sequent (^f)(Sequent), Sequent delta₋t,
  Sequent min, void (^memory)(Sequent integrale, 
  Sequent t₋acc, int * stop));
 EXT₋C₋FROM
+
+#define __builtin_fixpoint_add add_sequent
+#define __builtin_fixpoint_sub minus_sequent
+#define __builtin_fixpoint_mul mult_sequent
+#define __builtin_fixpoint_div div_sequent
+#define __builtin_fixpoint_rcp reciproc_sequent
+/* #define __builtin_fixpoint_sqrt 
+#define __builtin_fixpoint_rsqrt
+#define __builtin_fixpoint_fmadd(a,b,c)
+#define __builtin_fixpoint_min
+#define __builtin_fixpoint_max */
 
 struct intel₋sequent₋pair { struct sequent inner[2]; };
 typedef struct intel₋sequent₋pair simd256_t;
@@ -213,10 +234,16 @@ BITMASK (uint32_t /* and not 'unsigned short' */) {
   Binary16_MAN = 0x3ff /* fraction/mantissa/significand. */
 };
 
+#if defined __armv8a__
+typedef __attribute__ ((neon_vector_type(4))) float float32x4_t;
+typedef __attribute__ ((neon_vector_type(8))) __fp16 float16x8_t;
+#elif defined __x86_64__
 typedef half __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
-typedef __v8hf __m128i;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
-typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
+typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __v44f;
+typedef __v8hf __m128i; typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
+typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
+#endif
 
 #define IEEE754BASE2_16BIT_PZERO 0b0000000000000000
 #define IEEE754BASE2_16BIT_NZERO 0b1000000000000000
@@ -240,17 +267,15 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
      unsigned fraction : 7;
      unsigned exponent : 8;
      unsigned sign     : 1;
-   } bfloat16; /* ⬷ ubiquitous. */
+   } bfloat16; /* ⬷ ubiquitous. ARMv8.6-A and 𝘦.𝘨 'BFCVT'. */
    unsigned short bits;
-#if defined __x86_64__
    half location;
-#endif
 } pythagorean_double;
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
 
-typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
-#define simd_init₈(x) { float16x8_t z = { x, 1,2,3,4,5,6,7 }; uint32_t y = vgetq_lane_f16(z,0); return y; }
+#define simd_init₈ vdupq_n_f16
+/* #define simd_init₈(x) { float16x8_t z = { x, 1,2,3,4,5,6,7 }; uint32_t y = vgetq_lane_f16(z,0); return y; } */
 #define __builtin_simd_add₈ __arm_vaddq_f16
 #define __builtin_simd_sub₈ __arm_vsubq_f16
 #define __builtin_simd_mul₈ __arm_vmulq_f16 /* VMUL.F16 Qd,Qn,Qm */
@@ -262,7 +287,7 @@ typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
 #define __builtin_simd_min₈ __arm_vminq_f16
 #define __builtin_simd_max₈ __arm_vmaxq_f16
 #define simd_scalar₈(x) __arm_vgetq_lane_f16(x,0)
-/* ⬷ arm_mve.h and __ARM_FEATURE_MVE=2. */
+/* ⬷ +mve and +mve.fp. */
 
 EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
@@ -275,6 +300,7 @@ EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fall⒪⒲)(void *);
 /* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
 struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
 /* ⬷ a․𝘬․a expeditionary and 'void * pages[]'/'uint32_t avails[]'. */
+EXT₋C₂
 int Acquire𝟷ᵈ(__builtin_int_t ﹟, struct 𝟺kbframes * one₋set, void (^every)(uint8_t 
  * 𝟸ⁿ₋frame, int * stop));
 int Release𝟷ᵈ(void * 𝟸ⁿ₋frame, struct 𝟺kbframes * one₋set, int secure);
@@ -284,16 +310,31 @@ int CoalescingAcquire(unsigned expeditionary, void **𝟺kbframes, __builtin_int
 int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟);
 /* void intel₋/mips₋mzda₋Reservoir(unsigned expeditionary, 𝟺kbframes * one₋set, 
  __builtin_int_t * pages₋in₋expedition); */
+EXT₋C₋FROM
 
-EXT₋C void * nalloc(uint64_t); EXT₋C void free(void *);
+EXT₋C void * heap₋alloc(uint64_t); EXT₋C void free(void *);
+
+typedef __builtin_uint_t * WordAlignedRef; typedef uint8_t * ByteAlignedRef;
+EXT₋C int Compare8Memory(ByteAlignedRef p₁, ByteAlignedRef p₂, __builtin_uint_t bytes);
+EXT₋C ByteAlignedRef Overwrite8Memory(ByteAlignedRef src, uint8_t val,
+ __builtin_int_t bytes);
+EXT₋C ByteAlignedRef Copy8Memory(ByteAlignedRef dst, ByteAlignedRef src, 
+ __builtin_int_t bytes);
 
 #define MEASURE_START(prefix) int64_t prefix##Start = __rdtsc();
 #define MEASURE_END(prefix)                                                  \
- int64_t prefix##End = (int64_t)__rdtsc();                                   \
+ int64_t prefix##End = (int64_t)cycles();                                    \
  int64_t prefix##Nanos = prefix##End - prefix##Start;                        \
  print(#prefix " measures ⬚ ns\n", ﹟d(prefix##Nanos));
+static inline uint32_t __dwt_cyccnt() { return *(volatile unsigned *)0xe0001004; }
+#if defined __armv8a__
+#define cycles __dwt_cyccnt
+#elif defined __x86_64__
+#define cycles __rdtsc
+#endif
 
-#define rt₋namespace namespace
+#define rt₋namespace namespace /* ⬷ a library (an .a-file) consists of functions, not variables. */
+#define Pult💡(x) ++x
 
 struct distance { half length; int unit; };
 enum Image₋kind { PNGrgba8 };
@@ -303,11 +344,9 @@ struct Image { int scanlines, columns, pixelsize; int unpurged;
  union Image₋rectangle material; int kind; /* ∈[1,7] */ };
 struct Cropped₋image { struct Image picture; };
 struct Plate { struct Cropped₋image image; int unit; };
-int Init₋image(struct Image * image, int secure);
-int Release₋image(struct Image * image);
+EXT₋C int Init₋image(struct Image * image, int secure);
+EXT₋C int Release₋image(struct Image * image);
 
-#define a⃝ __attribute__((overloadable))
- 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...) a⃝;
@@ -315,7 +354,28 @@ EXT₋C int print(const char * utf8format, ...) a⃝;
 
 #ifndef __cplusplus
 typedef int bool;
+#define Wordbytes (sizeof(__builtin_uint_t))
+static inline __builtin_int_t Syspagesize() { return 4096; }
+#else
+#define WHEN_COMPILING constexpr static
+#define 🥈ᵢ WHEN_COMPILING __attribute__ ((internal_linkage))
+#define 🥈 WHEN_COMPILING /* ⬷ must be assigned to a 'const' and no inline assembler. */
+#define NOT_EVERYTIME const static
+#define 🥇 NOT_EVERYTIME
+template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
+template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". */
+__builtin_int_t 🥈 Wordbytes=sizeof(__builtin_uint_t);
+__builtin_int_t constexpr Syspagesize() { return 4096; }
 #endif
+
+#if defined __cplusplus
+constexpr
+#else
+inline
+#endif
+__builtin_int_t Frame(__builtin_uint_t size, __builtin_uint_t framesize)
+{ return (__builtin_int_t)((size + framesize - 1) & ~(framesize - 1)); }
+/* ⬷ may be evaluated at compile-time a․𝘬․a 'constexpr'. */
 
 typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, 
  void * context);
@@ -367,44 +427,85 @@ EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
-struct fifo {
- __builtin_int_t brk, count, *𝟷₋tile, words₋to₋unity;
+struct fifo { __builtin_uint_t * 𝟷₋tile; 
+ __builtin_int_t brk, count, words₋to₋unity;
 };
 
 EXT₋C int init₋fifo(struct fifo * 🅵, __builtin_int_t words, void * 𝟷₋tile);
-EXT₋C void 𝟷₋tile₋fifo₋pop(const struct fifo * 🅵);
-EXT₋C int 𝟷₋tile₋copy₋include(const struct fifo * 🅵, __builtin_int_t ﹟, 
+EXT₋C void 𝟷₋tile₋fifo₋pop(struct fifo * 🅵);
+EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, 
  __builtin_uint_t * words);
-EXT₋C int 𝟷₋tile₋shiftout(const struct fifo * 🅵, __builtin_int_t words);
+EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
 struct structa {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
 };
 
-typedef void * (^Leaf₋alloc)(__builtin_int_t /* bytes */);
+typedef void * (^Leaf₋alloc)(int /* bytes */);
 typedef struct structa Structa;
-EXT₋C int structa₋init(Structa * 🅢, Leaf₋alloc leaf₋alloc);
-EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[]);
-EXT₋C uint8_t * structa₋relative(Structa * 🅢, __builtin_int_t byte₋offset);
+EXT₋C int structa₋init(Structa * 🅢, __builtin_int_t bytes₋per₋tile);
+EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[], 
+ Leaf₋alloc leaf₋alloc);
+EXT₋C uint8_t * structa₋relative₋alt₋zero(Structa * 🅢, __builtin_int_t byte₋offset);
 EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
  void (^inflate)(__builtin_int_t ﹟, int * cancel));
 EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
-/* c++ mangling and __attribute__((overloadable)); = ^{ return malloc(bytes); };
+/* auto leaf₋alloc = ^(int bytes) { return malloc(bytes); };
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-/* __attribute__((overloadable)) is not yet executed in swift code. */
+/* C language 'overloadable' not yet executed in swift code. */
 
-struct radio₋editor { }; /* ⬷ a․𝘬․a remmingway. */
-struct debripaper { }; /* ⬷ a․𝘬․a bits₋on₋tiles. */
+struct radio₋editor₋tile { __builtin_int_t tetras; 
+  char32_t chars[4096-2*sizeof(struct radio₋editor₋tile *) - sizeof(__builtin_int_t)];
+  struct radio₋editor₋tile *next, *prev;
+};
+struct radio₋editor { struct radio₋editor₋tile * start; 
+  __builtin_int_t cursor₋unicodes₋offset, cursor₋unicodes₋length;
+  void * (^alloc)(int bytes);
+}; /* ⬷ a․𝘬․a remmingway. */
+#define INVISIBLE₋CHARACTER 0xfffc /* object replacement character. */
+typedef struct radio₋editor Editor;
+EXT₋C int radio₋editor₋init(Editor * 🅁, void * (^alloc)(int bytes));
+EXT₋C int radio₋editor₋select(Editor * 🅁, __builtin_int_t unicodes₋offset₋start, 
+ __builtin_int_t unicodes₋count);
+EXT₋C int radio₋editor₋wedge(Editor * 🅁, struct Unicodes symbols);
+EXT₋C int radio₋editor₋delete(Editor * 🅁, __builtin_int_t symbol₋count);
+EXT₋C int radio₋editor₋replace(Editor * 🅁, struct Unicodes symbols);
+
+struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
+
+#if defined __x86_64__ || defined __armv8a__ || defined Kirkbridge
+union treeint { struct { int64_t key; uint64_t val; } keyvalue; __uint128_t bits; };
+#elif defined __mips__ || defined __armv6__ || defined espressif
+union treeint { struct { int32_t key; uint32_t val; } keyvalue; uint64_t bits; };
+#endif
+
+typedef union treeint Treeint;
+EXT₋C void * Insert(void ᶿ﹡ opaque, Treeint valkey, void * (^alloc)(int bytes));
+EXT₋C void Forall(void ᶿ﹡ opaque, void (^dfs)(Treeint valkey, int * stop));
+EXT₋C Treeint * Lookup(void ᶿ﹡ opaque, Treeint leafkey);
+
+#define CARDINALS(...) enum Cardinal { __🄦hole=0, __VA_ARGS__ };           \
+  static jmp_buf __snapshot;                                                \
+  typedef void (^CSession)(enum Cardinal sin);                              \
+  CSession confess = ^(enum Cardinal sin) { longjmp(__snapshot, (int)sin); };
+#define NEARBYCROSS                                                         \
+  int __ctrl = setjmp(__snapshot);                                          \
+  switch (__ctrl)
+#define 🧵(...) /* ✠ */ CARDINALS(__VA_ARGS__) NEARBYCROSS
 
 #define va_epilogue __builtin_va_end(__various);
 #define va_prologue(symbol)                                                 \
  __builtin_va_list __various;                                               \
  __builtin_va_start(__various, symbol);
 
-/* #define NULL 0 */
+enum Impediment { MustBeOrdered, JustSwap };
+struct Peekey { __builtin_int_t board₁, palm₂; };
+EXT₋C int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, 
+ enum Impediment it); TROKADERO SELDOM
+
 typedef int pid_t;
 
 EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * 
@@ -414,66 +515,6 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
-
-enum Impediment { MustBeOrdered, JustSwap };
-struct Peekey { __builtin_int_t board₁, palm₂; };
-EXT₋C int OptimisticSwap(__builtin_int_t * p₁, __builtin_int_t * p₂, 
- enum Impediment it); TROKADERO SELDOM
-
-/* Överhandsavtal och underhandsuppfattning: 
- 
- ━━━   ━━━
-  ┊ 􀲯  ┊   ⤐ t 
- ━━━   ━━━
- 
- samtalar utan uppmärksamhet kvicknar. */
-
-/*
-  
-  E․𝘨 .size 89.0  .offset -5.0, 12.0  .origo 50.0, 50.0 .columned 1
-  
-  program <- directive-list statement-list-nandalt-twolevel
-  directive-list <- directive directive-list
-  statement-list-alt-hierarchy <- statement statement-list
-  statement-list alt. directive-list <- empty
-  
-  directive <- '.pixel-height' real 
-  directive <- '.origo' real ',' real
-  directive <- '.offset' real ',' real
-  directive <- '.columned' natural
-  
-  real-literal <- '-'* digit+ '.' digit*
-  
-  statement <- 'start-line' real ',' real
-  statement <- 'add-line' real ',' real
-  statement <- 'last-line' real ',' real
-  statement <- 'base16-image' [a-z]+                               and not base 21
-  statement <- 'utf8-text' ␜ <text> ␜
-  statement <- 'next'
-  statement <- 'azimuth' azimuth-flavor real ',' real ',' real ',' real
-  azimuth-flavor <- 'relative' | unit 'absolut' 
-  statement <- identifier '<-' 'cyan' real ',' real ',' real ',' real 
-   'mangenta' real ',' real ',' real ',' real 
-   'yellow' real ',' real ',' real ',' real 
-   'black' real ',' real ',' real ',' real color-unit real
-  statement <- 'color-clog' identifier 'on' identifier 
-  statement <- 'pressure' ⬷ with later relative alt. absolut ∓ADSR F
-  color-unit <- 'relative' | 'absolute'
-  statement <- 'ellipsoid' '(' real ',' real ')' 'and' '(' real ',' real ')'
-  statement <- 'intention' 'inner' | 'middle' | 'outer'
-  statement <- 'bleed' real unit
-  
-  unit <- 'mm'
-  unit <- 'cm'
-  unit <- 'in'
-  unit <- 'pc'
-  unit <- 'throu'
-  
-  two-level <- 'frame' statement-list 'closed' ⬷ a․𝘬․a 'draft'.
-  
- */
-
-/* Typechecked in your military-project: */
 
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
@@ -489,60 +530,6 @@ EXT₋C int Set₋text(struct Unicodes symbols, struct A₋point start, int mode
 EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
 EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
-union Artwork₋directive {
-  int Count; /* ar: short. */
-  double Scalar;
-  /* struct */ A₋size Size;
-  struct A₋point Point;
-};
-
-enum Artwork₋token₋symbol { dotsize, dotorigo, dotoffset, real, comma₋0x2c, 
- start₋line, add₋line, end₋line, base16₋image, base16₋text, 
- utf8₋text, rawtext₋sentinel, text, next, END₋OF₋TRANSMISSION };
-
-union Artwork₋instruction₋detail {
-  double * four₋parameters;                                        /*  (1) */
-  Nonabsolute symbol;                                              /*  (2) */
-  struct Unicodes identifier;                                      /*  (3) */
-  union Artwork₋directive various₋signatures;                      /*  (4) */
-};
-
-typedef char8_t uchar;
-typedef void (*semantics)(int artwork₋instruction, 
- union Artwork₋instruction₋detail parameters, void * ctx);
-
-enum Artwork₋scanner₋mode { initial, regular, 
- integer, period, fractional, 
- base16₋image₋text, raw₋unicode₋text, 
- div₋prefix₋comment, div₋suffix₋comment₋ie₋comment
-};
-
-struct Scanner₋ctxt {
-  __builtin_int_t lineno₋first, lineno₋last;
-  __builtin_int_t idx₋unicode; /* ⬷ and not idx₋u8s. */
-  struct sequent ongoing; int negative;
-  char32_t regular[1024]; short symbols₋in₋regular;
-  enum Artwork₋scanner₋mode mode;
-};
-
-EXT₋C int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
- struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
-EXT₋C int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
- struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
-
-typedef enum Artwork₋instruction { columned=1, 
- pixel₋height, place₋origo, offset₋drawing₋on,          /* ⬷ directive. */
- dualbezier₋initial, dualbezier₋add, dualbezier₋last,   /* ⬷ instruction. */
- quadbezier₋initial, quadbezier₋add, quadbezier₋last, 
- beziercurve₋initial, beziercurve₋add, beziercurve₋last, 
- line₋initial, line₋add, line₋last, 
- bezier₋alt₋line₋close, 
- 𝟸ᵈ₋intervallic, sample, link₋master₋detail, 
- base16₋encoded₋later₋layered₋png, place₋png, 
- color₋select, fill, 
- set₋letterbox₋anchor, set₋letterbox₋origo, 
- place₋text /* p3₋color₋select */
-} Artwork₋instruction; /* ⬷ a․𝘬․a ¹directives and ¹instruction. */
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
@@ -583,5 +570,7 @@ extern v2f64 __builtin_msa_cast_to_vector_double(double);
 #define __builtin_simd_maxᵦ _mm_max_pd
 #endif
 
+#define max(x₁, x₂) ((x₁) < (x₂) ? (x₂) : (x₁))
+#define min(x₁, x₂) ((x₂) < (x₁) ? (x₂) : (x₁))
 
 
