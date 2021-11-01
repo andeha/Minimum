@@ -456,22 +456,12 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
  as @convention(block) (__builtin_uint_t) -> Void */
 /* C language 'overloadable' not yet executed in swift code. */
 
-struct radio₋editor₋tile { __builtin_int_t tetras; 
-  char32_t chars[4096-2*sizeof(struct radio₋editor₋tile *) - sizeof(__builtin_int_t)];
-  struct radio₋editor₋tile *next, *prev;
-};
-struct radio₋editor { struct radio₋editor₋tile * start; 
-  __builtin_int_t cursor₋unicodes₋offset, cursor₋unicodes₋length;
-  void * (^alloc)(int bytes);
-}; /* ⬷ a․𝘬․a remmingway. */
-#define INVISIBLE₋CHARACTER 0xfffc /* object replacement character. */
-typedef struct radio₋editor Editor;
-EXT₋C int radio₋editor₋init(Editor * 🅁, void * (^alloc)(int bytes));
-EXT₋C int radio₋editor₋select(Editor * 🅁, __builtin_int_t unicodes₋offset₋start, 
- __builtin_int_t unicodes₋count);
-EXT₋C int radio₋editor₋wedge(Editor * 🅁, struct Unicodes symbols);
-EXT₋C int radio₋editor₋delete(Editor * 🅁, __builtin_int_t symbol₋count);
-EXT₋C int radio₋editor₋replace(Editor * 🅁, struct Unicodes symbols);
+EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * rhs);
+EXT₋C int rope₋insert(void ᶿ﹡ opaque, __builtin_int_t idx, void ᶿ﹡ wedge);
+EXT₋C int rope₋delete(void ᶿ﹡ opaque, __builtin_int_t idx, __builtin_int_t len);
+EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
+EXT₋C char rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
+EXT₋C void rope₋free(void ᶿ﹡ opaque);
 
 struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
