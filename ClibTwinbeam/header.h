@@ -456,12 +456,15 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
  as @convention(block) (__builtin_uint_t) -> Void */
 /* C language 'overloadable' not yet executed in swift code. */
 
-EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * rhs);
-EXT₋C int rope₋insert(void ᶿ﹡ opaque, __builtin_int_t idx, void ᶿ﹡ wedge);
-EXT₋C int rope₋delete(void ᶿ﹡ opaque, __builtin_int_t idx, __builtin_int_t len);
+EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * rhs, 
+ void (^heap₋free)(void *));
+EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
+ void ᶿ﹡ wedge, void (^heap₋free)(void *));
+EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
+ __builtin_int_t len, void (^heap₋free)(void *));
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
-EXT₋C void rope₋free(void ᶿ﹡ opaque);
+EXT₋C void rope₋free(void ᶿ﹡ opaque, void (^heap₋free)(void *));
 
 struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
