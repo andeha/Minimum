@@ -147,7 +147,7 @@ struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 EXT₋C char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8_t *u8s, short bytes));
 EXT₋C short Utf8Followers(char8_t leadOr8Bit);
-/* ⬷ C language char32_t is typealias CChar32 = Unicode.Scalar. */
+/* ⬷ The C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
 
