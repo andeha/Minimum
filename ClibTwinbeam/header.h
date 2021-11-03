@@ -454,7 +454,7 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
 /* auto leaf₋alloc = ^(int bytes) { return malloc(bytes); };
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-/* C language 'overloadable' not yet executed in swift code. */
+/* the 'overloadable' attribute in C-code not yet found in Swift code. */
 
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * text, 
  void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
@@ -472,6 +472,34 @@ EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, void (^heap₋dealloc)(void *),
 
 struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
+
+union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
+typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
+
+struct smallpool { struct structa symbol₋storage; void ᶿ﹡ opaque; };
+
+EXT₋C int init₋smallpool(struct smallpool * 🅿, __builtin_int_t 
+ tetras₋per₋tile, __builtin_int_t count, void * kbXtiles[], Leaf₋alloc 
+ leaf₋alloc);
+EXT₋C int optional₋uninit₋smallpool(struct smallpool * 🅿, 
+ void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *));
+EXT₋C int inflate₋smallpool(struct smallpool * 🅿, __builtin_int_t count, 
+ void * kbXtiles[], Leaf₋alloc leaf₋alloc);
+EXT₋C int copy₋append₋text(struct smallpool * 🅿, int count, 
+ char32_t cs[], Nonabsolute * ref, void (^inflate)(__builtin_int_t ﹟, 
+ void **kbXtiles, int * cancel));
+EXT₋C int datum₋text(struct smallpool * 🅿, int32_t tetras);
+EXT₋C union Tetra𝘖rUnicode * at(struct smallpool * 🅿, Nonabsolute relative);
+EXT₋C int textual₋similar(struct smallpool * 🅿, struct Unicodes uc₁, 
+ Nonabsolute relative);
+#if defined 𝟷𝟸𝟾₋bit₋integers
+EXT₋C void ᶿ﹡ store₋impression(struct smallpool * 🅿, __uint128_t fineprint, 
+ Leaf₋alloc leaf₋alloc);
+EXT₋C void ᶿ﹡ seek₋impression(struct smallpool * 🅿, __uint128_t fineprint);
+#endif
+/* ⬷ operating system releases allocated memory space when program ends. */
+/* ⬷ enough space to store all Unicode symbols in an utf-8 file 
+ may be found from the file's byte length. */
 
 #if defined __x86_64__ || defined __armv8a__ || defined Kirkbridge
 union treeint { struct { int64_t key; uint64_t val; } keyvalue; __uint128_t bits; };
@@ -514,12 +542,10 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
 
-union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
-typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 typedef half Artnumerical;
 /* ⬷ and neither 'struct sequent' nor 'struct Artnumerical { half value; }' for Swift half literal. */
 
-struct A₋point { double x,y; };
+struct A₋point { Artnumerical x,y; };
 struct Illustration { double size, place₋origo, offset₋drawing₋on; };
 EXT₋C int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
 /* ⬷ arbitrary number of other points. ⤐ */
