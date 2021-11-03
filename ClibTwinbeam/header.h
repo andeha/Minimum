@@ -312,7 +312,7 @@ int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟)
  __builtin_int_t * pages₋in₋expedition); */
 EXT₋C₋FROM
 
-EXT₋C void * heap₋alloc(uint64_t); EXT₋C void free(void *);
+EXT₋C void * Heap₋alloc(__builtin_uint_t); EXT₋C void Heap₋unalloc(void *);
 
 typedef __builtin_uint_t * WordAlignedRef; typedef uint8_t * ByteAlignedRef;
 EXT₋C int Compare8Memory(ByteAlignedRef p₁, ByteAlignedRef p₂, __builtin_uint_t bytes);
@@ -456,15 +456,19 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
  as @convention(block) (__builtin_uint_t) -> Void */
 /* C language 'overloadable' not yet executed in swift code. */
 
-EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * rhs, 
- void (^heap₋free)(void *));
+EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * text, 
+ void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
+ void * (^heap₋alloc)(__builtin_int_t bytes));
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
- void ᶿ﹡ wedge, void (^heap₋free)(void *));
+ void ᶿ﹡ wedge, void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
+ void * (^heap₋alloc)(__builtin_int_t bytes));
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
- __builtin_int_t len, void (^heap₋free)(void *));
+ __builtin_int_t len, void (^text₋dealloc)(void *), 
+ void (^heap₋dealloc)(void *), void * (^heap₋alloc)(__builtin_int_t bytes));
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
-EXT₋C void rope₋free(void ᶿ﹡ opaque, void (^heap₋free)(void *));
+EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, void (^heap₋dealloc)(void *), 
+ void (^text₋dealloc)(void *));
 
 struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
@@ -479,6 +483,7 @@ typedef union treeint Treeint;
 EXT₋C void * Insert(void ᶿ﹡ opaque, Treeint valkey, void * (^alloc)(int bytes));
 EXT₋C void Forall(void ᶿ﹡ opaque, void (^dfs)(Treeint valkey, int * stop));
 EXT₋C Treeint * Lookup(void ᶿ﹡ opaque, Treeint leafkey);
+struct node { Treeint payload; struct node *right, *left; };
 
 #define CARDINALS(...) enum Cardinal { __🄦hole=0, __VA_ARGS__ };           \
   static jmp_buf __snapshot;                                                \
