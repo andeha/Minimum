@@ -442,33 +442,36 @@ struct structa {
   void * treelist, *cached₋tile;
 };
 
-typedef void * (^Leaf₋alloc)(int /* bytes */);
 typedef struct structa Structa;
+typedef void * (^Leaf₋alloc)(short bytes);
 EXT₋C int structa₋init(Structa * 🅢, __builtin_int_t bytes₋per₋tile);
-EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[], 
- Leaf₋alloc leaf₋alloc);
-EXT₋C uint8_t * structa₋relative₋alt₋zero(Structa * 🅢, __builtin_int_t byte₋offset);
-EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, uint8_t * material, 
- void (^inflate)(__builtin_int_t ﹟, int * cancel));
+EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * 
+ fixedKbframes[], Leaf₋alloc leaf₋alloc);
+EXT₋C uint8_t * structa₋relative₋alt₋zero(Structa * 🅢, __builtin_int_t 
+ byte₋offset);
+EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, 
+ uint8_t * material, void (^inflate)(__builtin_int_t ﹟, int * cancel));
 EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
 /* auto leaf₋alloc = ^(int bytes) { return malloc(bytes); };
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
 /* the 'overloadable' attribute in C-code not yet found in Swift code. */
 
+typedef void (^Text₋dealloc)(void *);
+typedef void (^Node₋dealloc)(void *);
+typedef void * (^Heap₋alloc)(__builtin_int_t bytes);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * text, 
- void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
- void * (^heap₋alloc)(__builtin_int_t bytes));
+ Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, Heap₋alloc alloc);
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
- void ᶿ﹡ wedge, void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
- void * (^heap₋alloc)(__builtin_int_t bytes));
+ void ᶿ﹡ wedge, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
+ Heap₋alloc alloc);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
- __builtin_int_t len, void (^text₋dealloc)(void *), 
- void (^heap₋dealloc)(void *), void * (^heap₋alloc)(__builtin_int_t bytes));
+ __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
+ Heap₋alloc alloc);
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
-EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, void (^heap₋dealloc)(void *), 
- void (^text₋dealloc)(void *));
+EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
+ Text₋dealloc dealloc₂);
 
 struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
 struct two₋command₋queue { };
