@@ -245,6 +245,14 @@ typedef __v8hf __m128i; typedef __m128i panko; /* ⬷ in Swift already named SIM
 typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
 #endif
 
+#if defined __x86_64__
+typedef double __attribute__ ((__vector_size__(16), __aligned__(16))) __m128d;
+typedef __m128d simd_tᵦ;
+#elif defined __armv8a__
+typedef __attribute__ ((neon_vector_type(2))) double float64x2_t;
+typedef float64x2_t simd_tᵦ;
+#endif
+
 #define IEEE754BASE2_16BIT_PZERO 0b0000000000000000
 #define IEEE754BASE2_16BIT_NZERO 0b1000000000000000
 #define IEEE754BASE2_16BIT_ONE   0b0011110000000000
@@ -456,53 +464,79 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
 /* the 'overloadable' attribute in C-code not yet found in Swift code. */
-
-typedef void (^Text₋dealloc)(void *);
-typedef void (^Node₋dealloc)(void *);
-typedef void * (^Heap₋alloc)(__builtin_int_t bytes);
-EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, char * text, 
- Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, Heap₋alloc alloc);
-EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
- void ᶿ﹡ wedge, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
- Heap₋alloc alloc);
-EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
- __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
- Heap₋alloc alloc);
-EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
-EXT₋C char rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
-EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
- Text₋dealloc dealloc₂);
-
-struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles'. */
-struct two₋command₋queue { };
+/* also page with table idx|offset. */
 
 union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
+
+typedef void (^Text₋dealloc)(void *);
+typedef void (^Node₋dealloc)(void *);
+typedef void * (^Node₋alloc)(__builtin_int_t bytes);
+/* typedef void * (^Text₋alloc)(__builtin_int_t bytes); */
+
+EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, union Tetra𝘖rUnicode * length₋prefixed₋text, 
+ Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, void * (^heap₋alloc)(
+ __builtin_int_t bytes)); /* ⬷ the 'Tetra𝘖rUnicode * length₋prefixed₋text' is a․𝘬․a 'text𝘈nd𝟶𝚡𝟶𝟶𝟶𝟶'. */
+EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
+ void ᶿ﹡ wedge, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
+ Node₋alloc alloc);
+EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
+ __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
+ Node₋alloc alloc);
+EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
+EXT₋C char32_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
+EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
+ Text₋dealloc dealloc₂);
+
+struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. */
+struct two₋command₋queue { };
 
 struct smallpool { struct structa symbol₋storage; void ᶿ﹡ opaque; };
 
 EXT₋C int init₋smallpool(struct smallpool * 🅿, __builtin_int_t 
  tetras₋per₋tile, __builtin_int_t count, void * kbXtiles[], Leaf₋alloc 
  leaf₋alloc);
-EXT₋C int optional₋uninit₋smallpool(struct smallpool * 🅿, 
- void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *));
-EXT₋C int inflate₋smallpool(struct smallpool * 🅿, __builtin_int_t count, 
- void * kbXtiles[], Leaf₋alloc leaf₋alloc);
-EXT₋C int copy₋append₋text(struct smallpool * 🅿, int count, 
- char32_t cs[], Nonabsolute * ref, void (^inflate)(__builtin_int_t ﹟, 
- void **kbXtiles, int * cancel));
-EXT₋C int datum₋text(struct smallpool * 🅿, int32_t tetras);
-EXT₋C union Tetra𝘖rUnicode * at(struct smallpool * 🅿, Nonabsolute relative);
-EXT₋C int textual₋similar(struct smallpool * 🅿, struct Unicodes uc₁, 
+EXT₋C int optional₋uninit₋smallpool(struct smallpool * 🅿, Text₋dealloc 
+ dealloc₂, Node₋dealloc dealloc₁);
+EXT₋C int inflate₋smallpool(struct smallpool * 🅟, __builtin_int_t count, 
+ void * kbXtiles[], Leaf₋alloc alloc);
+EXT₋C int copy₋append₋text(struct smallpool * 🅟, int count, char32_t cs[], 
+ Nonabsolute * ref, void (^inflate)(__builtin_int_t ﹟, void **kbXtiles, 
+ int * cancel));
+EXT₋C int datum₋text(struct smallpool * 🅟, int32_t tetras);
+EXT₋C union Tetra𝘖rUnicode * at(struct smallpool * 🅟, Nonabsolute relative);
+EXT₋C int textual₋similar(struct smallpool * 🅟, struct Unicodes uc₁, 
  Nonabsolute relative);
 #if defined 𝟷𝟸𝟾₋bit₋integers
-EXT₋C void ᶿ﹡ store₋impression(struct smallpool * 🅿, __uint128_t fineprint, 
- Leaf₋alloc leaf₋alloc);
-EXT₋C void ᶿ﹡ seek₋impression(struct smallpool * 🅿, __uint128_t fineprint);
+EXT₋C void ᶿ﹡ store₋impression(struct smallpool * 🅟, __uint128_t fineprint, 
+ Leaf₋alloc alloc);
+EXT₋C void ᶿ﹡ seek₋impression(struct smallpool * 🅟, __uint128_t fineprint);
 #endif
 /* ⬷ operating system releases allocated memory space when program ends. */
 /* ⬷ enough space to store all Unicode symbols in an utf-8 file 
  may be found from the file's byte length. */
+
+struct ¹stack { uint8_t * words; 
+  __builtin_int_t size, elem₋bytesize, pos;
+}; /* ⬷ a․𝘬․a machinestack. */
+
+EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem) a⃝;
+EXT₋C void stack₋unalloc(struct ¹stack * 🆇) a⃝;
+EXT₋C int push(struct ¹stack * 🅧, uint8_t * item) a⃝;
+EXT₋C uint8_t * pop(struct ¹stack * 🅧) a⃝;
+EXT₋C int empty(struct ¹stack * 🅧) a⃝;
+
+typedef uint64_t chronology₋instant;
+typedef uint32_t chronology₋UQ32;
+typedef int32_t chronology₋relative;
+struct chronology₋date { int32_t y,m,d; };
+struct chronology₋time { int32_t h,m,s; chronology₋UQ32 partials; };
+EXT₋C struct chronology₋date chronology₋date(chronology₋instant timestamp);
+EXT₋C struct chronology₋time chronology₋sinceMidnight(chronology₋instant timestamp);
+EXT₋C int chronology₋integers₋encode(int32_t parts[6], chronology₋UQ32 frac, chronology₋instant * instant);
+EXT₋C chronology₋instant chronology₋addSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
+EXT₋C chronology₋instant chronology₋subtractSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
+EXT₋C int chronology₋dayofweek(chronology₋instant timestamp, int * wd);
 
 #if defined __x86_64__ || defined __armv8a__ || defined Kirkbridge
 union treeint { struct { int64_t key; uint64_t val; } keyvalue; __uint128_t bits; };
@@ -511,7 +545,7 @@ union treeint { struct { int32_t key; uint32_t val; } keyvalue; uint64_t bits; }
 #endif
 
 typedef union treeint Treeint;
-EXT₋C void * Insert(void ᶿ﹡ opaque, Treeint valkey, void * (^alloc)(int bytes));
+EXT₋C void * Insert(void ᶿ﹡ opaque, Treeint valkey, void * (^alloc)(short bytes));
 EXT₋C void Forall(void ᶿ﹡ opaque, void (^dfs)(Treeint valkey, int * stop));
 EXT₋C Treeint * Lookup(void ᶿ﹡ opaque, Treeint leafkey);
 struct node { Treeint payload; struct node *right, *left; };
