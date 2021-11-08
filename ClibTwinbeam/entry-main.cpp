@@ -53,7 +53,8 @@ import Stdlib;
 
 inexorable void printGreetings()
 {
-   print("\nTest harness for ClibTwinbeam, release "
+   print("▞ twinbeam loading...please stand-by. ▚\n"); /* Epson MX-80 166 169 */
+   print("test harness for clibTwinbeam, release "
      "⬚\n⬚\n\n", ﹟s(SHA1GIT), ﹟s(BUILDINFO_COPYRIGHT_MESSAGE));
 }
 
