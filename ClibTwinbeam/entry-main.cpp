@@ -9,16 +9,14 @@ import Stdlib;
      entry-main.cpp present-print.cpp                                          \
     unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp                        \
     amend-augment.o arabic-edit.c avant-garde.o edit-clot.o float-short.o      \
-    kiddle-symbol.c lock-arrange.c o-binary.o partial-referen.o queue-invent.o \
-    recoll-transmit.o round-fixed.o search-seek.o semantic-symbol.o            \
-    thread-fork.o tiles-map.o */
+    kiddle-symbol.c lock-arrange.c o-binary.o queue-invent.o round-fixed.o     \
+    search-seek.o semantic-symbol.o thread-fork.o tiles-map.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c18 amend-augment.c arabic-edit.c avant-garde.c float-short.c      \
-    o-binary.c partial-referen.c kiddle-symbol.c lock-arrange.c queue-invent.c \
-    round-fixed.c search-seek.c semantic-symbol.c thread-fork.c tiles-map.c    \
-    x-error-stack.c */
+    o-binary.c kiddle-symbol.c lock-arrange.c queue-invent.c round-fixed.c     \
+    search-seek.c semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
    $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
@@ -31,17 +29,15 @@ import Stdlib;
     decalogue.cpp eight-utf.cpp endian-base.cpp entry-main.cpp                 \
     present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
     amend-augment.o arabic-edit.o avant-garde.o float-short.o kiddle-symbol.c  \
-    lock-arrange.c o-binary.o partial-referen.o queue-invent.o                 \
-    recoll-transmit.o round-fixed.o search-seek.o semantic-symbol.o            \
-    thread-fork.o tiles-map.o */
+    lock-arrange.c o-binary.o queue-invent.o round-fixed.o search-seek.o       \
+    semantic-symbol.o thread-fork.o tiles-map.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c18 -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
     amend-augment.c arabic-edit.c avant-garde.c float-short.c kiddle-symbol.c  \
-    lock-arrange.c o-binary.c partial-referen.c queue-invent.c                 \
-    round-fixed.c search-seek.c semantic-symbol.c thread-fork.c tiles-map.c    \
-    x-error-stack.c */
+    lock-arrange.c o-binary.c queue-invent.c round-fixed.c search-seek.c       \
+    semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c */
 
 /* #define __armv8a__ __aarch64__ */
 
@@ -53,7 +49,7 @@ import Stdlib;
 
 inexorable void printGreetings()
 {
-   print("▞ twinbeam loading...please stand-by. ▚\n"); /* Epson MX-80 166 169 */
+   print("▞ twinbeam exercised...please stand-by. ▚\n"); /* Epson MX-80 166 and 169. */
    print("test harness for clibTwinbeam, release "
      "⬚\n⬚\n\n", ﹟s(SHA1GIT), ﹟s(BUILDINFO_COPYRIGHT_MESSAGE));
 }
