@@ -1,12 +1,13 @@
 /*  module.modulemap | for later harmonization C++ and Swift. */
 
-module ClibTwinbeam {
+module ClibTwinbeam_with_History {
+  header "header.h"
+  header "history.h"
+}
+
+module ClibTwinbeam_and_cCubist {
   header "header.h"
   header "codex-cubist.h"
-} /* ⬷ note modulemap is defined for Swift also c⁺⁺. */
-
-module History {
-  header "history.h"
 }
 
 module Types [system]
