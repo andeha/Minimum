@@ -43,4 +43,20 @@ int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
    if (material) { outcome=material; return 1; } else { return 0; }
 }
 
+EXT₋C void * Heap₋alloc(__builtin_int_t bytes) { return malloc(bytes); }
+
+EXT₋C void Heap₋unalloc(void * p) { free(p); }
+
+EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes) { return realloc(p,to₋bytes); }
+
+/* EXT₋C void * Heap₋realloc₂(void * p, __builtin_int_t to₋bytes)
+{
+  size_t old_bytes = malloc_size(p);
+  uint8_t * new_words = (uint8_t *)malloc(to₋bytes);
+  Copy8Memory((ByteAlignedRef)new_words, (ByteAlignedRef)p, old_bytes);
+  Heap₋unalloc(p);
+  return new_words;
+}
+EXT₋C void * Heap₋valloc(__builtin_int_t bytes) { return valloc(bytes); } */
+
 

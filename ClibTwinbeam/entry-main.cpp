@@ -39,8 +39,6 @@ import Stdlib;
     lock-arrange.c o-binary.c queue-invent.c round-fixed.c search-seek.c       \
     semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c */
 
-/* #define __armv8a__ __aarch64__ */
-
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"       \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
 #define BUILDINFO_BRAND "⚖️  sublimates experimentally"

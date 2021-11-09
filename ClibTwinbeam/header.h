@@ -320,7 +320,9 @@ int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟)
  __builtin_int_t * pages₋in₋expedition); */
 EXT₋C₋FROM
 
-EXT₋C void * Heap₋alloc(__builtin_uint_t); EXT₋C void Heap₋unalloc(void *);
+EXT₋C void * Heap₋alloc(__builtin_int_t bytes);
+EXT₋C void Heap₋unalloc(void * p);
+EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes);
 
 typedef __builtin_uint_t * WordAlignedRef; typedef uint8_t * ByteAlignedRef;
 EXT₋C int Compare8Memory(ByteAlignedRef p₁, ByteAlignedRef p₂, __builtin_uint_t bytes);
@@ -472,17 +474,17 @@ typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt
 typedef void (^Text₋dealloc)(void *);
 typedef void (^Node₋dealloc)(void *);
 typedef void * (^Node₋alloc)(__builtin_int_t bytes);
-/* typedef void * (^Text₋alloc)(__builtin_int_t bytes); */
+typedef void * (^Text₋alloc)(__builtin_int_t bytes);
 
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, union Tetra𝘖rUnicode * length₋prefixed₋text, 
  Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, void * (^heap₋alloc)(
  __builtin_int_t bytes)); /* ⬷ the 'Tetra𝘖rUnicode * length₋prefixed₋text' is a․𝘬․a 'text𝘈nd𝟶𝚡𝟶𝟶𝟶𝟶'. */
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
  void ᶿ﹡ wedge, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
- Node₋alloc alloc);
+ Node₋alloc nalloc, Text₋alloc talloc);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
  __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
- Node₋alloc alloc);
+ Node₋alloc nalloc, Text₋alloc talloc);
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char32_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
@@ -518,6 +520,9 @@ EXT₋C void ᶿ﹡ seek₋impression(struct smallpool * 🅟, __uint128_t finep
 
 struct ¹stack { uint8_t * words; 
   __builtin_int_t size, elem₋bytesize, pos;
+   void * (^initial₋area₋alloc)(__builtin_int_t);              /* ⬷ init₋stack */
+   void (^area₋dealloc)(void *);                               /* ⬷ stack₋unalloc */
+   void * (^area₋realloc)(void * p, __builtin_int_t to₋bytes); /* ⬷ push */
 }; /* ⬷ a․𝘬․a machinestack. */
 
 EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem) a⃝;

@@ -5,6 +5,10 @@ module ClibTwinbeam {
   header "codex-cubist.h"
 } /* ⬷ note modulemap is defined for Swift also c⁺⁺. */
 
+module History {
+  header "history.h"
+}
+
 module Types [system]
 { requires macos
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h"
@@ -31,6 +35,8 @@ module Mapfile [system]
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/malloc/malloc.h"  
 }
 
 module Setjmp [system]

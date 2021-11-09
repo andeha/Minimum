@@ -11,7 +11,7 @@ int structa₋init(Structa * 🅢, __builtin_int_t bytes₋per₋tile)
 }
 
 int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * fixedKbframes[], 
- void * (^leaf₋alloc)(int bytes))
+ void * (^leaf₋alloc)(short bytes))
 { Treeint leaf;
   🅢->unused₋bytes += 🅢->bytes₋per₋tile * ﹟;
   for (__builtin_int_t i=0; i<﹟; ++i) {
