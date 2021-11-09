@@ -31,7 +31,7 @@ import Stdlib;
     decalogue.cpp eight-utf.cpp endian-base.cpp entry-main.cpp                 \
     present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
     account-italian.o amend-augment.o arabic-edit.o avant-garde.o              \
-    float-short.o kiddle-symbol.c lock-arrange.c o-binary.o queue-invent.o     \
+    float-short.o kiddle-symbol.o lock-arrange.o o-binary.o queue-invent.o     \
     round-fixed.o search-seek.o semantic-symbol.o thread-fork.o tiles-map.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
