@@ -2,8 +2,7 @@
 
 import ClibTwinbeam;
 
-int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem, 
-  void * initial₋area₋alloc(__builtin_int_t)) a⃝
+int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem) a⃝
 {
    🆇->initial₋area₋alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
    🆇->area₋dealloc = ^(void * p) { Heap₋unalloc(p); };
@@ -21,8 +20,7 @@ void stack₋unalloc(struct ¹stack * 🆇) a⃝
    🆇->pos=0; 🆇->size=0; 🆇->words=ΨΛΩ;
 }
 
-inexorable int expand₋stack(struct ¹stack * 🅧, void * (^area₋realloc)(
- void * p, __builtin_int_t to₋bytes)) a⃝
+inexorable int expand₋stack(struct ¹stack * 🅧) a⃝
 {
    __builtin_uint_t new_size = 🅧->size << 1;
    __builtin_int_t new_bytes=new_size*🅧->elem₋bytesize;
@@ -35,7 +33,7 @@ inexorable int expand₋stack(struct ¹stack * 🅧, void * (^area₋realloc)(
 int push(struct ¹stack * 🅧, uint8_t * item) a⃝
 {
    if (🅧->pos == 🅧->size) {
-     if (expand₋stack(🅧,🅧->area₋realloc)) { return -1; }
+     if (expand₋stack(🅧)) { return -1; }
    }
    ByteAlignedRef dst = (ByteAlignedRef)(🅧->pos + 🅧->words);
    ByteAlignedRef src = (ByteAlignedRef)item;
