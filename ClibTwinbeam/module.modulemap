@@ -10,6 +10,8 @@ module ClibTwinbeam_and_cCubist {
   header "codex-cubist.h"
 }
 
+module ClibTwinbeam { requires macos header "header.h" }
+
 module Types [system]
 { requires macos
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h"
