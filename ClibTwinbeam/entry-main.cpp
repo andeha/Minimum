@@ -11,14 +11,14 @@ import Stdlib;
     account-italian.o amend-augment.o arabic-edit.o avant-garde.o              \
     chronolog-y.o float-short.o kiddle-symbol.o lock-arrange.o o-binary.o      \
     queue-invent.o round-fixed.o search-seek.o semantic-symbol.o thread-fork.o \
-    tiles-map.o */
+    tiles-map.o x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c18 account-italian.c amend-augment.c arabic-edit.c avant-garde.c  \
-    chronolog-y.c float-short.c o-binary.c kiddle-symbol.c lock-arrange.c      \
+    chronolog-y.c float-short.c kiddle-symbol.c lock-arrange.c o-binary.c      \
     queue-invent.c round-fixed.c search-seek.c semantic-symbol.c thread-fork.c \
-    tiles-map.c x-error-stack.c */
+    tiles-map.c x-error-stack.c x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
    $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
@@ -32,7 +32,8 @@ import Stdlib;
     present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
     account-italian.o amend-augment.o arabic-edit.o avant-garde.o              \
     float-short.o kiddle-symbol.o lock-arrange.o o-binary.o queue-invent.o     \
-    round-fixed.o search-seek.o semantic-symbol.o thread-fork.o tiles-map.o */
+    round-fixed.o search-seek.o semantic-symbol.o thread-fork.o tiles-map.o    \
+    x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
@@ -40,7 +41,7 @@ import Stdlib;
     account-italian.c amend-augment.c arabic-edit.c avant-garde.c              \
     chronolog-y.c float-short.c kiddle-symbol.c lock-arrange.c o-binary.c      \
     queue-invent.c round-fixed.c search-seek.c semantic-symbol.c thread-fork.c \
-    tiles-map.c x-error-stack.c */
+    tiles-map.c x-error-stack.c x-partial-referen.c */
 
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"       \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND

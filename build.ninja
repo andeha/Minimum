@@ -70,29 +70,36 @@ rule library
   ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
   printf $sha1git
 
+build $objs/account-italian.o: c ClibTwinbeam/account-italian.c
 build $objs/amend-augment.o: c ClibTwinbeam/amend-augment.c
+build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
 build $objs/avant-garde.o: c ClibTwinbeam/avant-garde.c
+build $objs/chronolog-y.o: c ClibTwinbeam/chronolog-y.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
+build $objs/kiddle-symbol.o: c ClibTwinbeam/kiddle-symbol.c
 build $objs/lock-arrange.o: c ClibTwinbeam/lock-arrange.c
 build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
-build $objs/partial-referen.o: c ClibTwinbeam/partial-referen.c
 build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
-build $objs/recoll-transmit.o: c ClibTwinbeam/recoll-transmit.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-seek.o: c ClibTwinbeam/search-seek.c
 build $objs/semantic-symbol.o: c ClibTwinbeam/semantic-symbol.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
+build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
+build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
+# build $objs/recoll-transmit.o: c ClibTwinbeam/recoll-transmit.c
 build $objs/decalogue.o: cc ClibTwinbeam/decalogue.cpp
 build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
 build $objs/endian-base.o: cc ClibTwinbeam/endian-base.cpp
 build $objs/present-print.o: cc ClibTwinbeam/present-print.cpp
-build libClibTwinbeam: library $objs/amend-augment.o $objs/avant-garde.o     $
- $objs/float-short.o $objs/lock-arrange.o $objs/o-binary.o                   $
- $objs/partial-referen.o $objs/queue-invent.o $objs/recoll-transmit.o        $
- $objs/round-fixed.o $objs/search-seek.o $objs/semantic-symbol.o             $
- $objs/thread-fork.o $objs/tiles-map.o $objs/decalogue.o $objs/eight-utf.o   $
- $objs/endian-base.o $objs/present-print.o
+build libClibTwinbeam: library $objs/account-italian.o $objs/amend-augment.o $
+ $objs/arabic-edit.o $objs/avant-garde.o $objs/chronolog-y.o                 $
+ $objs/float-short.o $objs/kiddle-symbol.o $objs/lock-arrange.o              $
+ $objs/o-binary.o $objs/queue-invent.o $objs/round-fixed.o                   $
+ $objs/search-seek.o $objs/semantic-symbol.o $objs/thread-fork.o             $
+ $objs/tiles-map.o $objs/x-error-stack.o $objs/x-partial-referen.o           $
+ $objs/decalogue.o $objs/eight-utf.o $objs/endian-base.o                     $
+ $objs/present-print.o
 build $appname: primary-compile-macswift histories.swift enriching.swift     $
  main.swift Data+Base16.swift
 build Minimum.app: assemble-macapp $appname
