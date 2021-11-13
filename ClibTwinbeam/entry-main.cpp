@@ -51,7 +51,7 @@ import Stdlib;
 
 inexorable void printGreetings()
 {
-   print("▞ twinbeam exercised...please stand-by. ▚\n"); /* Epson MX-80 166 and 169. */
+   print("▞ twinbeam exercised...please stand-by. ▚\n"); 
    print("test harness for clibTwinbeam.a, release "
      "⬚\n⬚\n\n", ﹟s(SHA1GIT), ﹟s(BUILDINFO_COPYRIGHT_MESSAGE));
 }
@@ -91,22 +91,17 @@ RunUnittests(
 )
 {
     __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
-    
     extern void Symbols(const char * utf8exepath, void (^callback)(const
       char *, uint64_t, int *));
     Symbols(execfilePath, ^(const char * sym, uint64_t addr, int * stop) {
-       
        if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
-          
           print("\nRunning ⬚ from 0x⬚\n\n", ﹟s(sym), ﹟x((__builtin_uint_t)addr));
-          
           runUnitTest((void *)addr, sym, ^(const char * symbol, uint64_t dt) {
              print("\n\nEND ");
              Base𝕟(dt, 10, 0,^(char 𝟶to𝟿) { print("⬚", ﹟c(𝟶to𝟿)); });
              print(" ns when running ⬚\n", ﹟s(symbol));
              *timetotal += dt;
           });
-          
           ++count;
        }
     });

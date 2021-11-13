@@ -584,6 +584,9 @@ EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath,
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
  void * outcome);
 
+EXT₋C void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath, 
+ __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *);
+
 typedef half Artnumerical;
 /* ⬷ and neither 'struct sequent' nor 'struct Artnumerical { half value; }' for Swift half literal. */
 
