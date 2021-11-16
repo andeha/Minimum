@@ -150,6 +150,7 @@ EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 /* ⬷ The C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
+EXT₋C __builtin_int_t Utf8BytesUntilNull(char8_t * u8s, __builtin_int_t maxutf8bytes);
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
@@ -387,16 +388,15 @@ __builtin_int_t Frame(__builtin_uint_t size, __builtin_uint_t framesize)
 { return (__builtin_int_t)((size + framesize - 1) & ~(framesize - 1)); }
 /* ⬷ may be evaluated at compile-time a․𝘬․a 'constexpr'. */
 
-typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, 
+typedef void (^Argᴾ₋output)(struct Unicodes set, void * context); /* ⬷ C and C++. */
+typedef void (*Argᴾ₋output₂)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
+struct Lambda { Argᴾ₋output scalar; void * context; };
+struct Lambda₋2 { Argᴾ₋output₂ scalar; void * context; };
+struct Chapter { struct Plate * anfang; struct Unicodes ingress; };
+/* typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, 
  void * context);
 typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x0000, 
- void * context₁, void * context₂);
-typedef void (^Argᴾ₋output)(Argᴾ₋Unicode set, void * context); /* ⬷ C and C++. */
-typedef void (*Argᴾ₋output₂)(Argᴾ₋Unicode₂ set, void * context); /* ⬷ C, C++ and Swift. */
-
-struct Lambda₋2 { Argᴾ₋output scalar; void * context; };
-struct Lambda { Argᴾ₋output₂ scalar; void * context; };
-struct Chapter { struct Plate * anfang; struct Unicodes ingress; };
+ void * context₁, void * context₂); */
 
 typedef struct Arg₋𝓟 {
  union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
@@ -430,7 +430,7 @@ EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
 EXT₋C Argᴾ ﹟F(double f, int format);
-EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context);
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output scalar, void * context);
 EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
 /* ⬷ PRO|29|17. See also PRO|3|30. */
 EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
@@ -490,7 +490,7 @@ EXT₋C char32_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
  Text₋dealloc dealloc₂);
 
-struct debripaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. */
+struct geometrypaper { }; /* ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. */
 struct two₋command₋queue { };
 
 struct smallpool { struct structa symbol₋storage; void ᶿ﹡ opaque; };
@@ -519,10 +519,10 @@ EXT₋C void ᶿ﹡ seek₋impression(struct smallpool * 🅟, __uint128_t finep
  may be found from the file's byte length. */
 
 struct ¹stack { uint8_t * words; 
-  __builtin_int_t size, elem₋bytesize, pos;
-   void * (^initial₋area₋alloc)(__builtin_int_t);              /* ⬷ init₋stack */
-   void (^area₋dealloc)(void *);                               /* ⬷ stack₋unalloc */
-   void * (^area₋realloc)(void * p, __builtin_int_t to₋bytes); /* ⬷ push */
+ __builtin_int_t size, elem₋bytesize, pos;
+ void * (^initial₋area₋alloc)(__builtin_int_t);              /* ⬷ init₋stack */
+ void (^area₋dealloc)(void *);                               /* ⬷ stack₋unalloc */
+ void * (^area₋realloc)(void * p, __builtin_int_t to₋bytes); /* ⬷ push */
 }; /* ⬷ a․𝘬․a machinestack. */
 
 EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem) a⃝;
