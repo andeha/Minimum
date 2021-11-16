@@ -32,7 +32,7 @@ EXT₋C Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
 EXT₋C Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
 
-EXT₋C Argᴾ ﹟λ(Argᴾ₋output₂ scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; }
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; }
 
 EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 {
