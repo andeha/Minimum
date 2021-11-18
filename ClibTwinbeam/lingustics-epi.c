@@ -56,19 +56,18 @@ struct lexer₋ctxt {
   char8_t * src₋path;
 };
 
-char8_t * utf8dup(char8_t * u8s)
-{ __builtin_int_t maxutf8bytes = BUILTIN₋INT₋MAX, 
-    bytes = Utf8BytesUntilNull(u8s,maxutf8bytes);
+char8_t * utf8dupn(char8_t * u8s, __builtin_int_t maxu8bytes)
+{ __builtin_int_t bytes = Utf8BytesUntilNull(u8s,maxu8bytes);
    void * start = Heap₋alloc(bytes);
    Copy8Memory((ByteAlignedRef)start, (ByteAlignedRef)u8s, bytes);
    return start;
-} /* ⬷ a․𝘬․a strdup₋for₋utf8. */
+} /* ⬷ a․𝘬․a strdup₋for₋utf8. Note U+8000 in UTF-8 is E0 *) *). */
 
 inexorable int context₋init(char8_t * utf8txtpath, struct lexer₋ctxt * ctx)
 {
    __builtin_int_t i=0,j=0, bytesActual, bytes;
    char8_t * leadOr8Bit; char32_t uc;
-   uint8_t * utf8₋text = (uint8_t *)mapfileʳᵚ((const char *)utf8txtpath,0,0,0,&bytesActual);
+   char8_t * utf8₋text = (char8_t *)mapfileʳᵚ((const char *)utf8txtpath,0,0,0,&bytesActual);
    if (utf8₋text == ΨΛΩ) { return -1; }
    ctx->text₋heap = (char32_t *)Heap₋alloc(4*(bytesActual + 1));
    if (ctx->text₋heap == ΨΛΩ) { return -2; }
@@ -77,7 +76,8 @@ inexorable int context₋init(char8_t * utf8txtpath, struct lexer₋ctxt * ctx)
    ctx->column₋first=1; ctx->column₋last=1;
    ctx->mode=mode₋initial;
    ctx->symbols₋in₋regular=0;
-   ctx->src₋path=utf8dup(utf8txtpath);
+   __builtin_int_t maxu8bytes = BUILTIN₋INT₋MAX;
+   ctx->src₋path=utf8dupn(utf8txtpath,maxu8bytes);
 again:
    if (i >= bytesActual) { ctx->symbols = j; 
      *(ctx->text₋heap + ctx->symbols) = U'\x4';
@@ -128,7 +128,32 @@ EXT₋C long write(int fd, const void * s, long unsigned nbyte);
 EXT₋C int print﹟(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
 
-void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char32_t * text, ... )
+EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+ const char * utf8format, ...) a⃝;
+
+EXT₋C
+int
+print﹟(
+  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+  const char * utf8format, 
+  __builtin_va_list argument
+)
+{ return 0; }
+
+EXT₋C
+int
+print(
+  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+  const char * utf8format, 
+  ...
+) a⃝
+{ int y; va_prologue(utf8format);
+   y = print﹟(out,utf8format,__various);
+   va_epilogue
+   return y;
+}
+
+void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char32_t * text, ...)
 {
   __builtin_int_t lineno₋first = s₋ctxt->lineno₋first, 
    column₋first = s₋ctxt->column₋first, 
@@ -138,10 +163,10 @@ void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char32_t * text, ... )
   Out out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
   print(out,"⬚:⬚:⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(column₋first));
   va_prologue(text);
-  print﹟(out,"⬚", __various); /* __builtin_va_list argument; */
-  print(out," (⬚ lines)\n", ﹟d(linecount));
+  print﹟(out, "⬚", __various);
+  print(out, " (⬚ lines)\n", ﹟d(linecount));
   va_epilogue;
-  if (bye) { exit(-2); } else { Pult💡(diagnosis₋count); }
+  if (bye) { exit(1); } else { Pult💡(diagnosis₋count); }
 } /*  ⬷ write 'error:', 'warning:' and 'internal-error:' prefixed texts. */
 
 enum token next₋token(struct lexer₋ctxt * s₋ctxt, 
