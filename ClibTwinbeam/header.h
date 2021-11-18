@@ -462,7 +462,7 @@ typedef struct structa Structa;
 typedef void * (^Leaf₋alloc)(short bytes);
 EXT₋C int structa₋init(Structa * 🅢, __builtin_int_t bytes₋per₋tile);
 EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * 
- fixedKbframes[], Leaf₋alloc leaf₋alloc);
+ fixedKbframes[], Leaf₋alloc founded);
 EXT₋C uint8_t * structa₋relative₋alt₋zero(Structa * 🅢, __builtin_int_t 
  byte₋offset);
 EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, 
