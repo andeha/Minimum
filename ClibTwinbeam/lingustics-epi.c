@@ -107,9 +107,7 @@ struct token₋detail {
 };
 
 /* rt₋namespace Diag₊nosis { extern */
-int inited=0, tapeinit₋failed=0, acquire₋failed=0, lengthen₋failed=0, 
- conversion₂₋failed=0, print₋failed=0, conversion₁₋failed=0, 
- diagnosis₋count=0, append₋failed=0;
+int32_t diagnosis₋failed=0, diagnosis₋count=0;
 /* } */
 
 __builtin_int_t symbolcount(struct Unicodes text, short unicodes, 
@@ -133,15 +131,6 @@ EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes),
 
 EXT₋C
 int
-print﹟(
-  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
-  const char * utf8format, 
-  __builtin_va_list argument
-)
-{ return 0; }
-
-EXT₋C
-int
 print(
   void (^out)(char8_t * u8s, __builtin_int_t bytes), 
   const char * utf8format, 
@@ -153,21 +142,20 @@ print(
    return y;
 }
 
-void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char32_t * text, ...)
-{
+void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char8_t * text, ...)
+{ va_prologue(text);
   __builtin_int_t lineno₋first = s₋ctxt->lineno₋first, 
    column₋first = s₋ctxt->column₋first, 
    linecount = 1 + s₋ctxt->lineno₋last - lineno₋first;
   char8_t * src₋path = s₋ctxt->src₋path;
-  typedef void (^Out)(char8_t * u8s, __builtin_int_t bytes);
-  Out out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
+  typedef void (^Utf8)(char8_t * u8s, __builtin_int_t bytes);
+  Utf8 out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
   print(out,"⬚:⬚:⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(column₋first));
-  va_prologue(text);
-  print﹟(out, "⬚", __various);
+  print﹟(out, text, __various);
   print(out, " (⬚ lines)\n", ﹟d(linecount));
   va_epilogue;
   if (bye) { exit(1); } else { Pult💡(diagnosis₋count); }
-} /*  ⬷ write 'error:', 'warning:' and 'internal-error:' prefixed texts. */
+} /*  ⬷ write texts prefixed with 'error:', 'warning:' and 'internal-error:'. */
 
 enum token next₋token(struct lexer₋ctxt * s₋ctxt, 
   struct token₋detail * detail₋out)
@@ -188,7 +176,7 @@ enum token next₋token(struct lexer₋ctxt * s₋ctxt,
    
    collect unicodes₋for₋regular = ^(char32_t uc) {
     short idx = s₋ctxt->symbols₋in₋regular;
-    if (idx >= 2048) { Diagnosis(s₋ctxt,1,U"error: identifier too long."); }
+    if (idx >= 2048) { Diagnosis(s₋ctxt,1,"error: identifier too long."); }
     s₋ctxt->regular[idx] = uc;
     s₋ctxt->symbols₋in₋regular += 1; };
    
@@ -211,7 +199,7 @@ again:
    else if (s₋ctxt->mode == mode₋regular && letter₋alt₋digit(unicode)) {
      unicodes₋for₋regular(unicode);
    }
-   else { Diagnosis(s₋ctxt,1,U"error: scanner error."); }
+   else { Diagnosis(s₋ctxt,1,"error: scanner error."); }
    s₋ctxt->tip₋unicode += 1;
    goto again;
 }
@@ -226,7 +214,7 @@ static void match(enum token expected, struct lexer₋ctxt * s₋ctxt,
  struct token₋detail * detail₋out)
 {
    if (lookahead == expected) { lookahead = next₋token(s₋ctxt,detail₋out); }
-   else { Diagnosis(s₋ctxt,0,U"error: syntax expected ⬚, got ⬚.\n", 
+   else { Diagnosis(s₋ctxt,0,"error: syntax expected ⬚, got ⬚.\n", 
    ﹟d((__builtin_int_t)expected), 
    ﹟d((__builtin_int_t)lookahead)); }
 }
@@ -282,7 +270,7 @@ static void parse₋circum(struct lexer₋ctxt * s₋ctxt)
    switch (lookahead) {
    case IDENT: match(IDENT,s₋ctxt,&detail); break;
    case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&detail); break;
-   default: Diagnosis(s₋ctxt,0,U"expecting IDENT alternatively NUMERIC₋CONST, "
+   default: Diagnosis(s₋ctxt,0,"expecting IDENT alternatively NUMERIC₋CONST, "
     "got type-of-token."); break;
    }
 }
