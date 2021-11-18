@@ -106,22 +106,6 @@ struct token₋detail {
   int kind;
 };
 
-/* rt₋namespace Diag₊nosis { extern */
-int32_t diagnosis₋failed=0, diagnosis₋count=0;
-/* } */
-
-__builtin_int_t symbolcount(struct Unicodes text, short unicodes, 
- char32_t * symbol) { short similar=unicodes-1;
-  __builtin_int_t found₋count=0, count=text.tetras;
-  for (__builtin_int_t i=count-1; i>=0; --i) {
-    if (symbol[similar] == text.start[i]) {
-      if (similar==0) { ++found₋count; similar=unicodes-1; }
-      else { --similar; }
-    } else { similar=unicodes-1; }
-  }
-  return found₋count;
-} /* ⬷ transpressions when in art-context, not 'impression'. */
-
 EXT₋C long write(int fd, const void * s, long unsigned nbyte);
 EXT₋C int print﹟(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
