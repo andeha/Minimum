@@ -79,7 +79,7 @@ int Details_in_C(uint64_t pid, int32_t cross);
 MACRO __builtin_uint_t 🔎(__builtin_uint_t var) { return *((__builtin_uint_t 
  /* volatile */ *) var); }
 #if defined __cplusplus
-MACRO __builtin_uint_t&  🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
+MACRO __builtin_uint_t& 🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
  *(__builtin_uint_t /* volatile */ *)var; }
 MACRO __builtin_uint_t TrailingZeros(__builtin_uint_t x) { if (x == 0) { return 
  sizeof(x)*8; } x=(x^(x-1))>>1; int c=0; for (; x; c++) { x >>= 1; } return c; }
@@ -90,9 +90,14 @@ MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask,
  (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
 #endif
 
-#if !defined(__cplusplus)
-typedef unsigned char char8_t; typedef unsigned int /* not uint32_t */ char32_t;
-#endif
+/* -fno-char8_t deactivates c++ builtin type char8_t. */
+
+//#if !defined(__cplusplus)
+// typedef unsigned char char8_t; /* in C */
+typedef char char8_t; /* before cpp20. */
+typedef unsigned int /* not uint32_t */ char32_t;
+/* C11 has a type char32_t illustrated in 'uchar.h'. */
+//#endif
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
 struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
@@ -151,10 +156,11 @@ EXT₋C short Utf8Followers(char8_t leadOr8Bit);
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
 EXT₋C __builtin_int_t Utf8BytesUntilNull(char8_t * u8s, __builtin_int_t maxutf8bytes);
+EXT₋C __builtin_int_t ExactUtf8bytes(char32_t * ucs, __builtin_int_t maxtetras);
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
-  ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
+ ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
 EXT₋C int atexit(void(*func)(void));
 EXT₋C void exit(int status);
