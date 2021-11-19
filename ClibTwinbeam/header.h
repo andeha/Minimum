@@ -90,14 +90,13 @@ MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask,
  (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
 #endif
 
-#define char32_t char32₋t
 typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
  deactivates the unused c++ builtin type char8_t not found in llvm-c code. */
-typedef uint32_t char32₋t;
+typedef uint32_t char32̄_t;
 
-struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
-struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
- uint32_t init; const char32_t * footnote; };
+struct Bitfield { const char32̄_t * regular; uint32_t mask; const char32̄_t * text; };
+struct AnnotatedRegister { const char32̄_t * header; int regcnt; struct Bitfield * regs; 
+ uint32_t init; const char32̄_t * footnote; };
 typedef struct Bitfield Explained[];
 
 #if defined __cplusplus
@@ -143,16 +142,16 @@ EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short d
 
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
 struct utf8₋text { __builtin_int_t bytes; char8₋t * start; };
-struct Unicodes { __builtin_int_t tetras; char32_t * start; };
+struct Unicodes { __builtin_int_t tetras; char32̄_t * start; };
 
-EXT₋C char32_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
-EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
+EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
+EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
 EXT₋C short Utf8Followers(char8₋t leadOr8Bit);
 /* ⬷ The C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
 EXT₋C __builtin_int_t Utf8BytesUntilNull(char8₋t * u8s, __builtin_int_t maxutf8bytes);
-EXT₋C __builtin_int_t ExactUtf8bytes(char32_t * ucs, __builtin_int_t maxtetras);
+EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras);
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
@@ -352,7 +351,7 @@ static inline uint32_t __dwt_cyccnt() { return *(volatile unsigned *)0xe0001004;
 struct distance { half length; int unit; };
 enum Image₋kind { PNGrgba8 };
 struct PngRGBA8Pixel { uint8_t R,G,B,A; };
-union Image₋rectangle { struct PngRGBA8Pixel * pngRgba8; /* ⬷ 𝘤𝘧․ Scatter. */ };
+union Image₋rectangle { struct PngRGBA8Pixel * pngRgba8; /* ⬷ c𝘧․ Scatter. */ };
 struct Image { int scanlines, columns, pixelsize; int unpurged; 
  union Image₋rectangle material; int kind; /* ∈[1,7] */ };
 struct Cropped₋image { struct Image picture; };
@@ -402,7 +401,7 @@ typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x0000,
 
 typedef struct Arg₋𝓟 {
  union { __builtin_int_t d; __builtin_uint_t x, b; char8₋t * u8s; 
-  char8₋t c; char32_t uc; double f₁; float f₂; struct Unicodes ucs;
+  char8₋t c; char32̄_t uc; double f₁; float f₂; struct Unicodes ucs;
   uint8_t paddingbytes[16];
 #if defined 𝟷𝟸𝟾₋bit₋integers
   __uint128_t U; __int128_t I;
@@ -422,11 +421,11 @@ EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝;
 EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝;
 EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝;
 EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝;
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝;
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32̄_t * unterminated₋uc) a⃝;
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝;
 EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝;
 EXT₋C Argᴾ ﹟c(char8₋t c) a⃝;
-EXT₋C Argᴾ ﹟C(char32_t C);
+EXT₋C Argᴾ ﹟C(char32̄_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
 EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
@@ -470,7 +469,7 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
 /* the 'overloadable' attribute in C-code not yet found in Swift code. */
 /* also page with table idx|offset. */
 
-union Tetra𝘖rUnicode { int32_t count; char32_t uc; };
+union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 
 typedef void (^Text₋dealloc)(void *);
@@ -488,7 +487,7 @@ EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx,
  __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
  Node₋alloc nalloc, Text₋alloc talloc);
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
-EXT₋C char32_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
+EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, Node₋dealloc dealloc₁, 
  Text₋dealloc dealloc₂);
 

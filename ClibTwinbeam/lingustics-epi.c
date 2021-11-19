@@ -47,12 +47,12 @@ import ClibTwinbeam;
 enum lexer₋mode { mode₋initial, mode₋regular };
 
 struct lexer₋ctxt {
-  __builtin_int_t symbols; char32_t * text₋heap;
+  __builtin_int_t symbols; char32̄_t * text₋heap;
   __builtin_int_t tip₋unicode;
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t column₋first, column₋last;
   enum lexer₋mode mode; short symbols₋in₋regular;
-  char32_t regular[2048];
+  char32̄_t regular[2048];
   char8₋t * src₋path;
 };
 
@@ -66,10 +66,10 @@ char8₋t * utf8dupn(char8₋t * u8s, __builtin_int_t maxu8bytes)
 inexorable int context₋init(char8₋t * utf8txtpath, struct lexer₋ctxt * ctx)
 {
    __builtin_int_t i=0,j=0, bytesActual, bytes;
-   char8₋t * leadOr8Bit; char32_t uc;
+   char8₋t * leadOr8Bit; char32̄_t uc;
    char8₋t * utf8₋text = (char8₋t *)mapfileʳᵚ((const char *)utf8txtpath,0,0,0,&bytesActual);
    if (utf8₋text == ΨΛΩ) { return -1; }
-   ctx->text₋heap = (char32_t *)Heap₋alloc(4*(bytesActual + 1));
+   ctx->text₋heap = (char32̄_t *)Heap₋alloc(4*(bytesActual + 1));
    if (ctx->text₋heap == ΨΛΩ) { return -2; }
    ctx->tip₋unicode=0;
    ctx->lineno₋first=1; ctx->lineno₋last=1;
@@ -100,7 +100,7 @@ enum token {
 
 struct token₋detail {
   union {
-    struct Regular𝘖rIdent { int symbols; char32_t * start; } regular𝘖rIdent;
+    struct Regular𝘖rIdent { int symbols; char32̄_t * start; } regular𝘖rIdent;
     double literal;
   } storage₋detail;
   int kind;
@@ -133,20 +133,20 @@ enum token next₋token(struct lexer₋ctxt * s₋ctxt,
   struct token₋detail * detail₋out)
 {
    __builtin_int_t i,symbols=s₋ctxt->symbols;
-   char32_t unicode, unicode₊₁;
+   char32̄_t unicode, unicode₊₁;
    
-   typedef int (^type)(char32_t unicode);
-   typedef void (^collect)(char32_t);
+   typedef int (^type)(char32̄_t unicode);
+   typedef void (^collect)(char32̄_t);
    typedef void (^perform)(void);
    
-   type digit = ^(char32_t c) { return U'0' <= c && c <= U'9'; };
-   type derender₋newline = ^(char32_t c) { return c == U'\xa'; };
-   type newline = ^(char32_t c) { return derender₋newline(c) || c == U'\xd'; };
-   type whitespace = ^(char32_t c) { return c == U' ' || U'\t' == c || newline(c); };
-   type letter = ^(char32_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
-   type letter₋alt₋digit = ^(char32_t c) { return letter(c) || digit(c); };
+   type digit = ^(char32̄_t c) { return U'0' <= c && c <= U'9'; };
+   type derender₋newline = ^(char32̄_t c) { return c == U'\xa'; };
+   type newline = ^(char32̄_t c) { return derender₋newline(c) || c == U'\xd'; };
+   type whitespace = ^(char32̄_t c) { return c == U' ' || U'\t' == c || newline(c); };
+   type letter = ^(char32̄_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
+   type letter₋alt₋digit = ^(char32̄_t c) { return letter(c) || digit(c); };
    
-   collect unicodes₋for₋regular = ^(char32_t uc) {
+   collect unicodes₋for₋regular = ^(char32̄_t uc) {
     short idx = s₋ctxt->symbols₋in₋regular;
     if (idx >= 2048) { Diagnos(s₋ctxt,1,"error: identifier too long."); }
     s₋ctxt->regular[idx] = uc;
