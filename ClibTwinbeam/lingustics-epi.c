@@ -53,21 +53,21 @@ struct lexer₋ctxt {
   __builtin_int_t column₋first, column₋last;
   enum lexer₋mode mode; short symbols₋in₋regular;
   char32_t regular[2048];
-  char8_t * src₋path;
+  char8₋t * src₋path;
 };
 
-char8_t * utf8dupn(char8_t * u8s, __builtin_int_t maxu8bytes)
+char8₋t * utf8dupn(char8₋t * u8s, __builtin_int_t maxu8bytes)
 { __builtin_int_t bytes = Utf8BytesUntilNull(u8s,maxu8bytes);
    void * start = Heap₋alloc(bytes);
    Copy8Memory((ByteAlignedRef)start, (ByteAlignedRef)u8s, bytes);
    return start;
 } /* ⬷ a․𝘬․a strdup₋for₋utf8. Note U+8000 in UTF-8 is E0 *) *). */
 
-inexorable int context₋init(char8_t * utf8txtpath, struct lexer₋ctxt * ctx)
+inexorable int context₋init(char8₋t * utf8txtpath, struct lexer₋ctxt * ctx)
 {
    __builtin_int_t i=0,j=0, bytesActual, bytes;
-   char8_t * leadOr8Bit; char32_t uc;
-   char8_t * utf8₋text = (char8_t *)mapfileʳᵚ((const char *)utf8txtpath,0,0,0,&bytesActual);
+   char8₋t * leadOr8Bit; char32_t uc;
+   char8₋t * utf8₋text = (char8₋t *)mapfileʳᵚ((const char *)utf8txtpath,0,0,0,&bytesActual);
    if (utf8₋text == ΨΛΩ) { return -1; }
    ctx->text₋heap = (char32_t *)Heap₋alloc(4*(bytesActual + 1));
    if (ctx->text₋heap == ΨΛΩ) { return -2; }
@@ -106,34 +106,22 @@ struct token₋detail {
   int kind;
 };
 
+/* rt₋namespace { */
+uint32_t diagnosis₋count=0;
+/* } */
+
 EXT₋C long write(int fd, const void * s, long unsigned nbyte);
-EXT₋C int print﹟(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+EXT₋C int print﹟(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
 
-EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
- const char * utf8format, ...) a⃝;
-
-EXT₋C
-int
-print(
-  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
-  const char * utf8format, 
-  ...
-) a⃝
-{ int y; va_prologue(utf8format);
-   y = print﹟(out,utf8format,__various);
-   va_epilogue
-   return y;
-}
-
-void Diagnosis(struct lexer₋ctxt * s₋ctxt, int bye, char8_t * text, ...)
+void Diagnos(struct lexer₋ctxt * s₋ctxt, int bye, char * text, ...)
 { va_prologue(text);
   __builtin_int_t lineno₋first = s₋ctxt->lineno₋first, 
    column₋first = s₋ctxt->column₋first, 
    linecount = 1 + s₋ctxt->lineno₋last - lineno₋first;
-  char8_t * src₋path = s₋ctxt->src₋path;
-  typedef void (^Utf8)(char8_t * u8s, __builtin_int_t bytes);
-  Utf8 out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
+  char8₋t * src₋path = s₋ctxt->src₋path;
+  typedef void (^Utf8)(char8₋t * u8s, __builtin_int_t bytes);
+  Utf8 out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
   print(out,"⬚:⬚:⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(column₋first));
   print﹟(out, text, __various);
   print(out, " (⬚ lines)\n", ﹟d(linecount));
@@ -160,7 +148,7 @@ enum token next₋token(struct lexer₋ctxt * s₋ctxt,
    
    collect unicodes₋for₋regular = ^(char32_t uc) {
     short idx = s₋ctxt->symbols₋in₋regular;
-    if (idx >= 2048) { Diagnosis(s₋ctxt,1,"error: identifier too long."); }
+    if (idx >= 2048) { Diagnos(s₋ctxt,1,"error: identifier too long."); }
     s₋ctxt->regular[idx] = uc;
     s₋ctxt->symbols₋in₋regular += 1; };
    
@@ -183,7 +171,7 @@ again:
    else if (s₋ctxt->mode == mode₋regular && letter₋alt₋digit(unicode)) {
      unicodes₋for₋regular(unicode);
    }
-   else { Diagnosis(s₋ctxt,1,"error: scanner error."); }
+   else { Diagnos(s₋ctxt,1,"error: scanner error."); }
    s₋ctxt->tip₋unicode += 1;
    goto again;
 }
@@ -198,7 +186,7 @@ static void match(enum token expected, struct lexer₋ctxt * s₋ctxt,
  struct token₋detail * detail₋out)
 {
    if (lookahead == expected) { lookahead = next₋token(s₋ctxt,detail₋out); }
-   else { Diagnosis(s₋ctxt,0,"error: syntax expected ⬚, got ⬚.\n", 
+   else { Diagnos(s₋ctxt,0,"error: syntax expected ⬚, got ⬚.\n", 
    ﹟d((__builtin_int_t)expected), 
    ﹟d((__builtin_int_t)lookahead)); }
 }
@@ -254,7 +242,7 @@ static void parse₋circum(struct lexer₋ctxt * s₋ctxt)
    switch (lookahead) {
    case IDENT: match(IDENT,s₋ctxt,&detail); break;
    case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&detail); break;
-   default: Diagnosis(s₋ctxt,0,"expecting IDENT alternatively NUMERIC₋CONST, "
+   default: Diagnos(s₋ctxt,0,"expecting IDENT alternatively NUMERIC₋CONST, "
     "got type-of-token."); break;
    }
 }
@@ -270,7 +258,7 @@ main(
 )
 {
    struct lexer₋ctxt s₋ctx; struct token₋detail detail;
-   if (context₋init((char8_t *)u8"/tmp/test.txt", &s₋ctx)) { return 1; }
+   if (context₋init((char8₋t *)u8"/tmp/test.txt", &s₋ctx)) { return 1; }
    lookahead = next₋token(&s₋ctx,&detail); parse₋assign(&s₋ctx);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful\n");

@@ -13,7 +13,7 @@ UNITTEST(half₋Presentᵧ)
    /* auto sometime = ^(int count, char32_t * terminated₋ucs) {
      print("⬚", ﹟S₁(beamed₋eigth₋uc)); }; */
    const int stdout=1;
-   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(stdout, (const void *)u8s, bytes); };
+   auto out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(stdout, (const void *)u8s, bytes); };
    NumberformatCatalogue₋Presentᵧ(x.bits,out);
 }
 

@@ -63,7 +63,7 @@ union Artwork₋instruction₋detail {
   union Artwork₋directive various₋signatures;                      /*  (4) */
 };
 
-typedef char8_t uchar;
+typedef char8₋t uchar;
 typedef void (*semantics)(int artwork₋instruction, 
  union Artwork₋instruction₋detail parameters, void * ctx);
 

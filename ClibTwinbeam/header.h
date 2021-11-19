@@ -90,14 +90,10 @@ MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask,
  (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
 #endif
 
-/* -fno-char8_t deactivates c++ builtin type char8_t. */
-
-//#if !defined(__cplusplus)
-// typedef unsigned char char8_t; /* in C */
-typedef char char8_t; /* before cpp20. */
-typedef unsigned int /* not uint32_t */ char32_t;
-/* C11 has a type char32_t illustrated in 'uchar.h'. */
-//#endif
+#define char32_t char32₋t
+typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
+ deactivates the unused c++ builtin type char8_t not found in llvm-c code. */
+typedef uint32_t char32₋t;
 
 struct Bitfield { const char32_t * regular; uint32_t mask; const char32_t * text; };
 struct AnnotatedRegister { const char32_t * header; int regcnt; struct Bitfield * regs; 
@@ -119,7 +115,7 @@ EXT₋C void NumberformatCatalogue₋Present(
   uint32_t numerics, 
   int is₋𝟷𝟼₋bits, 
   /* void (^sometime)(int count, char32_t * terminated₋ucs) */
-  void (^out)(char8_t * u8s, __builtin_int_t bytes)
+  void (^out)(char8₋t * u8s, __builtin_int_t bytes)
 );
 
 #define APPEND_PIMPL                                                         \
@@ -146,16 +142,16 @@ EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short d
 #define true (! false)
 
 struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
-struct utf8₋text { __builtin_int_t bytes; char8_t * start; };
+struct utf8₋text { __builtin_int_t bytes; char8₋t * start; };
 struct Unicodes { __builtin_int_t tetras; char32_t * start; };
 
-EXT₋C char32_t Utf8ToUnicode(char8_t *ξ, __builtin_int_t bytes);
-EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8_t *u8s, short bytes));
-EXT₋C short Utf8Followers(char8_t leadOr8Bit);
+EXT₋C char32_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
+EXT₋C int UnicodeToUtf8(char32_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
+EXT₋C short Utf8Followers(char8₋t leadOr8Bit);
 /* ⬷ The C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
-EXT₋C __builtin_int_t Utf8BytesUntilNull(char8_t * u8s, __builtin_int_t maxutf8bytes);
+EXT₋C __builtin_int_t Utf8BytesUntilNull(char8₋t * u8s, __builtin_int_t maxutf8bytes);
 EXT₋C __builtin_int_t ExactUtf8bytes(char32_t * ucs, __builtin_int_t maxtetras);
 
 #define UNITTEST(symbol) extern "C" void Unittest_##symbol()
@@ -188,7 +184,7 @@ Sequent minus_sequent(Sequent x₁, Sequent x₂);
 void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, uint64_t * int₋hi, uint64_t * hi₋prec);
 Sequent mult_sequent(Sequent x₁, Sequent x₂);
 Sequent reciproc_sequent(Sequent yb);
-Sequent div_sequent(Sequent x₁, Sequent x₂, int integer₋division); 
+Sequent div_sequent(Sequent x₁, Sequent x₂, int integer₋division);
 /* the symbol 'div' requires __attribute__((overloadable)); */
 Sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 Sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
@@ -308,7 +304,7 @@ EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
 EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, 
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
- void (^out)(char8_t * u8s, __builtin_int_t bytes));
+ void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
 EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fall⒪⒲)(void *);
 
@@ -365,7 +361,7 @@ EXT₋C int Init₋image(struct Image * image, int secure);
 EXT₋C int Release₋image(struct Image * image);
 
 EXT₋C int mfprint(const char * utf8format, ...);
-EXT₋C int print(void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+EXT₋C int print(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...) a⃝;
 EXT₋C int print(const char * utf8format, ...) a⃝;
 
@@ -405,8 +401,8 @@ typedef void (*Argᴾ₋Unicode₂)(bool anfang, char32_t * prvNxtEOTOr0x0000,
  void * context₁, void * context₂); */
 
 typedef struct Arg₋𝓟 {
- union { __builtin_int_t d; __builtin_uint_t x, b; char8_t * u8s; 
-  char8_t c; char32_t uc; double f₁; float f₂; struct Unicodes ucs;
+ union { __builtin_int_t d; __builtin_uint_t x, b; char8₋t * u8s; 
+  char8₋t c; char32_t uc; double f₁; float f₂; struct Unicodes ucs;
   uint8_t paddingbytes[16];
 #if defined 𝟷𝟸𝟾₋bit₋integers
   __uint128_t U; __int128_t I;
@@ -422,14 +418,14 @@ typedef struct Arg₋𝓟 {
 EXT₋C Argᴾ ﹟d(__builtin_int_t d);
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x);
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b);
-EXT₋C Argᴾ ﹟s(char8_t * u8s) a⃝;
-EXT₋C Argᴾ ﹟s(const char8_t * u8s) a⃝;
+EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝;
+EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝;
 EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝;
 EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝;
 EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝;
 EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝;
 EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝;
-EXT₋C Argᴾ ﹟c(char8_t c) a⃝;
+EXT₋C Argᴾ ﹟c(char8₋t c) a⃝;
 EXT₋C Argᴾ ﹟C(char32_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
 EXT₋C Argᴾ ﹟U(__uint128_t U);
@@ -487,7 +483,7 @@ EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, union Tetra𝘖rUnicode * 
  __builtin_int_t bytes)); /* ⬷ the 'Tetra𝘖rUnicode * length₋prefixed₋text' is a․𝘬․a 'text𝘈nd𝟶𝚡𝟶𝟶𝟶𝟶'. */
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
  void ᶿ﹡ wedge, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
- Node₋alloc nalloc, Text₋alloc talloc);
+ Node₋alloc position, Text₋alloc found);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
  __builtin_int_t len, Text₋dealloc dealloc₂, Node₋dealloc dealloc₁, 
  Node₋alloc nalloc, Text₋alloc talloc);

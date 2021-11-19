@@ -4,7 +4,7 @@ import ClibTwinbeam;
 
 FOCAL
 short
-Utf8Followers(char8_t leadOr8Bit)
+Utf8Followers(char8₋t leadOr8Bit)
 {
     if (leadOr8Bit < 128) { return 0; }
     if (128 <= leadOr8Bit && leadOr8Bit < 192) return -1;
@@ -30,13 +30,13 @@ Utf8Followers(char8_t leadOr8Bit)
 FOCAL
 char32_t
 Utf8ToUnicode(
-  char8_t *ξ,
+  char8₋t *ξ,
   __builtin_int_t bytes
 )
 {
-    char8_t first = *ξ;
+    char8₋t first = *ξ;
     if (248 <= first || (128 <= first && first < 192)) return 0x0000FFFF;
-    switch (bytes) { case 1: return (char32_t)(char8_t)*ξ; case 2: return 
+    switch (bytes) { case 1: return (char32_t)(char8₋t)*ξ; case 2: return 
     (0b11111&*ξ) << 6 | (0b111111&(*(ξ + 1))); case 3: return (0b1111&*ξ) << 
     12 | (0b111111&(*(ξ + 1))) << 6 | (0b111111&(*(ξ + 2))); case 4: return 
     (0b111&*ξ) << 18 | (0b111111&(*(ξ + 1))) << 12 | (0b111111&(*(ξ + 2))) << 
@@ -47,7 +47,7 @@ FOCAL
 int
 UnicodeToUtf8(
   char32_t Ξ,
-  void (^sometime₋valid)(char8_t *u8s, short bytes)
+  void (^sometime₋valid)(char8₋t *u8s, short bytes)
 )
 {
     unsigned char 🥈 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 
@@ -63,13 +63,13 @@ UnicodeToUtf8(
     else if (Ξ <= 0x0010FFFFL) { bytesToWrite=4; }
     else { return 1; }
     
-    char8_t target[4];
+    char8₋t target[4];
     
     switch (bytesToWrite) {
-    case 4: target[3] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 3: target[2] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 2: target[1] = (char8_t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
-    case 1: target[0] = (char8_t) (Ξ | firstByteMark[bytesToWrite]);
+    case 4: target[3] = (char8₋t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
+    case 3: target[2] = (char8₋t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
+    case 2: target[1] = (char8₋t)((Ξ | byteMark) & byteMask); Ξ >>= 6;
+    case 1: target[0] = (char8₋t) (Ξ | firstByteMark[bytesToWrite]);
     }
     
     sometime₋valid(target,bytesToWrite);

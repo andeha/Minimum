@@ -16,14 +16,14 @@ again:
 EXT₋C Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
-EXT₋C Argᴾ ﹟s(const char8_t * u8s) a⃝ { return Argᴾ { { .u8s=(char8_t *)u8s }, 4 }; }
-EXT₋C Argᴾ ﹟s(char8_t * u8s) a⃝ { return Argᴾ { { .u8s=u8s }, 4 }; }
-EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8_t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
 EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
 EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, (char32_t *)unterminated₋uc } }, 5 }; }
-EXT₋C Argᴾ ﹟c(char8_t c) a⃝ { return Argᴾ { { .c=c }, 6 }; }
-EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝ { return Argᴾ { { .c=(char8_t)c }, 6 }; }
+EXT₋C Argᴾ ﹟c(char8₋t c) a⃝ { return Argᴾ { { .c=c }, 6 }; }
+EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝ { return Argᴾ { { .c=(char8₋t)c }, 6 }; }
 EXT₋C Argᴾ ﹟C(char32_t C) { return Argᴾ { { .uc=C }, 7 }; }
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
@@ -41,7 +41,7 @@ EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 
 void Register₋reflect(__builtin_uint_t /* mask */) { }
 
-inexorable void Present(void (^out)(char8_t * u8s, __builtin_int_t bytes), char32_t * terminated₋ucs)
+inexorable void Present(void (^out)(char8₋t * u8s, __builtin_int_t bytes), char32_t * terminated₋ucs)
 {
    __builtin_int_t tetras = TetrasUntilNull(terminated₋ucs,BUILTIN₋INT₋MAX);
    print(out, "⬚", ﹟S₁(tetras,terminated₋ucs));
@@ -61,17 +61,17 @@ inexorable void Coalesc₋present(void (^out)(int count, char32_t * unterminated
 
 #define UNEXISTING₋IEEE754
 
-inexorable
+EXT₋C
 int
 print﹟(
-  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+  void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
   const char * utf8format, 
   __builtin_va_list argument
 )
 {  __builtin_int_t i=0, incr; short followers; char32_t uc;
     int 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 printedBytesExcept0=0; /* bool may𝘖rDidEscape=false; */
     auto out₂ = ^(const char * 𝟽bit₋utf8, __builtin_int_t bytes) {
-      out((char8_t *)𝟽bit₋utf8, bytes); printedBytesExcept0 += bytes; };
+      out((char8₋t *)𝟽bit₋utf8, bytes); printedBytesExcept0 += bytes; };
     auto out𝕫 = ^(__builtin_int_t x) { Base𝕫(x, 10, 0, ^(char s) { out₂(&s,1); }); };
     auto out𝕟 = ^(__builtin_uint_t x) { Base𝕟(x, 16, 
 #if defined __x86_64__ || defined __armv8a__
@@ -87,9 +87,9 @@ print﹟(
        32
 #endif
       , ^(char s) { out₂(&s,1); }); };
-    auto eight₋bit₋symbol = ^(char8_t c) { out(&c,1); };
-    auto u8c₋stream = ^(char8_t * utf8) { char8_t * p = (char8_t *)utf8; while (*p) { out(p,1); p++; } };
-    auto unicode₋symbol = ^(char32_t u) { UnicodeToUtf8(u, ^(char8_t * u8s, 
+    auto eight₋bit₋symbol = ^(char8₋t c) { out(&c,1); };
+    auto u8c₋stream = ^(char8₋t * utf8) { char8₋t * p = (char8₋t *)utf8; while (*p) { out(p,1); p++; } };
+    auto unicode₋symbol = ^(char32_t u) { UnicodeToUtf8(u, ^(char8₋t * u8s, 
      short bytes) { out(Critic(u8s),bytes); }); };
 #ifndef UNEXISTING₋IEEE754
     auto out𝕕 = ^(double ℝ) { Format(ℝ, Ieee754form::Scientific, ^(char32_t uc) { unicode₋symbol(uc); }); };
@@ -102,7 +102,7 @@ print﹟(
     auto 𝟷𝟸𝟾₋out𝕟 = ^(__uint128_t U) { Base𝕟(U, 16, 0, ^(char 𝟶to𝟿and₋) { out₂(&𝟶to𝟿and₋,1); }); };
 #endif
 again:
-    auto leadOr8Bit = i + (char8_t *)utf8format;
+    auto leadOr8Bit = i + (char8₋t *)utf8format;
     if (*leadOr8Bit == 0x0) { goto unagain; }
     followers = Utf8Followers(*leadOr8Bit);
     if (followers < 0) { return -1; }
@@ -149,12 +149,12 @@ mfprint(
   const char * utf8format, 
   ...
 )
-{ int y; 
+{ int y;
 #if defined __armv8a__ || defined __x86_64__
    bool original = false; int 🥇 descript = original ? 1 /* stdout */ : 2 /* stderr */;
-   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(descript, (const void *)u8s, bytes); };
+   auto out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(descript, (const void *)u8s, bytes); };
 #elif defined __mips__ || defined espressif || defined __armv6__
-   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Trace₁(u8s,bytes); };
+   auto out = ^(char8₋t * u8s, __builtin_int_t bytes) { Trace₁(u8s,bytes); };
 #endif
    va_prologue(utf8format);
    y = print﹟(out,utf8format,__various);
@@ -172,19 +172,19 @@ int
 print(const char * utf8format, ...) a⃝ /* Here all variable args are of the type `Argᴾ`. */
 { int y; va_prologue(utf8format);
 #if defined __armv8a__ || defined __x86_64__
-   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { write(1, (const void *)u8s, bytes); };
+   auto out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1, (const void *)u8s, bytes); };
 #elif  defined __mips__ || defined espressif || defined __armv6__
-   auto out = ^(char8_t * u8s, __builtin_int_t bytes) { Putₒ(u8s,bytes); };
+   auto out = ^(char8₋t * u8s, __builtin_int_t bytes) { Putₒ(u8s,bytes); };
 #endif
    y = print﹟(out,utf8format,__various);
    va_epilogue return y;
 }
 
-EXT₋C
 FOCAL
+EXT₋C
 int
 print(
-  void (^out)(char8_t * u8s, __builtin_int_t bytes), 
+  void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
   const char * utf8format, 
   ...
 ) a⃝
@@ -206,7 +206,7 @@ Present(struct Bitfield * field,
   int maxwidth, 
   /* void (^output)(char32_t uc) */
   /* void (^sometime)(int count, char32_t * terminated₋ucs) */
-  void (^out)(char8_t * u8s, __builtin_int_t bytes)
+  void (^out)(char8₋t * u8s, __builtin_int_t bytes)
 )
 {
    unsigned spaces = maxwidth - TetrasUntilNull(Critic(field->regular), BUILTIN₋INT₋MAX);
@@ -235,7 +235,7 @@ NumberformatCatalogue₋Present(
   int is₋𝟷𝟼₋bits, 
   /* void (^output)(char32_t uc) */
   /* void (^sometime)(int count, char32_t * terminated₋ucs) */
-  void (^out)(char8_t * u8s, __builtin_int_t bytes)
+  void (^out)(char8₋t * u8s, __builtin_int_t bytes)
 )
 {
    auto present = ^(int count, Bitfield * regs, uint32_t val, 

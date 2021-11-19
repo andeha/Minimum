@@ -1,4 +1,4 @@
-/* 􀊫 search-seek.c | 64 keyput prefix searching. */
+/* 􀊫 search-symbol.c | 64 keyput prefix searching. */
 
 import ClibTwinbeam;
 
@@ -20,13 +20,13 @@ again:
 EXT₋C
 __builtin_int_t
 Utf8BytesUntilNull(
-  char8_t * u8s,
+  char8₋t * u8s,
   __builtin_int_t maxbytes
 )
 { __builtin_int_t i=0;
 again:
    if (i >= maxbytes) { return maxbytes; }
-   char8_t * leadOr8Bit = u8s + i;
+   char8₋t * leadOr8Bit = u8s + i;
    if (*leadOr8Bit == 0x0) { return i; }
    __builtin_int_t followers = Utf8Followers(*leadOr8Bit);
    if (followers < 0) { return -1; }

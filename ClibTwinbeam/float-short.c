@@ -41,7 +41,7 @@ struct AnnotatedRegister AR_Binary16 = {
 };
 
 void NumberformatCatalogue₋Presentᵧ(half val, /* void (^out)(char32_t uc) */ 
- void (^out)(char8_t * u8s, __builtin_int_t bytes))
+ void (^out)(char8₋t * u8s, __builtin_int_t bytes))
 {
   pythagorean_double dbl = { .location=val };
   uint32_t bits = dbl.bits;
