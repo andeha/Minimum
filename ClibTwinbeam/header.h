@@ -434,7 +434,7 @@ EXT₋C Argᴾ ﹟F(double f, int format);
 EXT₋C Argᴾ ﹟λ(Argᴾ₋output scalar, void * context);
 EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
 /* ⬷ PRO|29|17. See also PRO|3|30. */
-EXT₋C Argᴾ ﹟S₂(char32_t * zero₋terminated₋uc);
+EXT₋C Argᴾ ﹟S₂(char32̄_t * zero₋terminated₋uc);
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref)))
 
@@ -503,7 +503,7 @@ EXT₋C int optional₋uninit₋smallpool(struct smallpool * 🅿, Text₋deallo
  dealloc₂, Node₋dealloc dealloc₁);
 EXT₋C int inflate₋smallpool(struct smallpool * 🅟, __builtin_int_t count, 
  void * kbXtiles[], Leaf₋alloc alloc);
-EXT₋C int copy₋append₋text(struct smallpool * 🅟, int count, char32_t cs[], 
+EXT₋C int copy₋append₋text(struct smallpool * 🅟, int count, char32̄_t cs[], 
  Nonabsolute * ref, void (^inflate)(__builtin_int_t ﹟, void **kbXtiles, 
  int * cancel));
 EXT₋C int datum₋text(struct smallpool * 🅟, int32_t tetras);

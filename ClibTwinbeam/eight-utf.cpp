@@ -28,7 +28,7 @@ Utf8Followers(char8₋t leadOr8Bit)
 }
 
 FOCAL
-char32_t
+char32̄_t
 Utf8ToUnicode(
   char8₋t *ξ,
   __builtin_int_t bytes
@@ -36,7 +36,7 @@ Utf8ToUnicode(
 {
     char8₋t first = *ξ;
     if (248 <= first || (128 <= first && first < 192)) return 0x0000FFFF;
-    switch (bytes) { case 1: return (char32_t)(char8₋t)*ξ; case 2: return 
+    switch (bytes) { case 1: return (char32̄_t)(char8₋t)*ξ; case 2: return 
     (0b11111&*ξ) << 6 | (0b111111&(*(ξ + 1))); case 3: return (0b1111&*ξ) << 
     12 | (0b111111&(*(ξ + 1))) << 6 | (0b111111&(*(ξ + 2))); case 4: return 
     (0b111&*ξ) << 18 | (0b111111&(*(ξ + 1))) << 12 | (0b111111&(*(ξ + 2))) << 
@@ -46,14 +46,14 @@ Utf8ToUnicode(
 FOCAL
 int
 UnicodeToUtf8(
-  char32_t Ξ,
+  char32̄_t Ξ,
   void (^sometime₋valid)(char8₋t *u8s, short bytes)
 )
 {
     unsigned char 🥈 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 
       0xF8, 0xFC };
     
-    char32_t 🥈 byteMask=0xBF, byteMark=0x80;
+    char32̄_t 🥈 byteMask=0xBF, byteMark=0x80;
     
     short bytesToWrite=0;
     

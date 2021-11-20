@@ -221,12 +221,12 @@ __builtin_int_t rope₋length(void ᶿ﹡ opaque)
    return (__builtin_int_t)(((struct node *)opaque)->payload.keyvalue.val);
 }
 
-char32_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
+char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
 {
    __builtin_int_t lhs₋weight=0;
    if (opaque == ΨΛΩ) { return U'\x0'; }
    else if (is₋leaf₋node(opaque)) {
-     return *(idx + 1 + (char32_t *)(((struct node *)opaque)->payload.keyvalue.val));
+     return *(idx + 1 + (char32̄_t *)(((struct node *)opaque)->payload.keyvalue.val));
    }
    else {
      struct node * root₋node = (struct node *)opaque;

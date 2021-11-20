@@ -157,9 +157,28 @@ enum token next₋token(struct lexer₋ctxt * s₋ctxt,
      s₋ctxt->mode = mode₋initial;
    };
    
+   perform attempt₋regular₋closure = ^{
+     if (unicode₊₁ == U'=' || unicode₊₁ == U';' || 
+         unicode₊₁ == U'+' || unicode₊₁ == U'-' || 
+         unicode₊₁ == U'*' || unicode₊₁ == U'/' || 
+         unicode₊₁ == U'^' || unicode₊₁ == U'(' || 
+         unicode₊₁ == U')') {
+      if (s₋ctxt->mode == mode₋regular) { }
+     }
+   };
+   
+   🧵(identifier,number₋literal,keyword,token,lex₋error,completion) {
+    case identifier: return 0;
+    case number₋literal: return 0;
+    case keyword: return 0;
+    case token: return 0;
+    case lex₋error: Diagnos(s₋ctxt,1,"error: scanner error."); return -1;
+    case completion: return END₋OF₋TRANSMISSION;
+   }
+   
 again:
    i=s₋ctxt->tip₋unicode;
-   if (i >= symbols) { reset(); return END₋OF₋TRANSMISSION; }
+   if (i >= symbols) { reset(); confess(completion); }
    unicode = s₋ctxt->text₋heap[i], unicode₊₁ = s₋ctxt->text₋heap[i+1];
    if (derender₋newline(unicode)) { s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; }
    else if (newline(unicode)) { /* do nothing */ }
@@ -167,11 +186,13 @@ again:
    else if (s₋ctxt->mode == mode₋initial && letter(unicode)) {
      unicodes₋for₋regular(unicode);
      s₋ctxt->mode = mode₋regular;
+     attempt₋regular₋closure();
    }
    else if (s₋ctxt->mode == mode₋regular && letter₋alt₋digit(unicode)) {
      unicodes₋for₋regular(unicode);
+     attempt₋regular₋closure();
    }
-   else { Diagnos(s₋ctxt,1,"error: scanner error."); }
+   else { confess(lex₋error); }
    s₋ctxt->tip₋unicode += 1;
    goto again;
 }
@@ -259,6 +280,7 @@ main(
 {
    struct lexer₋ctxt s₋ctx; struct token₋detail detail;
    if (context₋init((char8₋t *)u8"/tmp/test.txt", &s₋ctx)) { return 1; }
+   if (s₋ctxt->symbols == 0) { return 2; }
    lookahead = next₋token(&s₋ctx,&detail); parse₋assign(&s₋ctx);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful\n");

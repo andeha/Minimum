@@ -77,13 +77,13 @@ struct Scanner₋ctxt {
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t idx₋unicode; /* ⬷ and not idx₋u8s. */
   struct sequent ongoing; int negative;
-  char32_t regular[1024]; short symbols₋in₋regular;
+  char32̄_t regular[1024]; short symbols₋in₋regular;
   enum Artwork₋scanner₋mode mode;
 };
 
-EXT₋C int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
+EXT₋C int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32̄_t text[], 
  struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
-EXT₋C int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
+EXT₋C int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32̄_t text[], 
  struct Scanner₋ctxt * s₋ctxt, semantics truly₋your);
 
 typedef enum Artwork₋instruction { columned=1, 

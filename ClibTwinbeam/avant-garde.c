@@ -1,6 +1,6 @@
 /* 􀝦􁅀 codex-cubist.c | juxtaposition and non-sequitur with bōcstafs and graphemes. */
 
-import ClibTwinbeam;
+import ClibTwinbeam_and_cCubist;
 import Setjmp;
 
 unionᵢ Artwork₋symbol₋token₋detail {
@@ -29,14 +29,14 @@ inexorable int init₋context(__builtin_int_t unicode₋program₋symbols,
 
 inexorable int
 Lookahead₋scan₋Artwork(
-  __builtin_int_t symbols, char32_t text[], 
+  __builtin_int_t symbols, char32̄_t text[], 
   enum Artwork₋token₋symbol * kind, 
   union Artwork₋symbol₋token₋detail * detail, 
   struct Scanner₋ctxt * s₋ctxt, 
-  void (^regular𝘖rIdent)(int symbols, char32_t * start)
+  void (^regular𝘖rIdent)(int symbols, char32̄_t * start)
 )
 {
-   char32_t unicode, unicode₋₁; __builtin_int_t i=s₋ctxt->idx₋unicode;
+   char32̄_t unicode, unicode₋₁; __builtin_int_t i=s₋ctxt->idx₋unicode;
    
    🧵(scanner₋error,conversion₋error,unterminated₋quote,unterminated₋base16,
   truncated₋scan,identifier,number₋literal,keyword,token) {
@@ -50,24 +50,24 @@ Lookahead₋scan₋Artwork(
     case token: return 0;
    }
    
-   typedef int (^type)(char32_t unicode);
+   typedef int (^type)(char32̄_t unicode);
    typedef void (^action)(void);
-   typedef void (^work)(char32_t);
+   typedef void (^work)(char32̄_t);
    
-   work append₋to₋regular = ^(char32_t uc) {
+   work append₋to₋regular = ^(char32̄_t uc) {
     short idx = s₋ctxt->symbols₋in₋regular;
     s₋ctxt->regular[idx] = uc;
     s₋ctxt->symbols₋in₋regular += 1; };
    
-   type digit = ^(char32_t c) { return U'0' <= c && c <= U'9'; };
-   type derender₋newline = ^(char32_t c) { return c == U'\xa'; }; /* de- = completely = fullgångna. */
-   type newline = ^(char32_t c) { return derender₋newline(c) || c == U'\xd'; };
-   type whitespace = ^(char32_t c) { return c == U' ' || U'\t' == c || newline(c); };
-   type letter = ^(char32_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
-   type letter₋alt₋digit = ^(char32_t c) { return letter(c) || digit(c); };
-   type base₋5₋character = ^(char32_t c) { return U'B' <= c && c <= U'E'; };
-   type base₋16₋character = ^(char32_t c) { return U'A' <= c && c <= U'Z'; };
-   type period = ^(char32_t c) { return c == U'.'; };
+   type digit = ^(char32̄_t c) { return U'0' <= c && c <= U'9'; };
+   type derender₋newline = ^(char32̄_t c) { return c == U'\xa'; }; /* de- = completely = fullgångna. */
+   type newline = ^(char32̄_t c) { return derender₋newline(c) || c == U'\xd'; };
+   type whitespace = ^(char32̄_t c) { return c == U' ' || U'\t' == c || newline(c); };
+   type letter = ^(char32̄_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
+   type letter₋alt₋digit = ^(char32̄_t c) { return letter(c) || digit(c); };
+   type base₋5₋character = ^(char32̄_t c) { return U'B' <= c && c <= U'E'; };
+   type base₋16₋character = ^(char32̄_t c) { return U'A' <= c && c <= U'Z'; };
+   type period = ^(char32̄_t c) { return c == U'.'; };
    
    action presentable₋token = ^{
      s₋ctxt->ongoing=accumulative₋zero();
@@ -143,9 +143,9 @@ again:
    goto again;
 }
 
-typedef void (^Regular𝘖rIdent)(int symbols, char32_t * start);
+typedef void (^Regular𝘖rIdent)(int symbols, char32̄_t * start);
 
-int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[], 
+int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32̄_t text[], 
  struct Scanner₋ctxt * s₋ctxt, semantics truly₋yours)
 {
   struct fifo 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 symbol₋lookahead, detail₋lookahead;
@@ -178,7 +178,7 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[],
   enum Artwork₋token₋symbol kind;
   union Artwork₋symbol₋token₋detail hearken;
   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
-  Regular𝘖rIdent regident = ^(int symbols, char32_t * start) { ident.start=start; ident.tetras=symbols; };
+  Regular𝘖rIdent regident = ^(int symbols, char32̄_t * start) { ident.start=start; ident.tetras=symbols; };
   if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regident)) { return -1; }
   
   /* typedef struct Artwork₋token (^mass₋reading₋saddle)(void); 
@@ -201,7 +201,7 @@ int Parse₋Artwork₋LL₍k₎(__builtin_int_t symbols, char32_t text[],
 } /* ⬷ read errors from left to right when correcting both syntactic and 
  semantic errors. */
 
-int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[], 
+int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32̄_t text[], 
   struct Scanner₋ctxt * s₋ctxt, semantics truly₋your)
 {
    struct Scanner₋ctxt ctxt;
@@ -226,7 +226,7 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32_t text[],
      enum Artwork₋token₋symbol kind;
      union Artwork₋symbol₋token₋detail hearken;
      𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct Unicodes ident;
-     Regular𝘖rIdent regular𝘖rIdent = ^(int symbols, char32_t * start) { 
+     Regular𝘖rIdent regular𝘖rIdent = ^(int symbols, char32̄_t * start) { 
       ident.tetras=symbols; ident.start=start; };
      if (Lookahead₋scan₋Artwork(symbols,text,&kind,&hearken,s₋ctxt,regular𝘖rIdent)) 
      { confess(lex₋error); }
