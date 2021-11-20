@@ -3,11 +3,11 @@
 import ClibTwinbeam;
 
 EXT₋C
-__builtin_int_t ExactUtf8bytes(char32_t * ucs, __builtin_int_t maxtetras)
+__builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras)
 { __builtin_int_t sum=0, i=0;
 again:
    if (i >= maxtetras) { return sum; }
-   char32_t uc = *(ucs + i);
+   char32̄_t uc = *(ucs + i);
    if (uc < 0x80L) { sum += 1; }
    else if (uc < 0x800L) { sum += 2; }
    else if (uc < 0x10000L) { sum += 3; }
