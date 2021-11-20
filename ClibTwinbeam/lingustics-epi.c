@@ -1,6 +1,7 @@
 /*  􀥳 lingustics-epi.c | an epitomic recursive descent parser. */
 
 import ClibTwinbeam;
+import Setjmp;
 
 /*
   
@@ -280,7 +281,7 @@ main(
 {
    struct lexer₋ctxt s₋ctx; struct token₋detail detail;
    if (context₋init((char8₋t *)u8"/tmp/test.txt", &s₋ctx)) { return 1; }
-   if (s₋ctxt->symbols == 0) { return 2; }
+   if (s₋ctx.symbols == 0) { return 2; }
    lookahead = next₋token(&s₋ctx,&detail); parse₋assign(&s₋ctx);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful\n");
