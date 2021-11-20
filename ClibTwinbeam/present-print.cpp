@@ -2,11 +2,11 @@
 
 import ClibTwinbeam;
 
-__builtin_int_t TetrasUntilNull(char32_t * ucs, __builtin_int_t maxtetras)
+__builtin_int_t TetrasUntilNull(char32̄_t * ucs, __builtin_int_t maxtetras)
 { __builtin_int_t i=0;
 again:
    if (i >= maxtetras) { return maxtetras; }
-   char32_t * uc = ucs + i;
+   char32̄_t * uc = ucs + i;
    if (*uc == 0x0000) { return i; }
    ++i; goto again;
 }
@@ -20,11 +20,11 @@ EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=(char8�
 EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=u8s }, 4 }; }
 EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
 EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, (char32_t *)unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32̄_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; }
 EXT₋C Argᴾ ﹟c(char8₋t c) a⃝ { return Argᴾ { { .c=c }, 6 }; }
 EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝ { return Argᴾ { { .c=(char8₋t)c }, 6 }; }
-EXT₋C Argᴾ ﹟C(char32_t C) { return Argᴾ { { .uc=C }, 7 }; }
+EXT₋C Argᴾ ﹟C(char32̄_t C) { return Argᴾ { { .uc=C }, 7 }; }
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
 EXT₋C Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
@@ -41,18 +41,18 @@ EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 
 void Register₋reflect(__builtin_uint_t /* mask */) { }
 
-inexorable void Present(void (^out)(char8₋t * u8s, __builtin_int_t bytes), char32_t * terminated₋ucs)
+inexorable void Present(void (^out)(char8₋t * u8s, __builtin_int_t bytes), char32̄_t * terminated₋ucs)
 {
    __builtin_int_t tetras = TetrasUntilNull(terminated₋ucs,BUILTIN₋INT₋MAX);
    print(out, "⬚", ﹟S₁(tetras,terminated₋ucs));
 }
 
-EXT₋C Argᴾ ﹟S₂(char32_t * terminated₋uc) {
+EXT₋C Argᴾ ﹟S₂(char32̄_t * terminated₋uc) {
   __builtin_int_t tetras = TetrasUntilNull(terminated₋uc,BUILTIN₋INT₋MAX);
   return Argᴾ { { .ucs={ tetras, terminated₋uc } }, 5 };
 }
 
-inexorable void Coalesc₋present(void (^out)(int count, char32_t * unterminated₋ucs), int count, char32_t * unterminated₋ucs)
+inexorable void Coalesc₋present(void (^out)(int count, char32̄_t * unterminated₋ucs), int count, char32̄_t * unterminated₋ucs)
 {
    
 } /* ⬷ two 'async'-job alt. written coroutines alt. threads for example. */
@@ -68,7 +68,7 @@ print﹟(
   const char * utf8format, 
   __builtin_va_list argument
 )
-{  __builtin_int_t i=0, incr; short followers; char32_t uc;
+{  __builtin_int_t i=0, incr; short followers; char32̄_t uc;
     int 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 printedBytesExcept0=0; /* bool may𝘖rDidEscape=false; */
     auto out₂ = ^(const char * 𝟽bit₋utf8, __builtin_int_t bytes) {
       out((char8₋t *)𝟽bit₋utf8, bytes); printedBytesExcept0 += bytes; };
@@ -89,13 +89,13 @@ print﹟(
       , ^(char s) { out₂(&s,1); }); };
     auto eight₋bit₋symbol = ^(char8₋t c) { out(&c,1); };
     auto u8c₋stream = ^(char8₋t * utf8) { char8₋t * p = (char8₋t *)utf8; while (*p) { out(p,1); p++; } };
-    auto unicode₋symbol = ^(char32_t u) { UnicodeToUtf8(u, ^(char8₋t * u8s, 
+    auto unicode₋symbol = ^(char32̄_t u) { UnicodeToUtf8(u, ^(char8₋t * u8s, 
      short bytes) { out(Critic(u8s),bytes); }); };
 #ifndef UNEXISTING₋IEEE754
-    auto out𝕕 = ^(double ℝ) { Format(ℝ, Ieee754form::Scientific, ^(char32_t uc) { unicode₋symbol(uc); }); };
+    auto out𝕕 = ^(double ℝ) { Format(ℝ, Ieee754form::Scientific, ^(char32̄_t uc) { unicode₋symbol(uc); }); };
 #endif
-    auto unicode₋stream = ^(int tetras, char32_t * unicodes) { __builtin_int_t 
-      beam=0; while (beam < tetras) { char32_t uc = *(unicodes + beam); unicode₋symbol(uc); 
+    auto unicode₋stream = ^(int tetras, char32̄_t * unicodes) { __builtin_int_t 
+      beam=0; while (beam < tetras) { char32̄_t uc = *(unicodes + beam); unicode₋symbol(uc); 
       ++beam; } }; /* { int, (bytes, symbols) } */
 #ifdef 𝟷𝟸𝟾₋bit₋integers
     auto 𝟷𝟸𝟾₋out𝕫 = ^(__int128_t I) { Base𝕫(I, 10, 0, ^(char 𝟶to𝟿) { out₂(&𝟶to𝟿,1); }); };
