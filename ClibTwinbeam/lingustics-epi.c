@@ -259,11 +259,12 @@ again:
     s₋ctxt->ongoing=mult_sequent(ten,s₋ctxt->ongoing);
     int₋to₋sequent(ucode - U'0',&augment);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,augment);
+    if (is₋integer₋last()) { }
     }
    else if (STATE(mode₋fract) && digit(ucode) && is₋fractional₋last())
     {
-    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequent fract;
     append₋to₋fraction(ucode);
+    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequent fract;
     rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&fract);
     confess(number₋literal);
     }
