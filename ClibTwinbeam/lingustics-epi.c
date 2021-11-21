@@ -161,7 +161,7 @@ enum token next₋token(lexer * s₋ctxt,
   struct token₋detail * detail₋out)
 {
    __builtin_int_t i,symbols=s₋ctxt->symbols;
-   char32̄_t ucode, ucode₊₁;
+   char32̄_t ucode, ucode₊₁; int last₋uc=0;
    
    typedef int (^type)(char32̄_t unicode);
    typedef void (^collect)(char32̄_t);
@@ -218,7 +218,8 @@ enum token next₋token(lexer * s₋ctxt,
 again:
    i=s₋ctxt->tip₋unicode; s₋ctxt->tip₋unicode += 1;
    if (i >= symbols) { confess(completion); }
-   ucode = s₋ctxt->text₋heap[i], ucode₊₁ = s₋ctxt->text₋heap[i+1];
+   if (i == symbols - 1) { last₋uc=1; }
+   ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (last₋uc ? 0 : s₋ctxt->text₋heap[i+1]);
    if (derender₋newline(ucode)) { increment₋simplebook(); }
    else if (newline(ucode)) { /* do nothing */ }
    else if (whitespace(ucode)) { /* do nothing */ }
