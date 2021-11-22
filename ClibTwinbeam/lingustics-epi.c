@@ -161,7 +161,7 @@ enum token next₋token(lexer * s₋ctxt,
   struct token₋detail * detail₋out)
 {
    __builtin_int_t i,symbols=s₋ctxt->symbols;
-   char32̄_t ucode, ucode₊₁; int last₋uc=0;
+   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 char32̄_t ucode, ucode₊₁; int uc₋last=0;
    
    typedef int (^type)(char32̄_t unicode);
    typedef void (^collect)(char32̄_t);
@@ -176,6 +176,13 @@ enum token next₋token(lexer * s₋ctxt,
    type letter₋alt₋digit = ^(char32̄_t c) { return letter(c) || digit(c); };
    type period = ^(char32̄_t c) { return c == U'.'; };
    
+   perform reset = ^{
+     s₋ctxt->symbols₋in₋fract=0;
+     s₋ctxt->symbols₋in₋regular=0;
+     s₋ctxt->ongoing = accumulative₋zero();
+     s₋ctxt->mode = mode₋initial;
+   };
+   
    collect append₋to₋fraction = ^(char32̄_t uc) {
     short idx = s₋ctxt->symbols₋in₋fract;
     if (idx >= 2049) Diagnos(s₋ctxt,1,"error: fractional too precise.");
@@ -187,13 +194,6 @@ enum token next₋token(lexer * s₋ctxt,
     if (idx >= 2048) { Diagnos(s₋ctxt,1,"error: identifier too long."); }
     s₋ctxt->regular[idx] = uc;
     s₋ctxt->symbols₋in₋regular += 1; };
-   
-   perform reset = ^{
-     s₋ctxt->symbols₋in₋fract=0;
-     s₋ctxt->symbols₋in₋regular=0;
-     s₋ctxt->mode = mode₋initial;
-     s₋ctxt->ongoing = accumulative₋zero();
-   };
    
    query is₋regular₋last = ^{ return !letter₋alt₋digit(ucode₊₁); };
    query is₋fractional₋last = ^{ return !digit(ucode₊₁); };
@@ -209,8 +209,9 @@ enum token next₋token(lexer * s₋ctxt,
      detail₋out->store.regular𝘖rIdent.start=s₋ctxt->text₋heap;
      reset(); return IDENT/*IFIER*/;
     case number₋literal: detail₋out->kind=2; 
-     detail₋out->store.literal=0.0; reset();
-     return NUMERIC₋CONST; /* ⬷ relative-to-string big-endian. */
+     /* s₋ctxt->ongoing is valid and s₋ctxt->fract₋0to9 is still. */
+     detail₋out->store.literal=0.0;
+     reset(); return NUMERIC₋CONST; /* ⬷ relative-to-letters big-endian. */
     case lex₋error: Diagnos(s₋ctxt,1,"error: scanner error."); return 0;
     case completion: return END₋OF₋TRANSMISSION;
    }
@@ -218,8 +219,10 @@ enum token next₋token(lexer * s₋ctxt,
 again:
    i=s₋ctxt->tip₋unicode; s₋ctxt->tip₋unicode += 1;
    if (i >= symbols) { confess(completion); }
-   if (i == symbols - 1) { last₋uc=1; }
-   ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (last₋uc ? 0 : s₋ctxt->text₋heap[i+1]);
+   if (i == symbols - 1) { uc₋last=1; }
+   ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
+   /* if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; }
+   if (STATE(mode-initial)) { s₋ctxt->column₋last+=1; } */
    if (derender₋newline(ucode)) { increment₋simplebook(); }
    else if (newline(ucode)) { /* do nothing */ }
    else if (whitespace(ucode)) { /* do nothing */ }
@@ -234,6 +237,7 @@ again:
    else if (STATE(mode₋initial) && ucode == U'-') { return MINUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'+') { return PLUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'*') { return MULT_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U';') { return SEMICOLON; }
    else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ != U'*') { return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
     { NEXT(mode₋multiline₋comment); }
@@ -246,13 +250,12 @@ again:
    else if (STATE(mode₋singleline₋comment) && newline(ucode))
     { NEXT(mode₋initial); if (derender₋newline(ucode)) { increment₋simplebook(); } }
    else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
-   else if (STATE(mode₋singleline₋comment)) { NEXT(mode₋initial); }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
-   else if (STATE(mode₋integer) && period(ucode)) { NEXT(mode₋fract); }
+   else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
    else if (STATE(mode₋initial) && digit(ucode))
     {
     int₋to₋sequent(ucode - U'0',&s₋ctxt->ongoing);
-    if (is₋integer₋last()) { } else { NEXT(mode₋integer); }
+    if (is₋integer₋last()) { confess(number₋literal); } else { NEXT(mode₋integer); }
     }
    else if (STATE(mode₋integer) && digit(ucode))
     {
@@ -260,13 +263,14 @@ again:
     s₋ctxt->ongoing=mult_sequent(ten,s₋ctxt->ongoing);
     int₋to₋sequent(ucode - U'0',&augment);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,augment);
-    if (is₋integer₋last()) { }
+    if (is₋integer₋last()) { confess(number₋literal); }
     }
    else if (STATE(mode₋fract) && digit(ucode) && is₋fractional₋last())
     {
     append₋to₋fraction(ucode);
-    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequent fract;
-    rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&fract);
+    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequent lessthanone;
+    rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&lessthanone);
+    s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,lessthanone);
     confess(number₋literal);
     }
    else if (STATE(mode₋fract) && digit(ucode))
@@ -367,6 +371,16 @@ again:
    goto again;
 }
 
+void print₋unicodes(lexer * s₋ctxt)
+{ uint32_t uc; int i=0;
+   uint32_t * text = (uint32_t *)s₋ctxt->text₋heap;
+again:
+   if (i >= s₋ctxt->symbols) { return; }
+   uc = *(i + text); i += 1;
+   print("⬚ ", ﹟x((__builtin_uint_t)uc));
+   goto again;
+}
+
 /*
  *  main function.
  */
@@ -377,11 +391,12 @@ main(
   const char * argv[]
 )
 {
-   lexer bag; struct token₋detail gritty;
+   lexer bag; struct token₋detail notes;
    if (context₋init((char8₋t *)u8"./test.txt",&bag)) { return 1; }
    if (bag.symbols == 0) { return 2; }
-   print₋tokens(&bag,&gritty); /* debugbuild */
-   lookahead = next₋token(&bag,&gritty); parse₋assign(&bag);
+   print₋unicodes(&bag); print("\n");
+   print₋tokens(&bag,&notes); /* debugbuild */
+   lookahead = next₋token(&bag,&notes); parse₋assign(&bag);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful\n");
    return 0;
