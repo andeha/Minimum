@@ -223,9 +223,9 @@ again:
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
    /* if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; }
    if (STATE(mode-initial)) { s₋ctxt->column₋last+=1; } */
-   if (derender₋newline(ucode)) { increment₋simplebook(); }
-   else if (newline(ucode)) { /* do nothing */ }
-   else if (whitespace(ucode)) { /* do nothing */ }
+   if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); }
+   else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
+   else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); } else { NEXT(mode₋multiregular); }
@@ -238,14 +238,15 @@ again:
    else if (STATE(mode₋initial) && ucode == U'+') { return PLUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'*') { return MULT_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U';') { return SEMICOLON; }
-   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ != U'*') { return DIV_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
+    { return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
     { NEXT(mode₋multiline₋comment); }
    else if (STATE(mode₋multiline₋comment) && ucode == U'*' && ucode₊₁ == U'/')
     { NEXT(mode₋initial); }
    else if (STATE(mode₋multiline₋comment) /* && ucode != U'*' && ucode₊₁ != U'/' */)
     { if (derender₋newline(ucode)) { increment₋simplebook(); } }
-   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'/')
+   else if (STATE(mode₋initial) && ucode₊₁ == U'/' && ucode == U'/' )
     { NEXT(mode₋singleline₋comment); }
    else if (STATE(mode₋singleline₋comment) && newline(ucode))
     { NEXT(mode₋initial); if (derender₋newline(ucode)) { increment₋simplebook(); } }
@@ -371,14 +372,15 @@ again:
    goto again;
 }
 
-void print₋unicodes(lexer * s₋ctxt)
-{ uint32_t uc; int i=0;
-   uint32_t * text = (uint32_t *)s₋ctxt->text₋heap;
+void print₋unicodes(char32̄_t * text)
+{ char32̄_t uc; __builtin_int_t i=0;
 again:
-   if (i >= s₋ctxt->symbols) { return; }
-   uc = *(i + text); i += 1;
-   print("⬚ ", ﹟x((__builtin_uint_t)uc));
-   goto again;
+   uc = *(i + text);
+   if (uc == 0x0004) { return; }
+   print("U+");
+   Base𝕟((__builtin_uint_t)uc,16,4,^(char 𝟶to𝟿) { print("⬚", ﹟c(𝟶to𝟿)); });
+   print(" ");
+   i += 1; goto again;
 }
 
 /*
@@ -392,9 +394,11 @@ main(
 )
 {
    lexer bag; struct token₋detail notes;
-   if (context₋init((char8₋t *)u8"./test.txt",&bag)) { return 1; }
+   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(argv[0])); }
+   char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
+   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(argv[1])); return 1; }
    if (bag.symbols == 0) { return 2; }
-   print₋unicodes(&bag); print("\n");
+   print₋unicodes(bag.text₋heap); print("\n");
    print₋tokens(&bag,&notes); /* debugbuild */
    lookahead = next₋token(&bag,&notes); parse₋assign(&bag);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
