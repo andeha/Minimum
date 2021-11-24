@@ -256,6 +256,7 @@ again:
     { return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
    else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
+   else if (STATE(mode₋integer) && period(ucode) && !is₋integer₋last()) { NEXT(mode₋fract); }
    else if (STATE(mode₋initial) && digit(ucode))
     {
     int₋to₋sequent(ucode - U'0',&s₋ctxt->ongoing);
@@ -289,27 +290,23 @@ again:
  *  unicode parser.
  */
 
-static enum token lookahead; /* ⬷ later struct token_fifo * tf for LL(k). */
+static enum token lookahead, retrospect; /* ⬷ later struct token_fifo * tf for LL(k). */
 
-static void match(enum token expected, lexer * log, 
+static void match(enum token expected, lexer * background, 
  struct token₋detail * detail₋out)
 {
-   if (lookahead == expected) { lookahead = next₋token(log,detail₋out); }
-   else { Diagnos(log,0,"error: syntax expected ⬚, got ⬚.\n", 
+   if (lookahead == expected) { lookahead = next₋token(background,detail₋out); }
+   else { Diagnos(background,0,"error: syntax expected ⬚, got ⬚.\n", 
    ﹟d((__builtin_int_t)expected), 
    ﹟d((__builtin_int_t)lookahead)); }
-// if debugbuild() {
-   char * text = tokenname(lookahead);
-   print("token ⬚ ", ﹟s(text));
-// }
 }
 
-static void parse₋assign(lexer * s₋ctxt);
-static void parse₋expr(lexer * s₋ctxt);
-static void parse₋term(lexer * s₋ctxt);
-static void parse₋factor(lexer * s₋ctxt);
-static void parse₋unary(lexer * s₋ctxt);
-static void parse₋circum(lexer * s₋ctxt);
+static void parse₋assign(lexer * ctx);
+static void parse₋expr(lexer * ctx);
+static void parse₋term(lexer * ctx);
+static void parse₋factor(lexer * ctx);
+static void parse₋unary(lexer * ctx);
+static void parse₋circum(lexer * ctx);
 
 static void parse₋assign(lexer * s₋ctxt)
 { struct token₋detail gal;
@@ -371,7 +368,7 @@ again:
    lookahead = next₋token(bag,gritty);
    char * text = tokenname(lookahead);
    print("⬚ ", ﹟s(text));
-   if (lookahead == END₋OF₋TRANSMISSION) { exit(3); }
+   if (lookahead == END₋OF₋TRANSMISSION) { print("\n"); return; }
    goto again;
 }
 
