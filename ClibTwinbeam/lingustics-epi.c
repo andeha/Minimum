@@ -218,12 +218,24 @@ enum token next₋token(lexer * s₋ctxt,
    
 again:
    i=s₋ctxt->tip₋unicode; s₋ctxt->tip₋unicode += 1;
-   if (i >= symbols) { confess(completion); }
+   if (i >= symbols && STATE(mode₋initial)) { confess(completion); }
    if (i == symbols - 1) { uc₋last=1; }
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
-   /* if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; }
-   if (STATE(mode-initial)) { s₋ctxt->column₋last+=1; } */
    if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); }
+   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
+    { NEXT(mode₋multiline₋comment); }
+   else if (STATE(mode₋multiline₋comment) && ucode == U'*' && ucode₊₁ == U'/')
+    { NEXT(mode₋initial); s₋ctxt->tip₋unicode += 1; }
+  else if (STATE(mode₋multiline₋comment) /* && ucode != U'*' && ucode₊₁ != U'/' */)
+    { if (derender₋newline(ucode)) { increment₋simplebook(); } }
+   else if (STATE(mode₋initial) && ucode₊₁ == U'/' && ucode == U'/')
+    { NEXT(mode₋singleline₋comment); }
+   else if (STATE(mode₋singleline₋comment) && newline(ucode))
+    {
+    NEXT(mode₋initial);
+    if (derender₋newline(ucode)) { increment₋simplebook(); }
+    }
+   else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
    else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
@@ -233,6 +245,8 @@ again:
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); }
    }
+ /* if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; }
+   if (STATE(mode-initial)) { s₋ctxt->column₋last+=1; } */
    else if (STATE(mode₋initial) && ucode == U'=') { return EQUALS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'-') { return MINUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'+') { return PLUS_KEYWORD; }
@@ -240,17 +254,6 @@ again:
    else if (STATE(mode₋initial) && ucode == U';') { return SEMICOLON; }
    else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
     { return DIV_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
-    { NEXT(mode₋multiline₋comment); }
-   else if (STATE(mode₋multiline₋comment) && ucode == U'*' && ucode₊₁ == U'/')
-    { NEXT(mode₋initial); }
-   else if (STATE(mode₋multiline₋comment) /* && ucode != U'*' && ucode₊₁ != U'/' */)
-    { if (derender₋newline(ucode)) { increment₋simplebook(); } }
-   else if (STATE(mode₋initial) && ucode₊₁ == U'/' && ucode == U'/' )
-    { NEXT(mode₋singleline₋comment); }
-   else if (STATE(mode₋singleline₋comment) && newline(ucode))
-    { NEXT(mode₋initial); if (derender₋newline(ucode)) { increment₋simplebook(); } }
-   else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
    else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
    else if (STATE(mode₋initial) && digit(ucode))
@@ -373,13 +376,13 @@ again:
 }
 
 void print₋unicodes(char32̄_t * text)
-{ char32̄_t uc; __builtin_int_t i=0;
+{ char32̄_t uc; __builtin_int_t i=0, ext₋count=0;
 again:
    uc = *(i + text);
-   if (uc == 0x0004) { return; }
+   if (uc == 0x0004) { print("(ext₋count=⬚)\n", ﹟d(ext₋count)); return; }
    print("U+");
    Base𝕟((__builtin_uint_t)uc,16,4,^(char 𝟶to𝟿) { print("⬚", ﹟c(𝟶to𝟿)); });
-   print(" ");
+   if (uc & 0xffff0000) { ext₋count += 1; print("⌜"); } else { print(" "); }
    i += 1; goto again;
 }
 
