@@ -109,6 +109,7 @@ struct token₋detail {
     double literal;
   } store;
   int kind;
+  __builtin_int_t start₋line, column₋start, final₋line, column₋end;
 };
 
 char * tokenname(enum token gritty)
@@ -296,9 +297,9 @@ static void match(enum token expected, lexer * background,
  struct token₋detail * detail₋out)
 {
    if (lookahead == expected) { lookahead = next₋token(background,detail₋out); }
-   else { Diagnos(background,0,"error: syntax expected ⬚, got ⬚.\n", 
-   ﹟d((__builtin_int_t)expected), 
-   ﹟d((__builtin_int_t)lookahead)); }
+   else { Diagnos(background,0,"error: syntax expected ⬚, got ⬚.", 
+   ﹟s(tokenname(expected)), 
+   ﹟s(tokenname(lookahead))); }
 }
 
 static void parse₋assign(lexer * ctx);
@@ -357,8 +358,8 @@ static void parse₋circum(lexer * s₋ctxt)
    switch (lookahead) {
    case IDENT: match(IDENT,s₋ctxt,&gal); break;
    case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal); break;
-   default: Diagnos(s₋ctxt,0,"expecting IDENT alternatively NUMERIC₋CONST, "
-    "got type-of-token."); break;
+   default: Diagnos(s₋ctxt,0,"error: expecting IDENT alternatively NUMERIC₋CONST, "
+    "got ⬚.", ﹟s(tokenname(lookahead))); break;
    }
 }
 
