@@ -5,7 +5,7 @@ import Setjmp;
 
 /*
   
-  assign -> Ident '=' expr ';'
+  assign -> Ident = expr ;
   
   expr -> term + term
   expr -> term - term
@@ -25,7 +25,7 @@ import Setjmp;
   circum -> real-literal
   circum -> integer-literal
   circum -> ( expr )
-  circum -> funct ( expr )
+  circum -> funct ( expr ) alt. funct ( )
   circum -> identifier
   
  */
@@ -109,7 +109,8 @@ struct token₋detail {
     double literal;
   } store;
   int kind;
-  __builtin_int_t start₋line, column₋start, final₋line, column₋end;
+  __builtin_int_t lineno₋first, column₋first, column₋last, lineno₋last;
+  lexer * src;
 };
 
 char * tokenname(enum token gritty)
@@ -143,17 +144,30 @@ EXT₋C long write(int fd, const void * s, long unsigned nbyte);
 EXT₋C int print﹟(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
 
-void Diagnos(lexer * s₋ctxt, int bye, char * text, ...)
-{ va_prologue(text);
-  __builtin_int_t lineno₋first = s₋ctxt->lineno₋first, 
-   column₋first = s₋ctxt->column₋first, 
-   linecount = 1 + s₋ctxt->lineno₋last - lineno₋first;
-  char8₋t * src₋path = s₋ctxt->src₋path;
+void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * text, ...)
+{ va_prologue(text); char8₋t * src₋path;
+  __builtin_int_t lineno₋first, first₋column, linecount, last₋column;
+  if (type == 2) { lexer * s₋ctxt = (lexer *)ctx;
+     lineno₋first = s₋ctxt->lineno₋first, 
+     first₋column = s₋ctxt->column₋first, 
+     linecount = 1 + s₋ctxt->lineno₋last - lineno₋first, 
+     last₋column = s₋ctxt->column₋last; /* ⬷ diagnos-2. */
+     src₋path = s₋ctxt->src₋path;
+  } else if (type == 1) { struct token₋detail * ahead = 
+     (struct token₋detail *)ctx;
+    lineno₋first = ahead->lineno₋first, 
+    first₋column = ahead->column₋first, 
+    linecount = 1 + ahead->lineno₋last - lineno₋first, 
+    last₋column = ahead->column₋last;
+    src₋path = ahead->src->src₋path; }
   typedef void (^Utf8)(char8₋t * u8s, __builtin_int_t bytes);
   Utf8 out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
-  print(out,"⬚:⬚:⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(column₋first));
+  print(out,"⬚:⬚:⬚—⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(first₋column), 
+   ﹟d(last₋column));
   print﹟(out, text, __various);
-  print(out, " (⬚ lines)\n", ﹟d(linecount));
+  print(out, " (⬚ line", ﹟d(linecount));
+  if (linecount != 1) { print("s"); }
+  print(out, ")\n");
   va_epilogue;
   if (bye) { exit(1); } else { Pult💡(diagnosis₋count); }
 } /*  ⬷ write texts prefixed with 'error:', 'warning:' and 'internal-error:'. */
@@ -163,6 +177,7 @@ enum token next₋token(lexer * s₋ctxt,
 {
    __builtin_int_t i,symbols=s₋ctxt->symbols;
    𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 char32̄_t ucode, ucode₊₁; int uc₋last=0;
+   detail₋out->src = s₋ctxt;
    
    typedef int (^type)(char32̄_t unicode);
    typedef void (^collect)(char32̄_t);
@@ -186,13 +201,13 @@ enum token next₋token(lexer * s₋ctxt,
    
    collect append₋to₋fraction = ^(char32̄_t uc) {
     short idx = s₋ctxt->symbols₋in₋fract;
-    if (idx >= 2049) Diagnos(s₋ctxt,1,"error: fractional too precise.");
+    if (idx >= 2049) Diagnos(2,s₋ctxt,1,"error: fractional too precise.");
     s₋ctxt->fract₋𝟶to𝟿s[idx] = uc;
     s₋ctxt->symbols₋in₋fract += 1; };
    
    collect append₋to₋regular = ^(char32̄_t uc) {
     short idx = s₋ctxt->symbols₋in₋regular;
-    if (idx >= 2048) { Diagnos(s₋ctxt,1,"error: identifier too long."); }
+    if (idx >= 2048) { Diagnos(2,s₋ctxt,1,"error: identifier too long."); }
     s₋ctxt->regular[idx] = uc;
     s₋ctxt->symbols₋in₋regular += 1; };
    
@@ -203,17 +218,25 @@ enum token next₋token(lexer * s₋ctxt,
 #define STATE(s) (s == s₋ctxt->mode)
    
    perform increment₋simplebook = ^{ s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; };
+   perform sample₋location = ^{
+     detail₋out->lineno₋first=s₋ctxt->lineno₋first;
+     detail₋out->lineno₋last=s₋ctxt->lineno₋last;
+     detail₋out->column₋first=s₋ctxt->column₋first;
+     detail₋out->column₋last=s₋ctxt->column₋last;
+   };
    
    🧵(identifier,number₋literal,lex₋error,completion) {
     case identifier: detail₋out->kind=1; 
      detail₋out->store.regular𝘖rIdent.symbols=s₋ctxt->symbols;
      detail₋out->store.regular𝘖rIdent.start=s₋ctxt->text₋heap;
+     sample₋location();
      reset(); return IDENT/*IFIER*/;
     case number₋literal: detail₋out->kind=2; 
      /* s₋ctxt->ongoing is valid and s₋ctxt->fract₋0to9 is still. */
      detail₋out->store.literal=0.0;
+     sample₋location();
      reset(); return NUMERIC₋CONST; /* ⬷ relative-to-letters big-endian. */
-    case lex₋error: Diagnos(s₋ctxt,1,"error: scanner error."); return 0;
+    case lex₋error: Diagnos(2,s₋ctxt,1,"error: scanner error."); return 0;
     case completion: return END₋OF₋TRANSMISSION;
    }
    
@@ -222,6 +245,8 @@ again:
    if (i >= symbols && STATE(mode₋initial)) { confess(completion); }
    if (i == symbols - 1) { uc₋last=1; }
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
+   if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; s₋ctxt->column₋last=s₋ctxt->column₋first; }
+   if (!STATE(mode₋initial)) { s₋ctxt->column₋last+=1; }
    if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); }
    else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
     { NEXT(mode₋multiline₋comment); }
@@ -246,12 +271,12 @@ again:
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); }
    }
- /* if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; }
-   if (STATE(mode-initial)) { s₋ctxt->column₋last+=1; } */
    else if (STATE(mode₋initial) && ucode == U'=') { return EQUALS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'-') { return MINUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'+') { return PLUS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'*') { return MULT_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'(') { return LPAREN_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U')') { return RPAREN_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U';') { return SEMICOLON; }
    else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
     { return DIV_KEYWORD; }
@@ -291,15 +316,17 @@ again:
  *  unicode parser.
  */
 
-static enum token lookahead, retrospect; /* ⬷ later struct token_fifo * tf for LL(k). */
+enum token lookahead, retrospect; /* ⬷ later struct token_fifo * tf for LL(k). */
 
 static void match(enum token expected, lexer * background, 
- struct token₋detail * detail₋out)
+ struct token₋detail * gal₋out)
 {
-   if (lookahead == expected) { lookahead = next₋token(background,detail₋out); }
-   else { Diagnos(background,0,"error: syntax expected ⬚, got ⬚.", 
-   ﹟s(tokenname(expected)), 
-   ﹟s(tokenname(lookahead))); }
+   if (lookahead == expected) { 
+     /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
+     lookahead = next₋token(background,gal₋out); }
+   else { Diagnos(1,gal₋out,0,"error: syntax expected ⬚, got ⬚.", 
+    ﹟s(tokenname(expected)), 
+    ﹟s(tokenname(lookahead))); }
 }
 
 static void parse₋assign(lexer * ctx);
@@ -356,9 +383,18 @@ static void parse₋unary(lexer * s₋ctxt)
 static void parse₋circum(lexer * s₋ctxt)
 { struct token₋detail gal;
    switch (lookahead) {
-   case IDENT: match(IDENT,s₋ctxt,&gal); break;
    case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal); break;
-   default: Diagnos(s₋ctxt,0,"error: expecting IDENT alternatively NUMERIC₋CONST, "
+   case LPAREN_KEYWORD: match(LPAREN_KEYWORD,s₋ctxt,&gal); 
+    parse₋expr(s₋ctxt); match(RPAREN_KEYWORD,s₋ctxt,&gal); break;
+   case IDENT: match(IDENT,s₋ctxt,&gal); 
+    if (lookahead == LPAREN_KEYWORD) {
+      match(LPAREN_KEYWORD,s₋ctxt,&gal);
+      if (lookahead == RPAREN_KEYWORD) { /* do nothing */ }
+      else { parse₋expr(s₋ctxt); }
+      match(RPAREN_KEYWORD,s₋ctxt,&gal);
+    }
+    break;
+   default: Diagnos(1,&gal,0,"error: expecting IDENT, LPAREN and NUMERIC₋CONST, "
     "got ⬚.", ﹟s(tokenname(lookahead))); break;
    }
 }
@@ -369,7 +405,7 @@ again:
    lookahead = next₋token(bag,gritty);
    char * text = tokenname(lookahead);
    print("⬚ ", ﹟s(text));
-   if (lookahead == END₋OF₋TRANSMISSION) { print("\n"); return; }
+   if (lookahead == END₋OF₋TRANSMISSION) { print("\n\n"); return; }
    goto again;
 }
 
@@ -395,15 +431,17 @@ main(
 )
 {
    lexer bag; struct token₋detail notes;
-   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(argv[0])); }
+   const char * binary = argv[0];
+   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(binary)); }
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
-   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(argv[1])); return 1; }
+   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 1; }
    if (bag.symbols == 0) { return 2; }
-   print₋unicodes(bag.text₋heap); print("\n");
-   print₋tokens(&bag,&notes); /* debugbuild */
-   lookahead = next₋token(&bag,&notes); parse₋assign(&bag);
+/* debugbuild ⤐ print₋unicodes(bag.text₋heap); print("\n"); 
+    print₋tokens(&bag,&notes); ⬷ debugbuild */
+   lookahead = next₋token(&bag,&notes); parse₋assign(&bag); lookahead = 
+    next₋token(&bag,&notes);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
-   else print("parsing unsuccessful\n");
+   else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
    return 0;
 }
 
