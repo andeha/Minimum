@@ -106,7 +106,7 @@ enum token { END₋OF₋TRANSMISSION=1,
 struct token₋detail {
   union {
     struct Regular𝘖rIdent { int symbols; char32̄_t * start; } regular𝘖rIdent;
-    double literal;
+    Sequent literal;
   } store;
   int kind;
   __builtin_int_t lineno₋first, column₋first, column₋last, lineno₋last;
@@ -147,7 +147,9 @@ EXT₋C int print﹟(void (^out)(char8₋t * u8s, __builtin_int_t bytes),
 void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * text, ...)
 { va_prologue(text); char8₋t * src₋path;
   __builtin_int_t lineno₋first, first₋column, linecount, last₋column;
-  if (type == 2) { lexer * s₋ctxt = (lexer *)ctx;
+  if (type == 3) {
+    
+  } else if (type == 2) { lexer * s₋ctxt = (lexer *)ctx;
      lineno₋first = s₋ctxt->lineno₋first, 
      first₋column = s₋ctxt->column₋first, 
      linecount = 1 + s₋ctxt->lineno₋last - lineno₋first, 
@@ -233,7 +235,7 @@ enum token next₋token(lexer * s₋ctxt,
      reset(); return IDENT/*IFIER*/;
     case number₋literal: detail₋out->kind=2; 
      /* s₋ctxt->ongoing is valid and s₋ctxt->fract₋0to9 is still. */
-     detail₋out->store.literal=0.0;
+     int₋to₋sequent(0,&(detail₋out->store.literal));
      sample₋location();
      reset(); return NUMERIC₋CONST; /* ⬷ relative-to-letters big-endian. */
     case lex₋error: Diagnos(2,s₋ctxt,1,"error: scanner error."); return 0;
@@ -317,7 +319,8 @@ again:
  */
 
 enum token lookahead, retrospect; /* ⬷ later struct token_fifo * tf for LL(k). */
-
+Stack 🥞;
+ 
 static void match(enum token expected, lexer * background, 
  struct token₋detail * gal₋out)
 {
@@ -336,12 +339,26 @@ static void parse₋factor(lexer * ctx);
 static void parse₋unary(lexer * ctx);
 static void parse₋circum(lexer * ctx);
 
+void Ⓑ() { print("ASSIGN "); }
+void Ⓒ(enum token op) { print("ADD "); 
+   if (empty(&🥞)) { return; }
+   uint8_t * r = pop(&🥞), *l=pop(&🥞);
+   uint32_t item=13; uint8_t * bitem = (uint8_t *)&item;
+   if (push(&🥞,bitem)) { return; }
+}
+void Ⓓ() { print("MULT "); }
+void Ⓔ() { print("SIGN "); }
+void Ⓕ() { print("ASSOC "); }
+void Ⓖ() { print("LITERAL "); }
+void Ⓗ() { print("FUNCT "); }
+void Ⓘ() { print("BIND-PARAM "); }
+
 static void parse₋assign(lexer * s₋ctxt)
 { struct token₋detail gal;
    match(IDENT,s₋ctxt,&gal);
    match(EQUALS_KEYWORD,s₋ctxt,&gal);
    parse₋expr(s₋ctxt);
-   match(SEMICOLON,s₋ctxt,&gal);
+   match(SEMICOLON,s₋ctxt,&gal); Ⓑ();
 }
 
 static void parse₋expr(lexer * s₋ctxt)
@@ -349,7 +366,7 @@ static void parse₋expr(lexer * s₋ctxt)
    parse₋term(s₋ctxt);
    while (lookahead == PLUS_KEYWORD || lookahead == MINUS_KEYWORD) {
      match(lookahead,s₋ctxt,&gal);
-     parse₋term(s₋ctxt);
+     parse₋term(s₋ctxt); Ⓒ(lookahead);
    }
 }
 
@@ -358,7 +375,7 @@ static void parse₋term(lexer * s₋ctxt)
    parse₋factor(s₋ctxt);
    while (lookahead == MULT_KEYWORD || lookahead == DIV_KEYWORD) {
      match(lookahead,s₋ctxt,&gal);
-     parse₋factor(s₋ctxt);
+     parse₋factor(s₋ctxt); Ⓓ();
    }
 }
 
@@ -367,7 +384,7 @@ static void parse₋factor(lexer * s₋ctxt)
    parse₋unary(s₋ctxt);
    while (lookahead == PLUS_KEYWORD || lookahead == MINUS_KEYWORD) {
      match(lookahead,s₋ctxt,&gal);
-     parse₋unary(s₋ctxt);
+     parse₋unary(s₋ctxt); Ⓔ();
    }
 }
 
@@ -376,21 +393,21 @@ static void parse₋unary(lexer * s₋ctxt)
    parse₋circum(s₋ctxt);
    if (lookahead == CIRCUM_KEYWORD) {
      match(CIRCUM_KEYWORD,s₋ctxt,&gal);
-     parse₋circum(s₋ctxt);
+     parse₋circum(s₋ctxt); Ⓕ();
    }
 }
 
 static void parse₋circum(lexer * s₋ctxt)
 { struct token₋detail gal;
    switch (lookahead) {
-   case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal); break;
+   case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal); Ⓖ(); break;
    case LPAREN_KEYWORD: match(LPAREN_KEYWORD,s₋ctxt,&gal); 
     parse₋expr(s₋ctxt); match(RPAREN_KEYWORD,s₋ctxt,&gal); break;
    case IDENT: match(IDENT,s₋ctxt,&gal); 
     if (lookahead == LPAREN_KEYWORD) {
       match(LPAREN_KEYWORD,s₋ctxt,&gal);
-      if (lookahead == RPAREN_KEYWORD) { /* do nothing */ }
-      else { parse₋expr(s₋ctxt); }
+      if (lookahead == RPAREN_KEYWORD) { Ⓗ(); }
+      else { parse₋expr(s₋ctxt); Ⓘ(); }
       match(RPAREN_KEYWORD,s₋ctxt,&gal);
     }
     break;
@@ -438,10 +455,13 @@ main(
    if (bag.symbols == 0) { return 2; }
 /* debugbuild ⤐ print₋unicodes(bag.text₋heap); print("\n"); 
     print₋tokens(&bag,&notes); ⬷ debugbuild */
+   short bytes₋per₋elem = 4;
+   if (init₋stack(&🥞,bytes₋per₋elem)) { return 2; }
    lookahead = next₋token(&bag,&notes); parse₋assign(&bag); lookahead = 
     next₋token(&bag,&notes);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
+   /* stack₋unalloc(&🥞); */
    return 0;
 }
 
