@@ -7,7 +7,7 @@ module ClibTwinbeam_with_History {
 
 module ClibTwinbeam_and_cCubist {
   header "header.h"
-  header "codex-cubist.h"
+  header "bōcstaf-codex.h"
 }
 
 module ClibTwinbeam { requires macos header "header.h" }

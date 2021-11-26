@@ -1,4 +1,4 @@
-/* 􀝦􁅀 codex-cubist.c | juxtaposition and non-sequitur with bōcstafs and graphemes. */
+/*  􀝦􁅀 yello-cubist.c | graphemes with juxtaposition and non-sequitur. */
 
 import ClibTwinbeam_and_cCubist;
 import Setjmp;
@@ -21,7 +21,6 @@ inexorable int init₋context(__builtin_int_t unicode₋program₋symbols,
    ctx->lineno₋first=1, ctx->lineno₋last=1;
    ctx->idx₋unicode=0;
    ctx->ongoing = accumulative₋zero();
-   ctx->negative=0;
    ctx->symbols₋in₋regular = 0;
    ctx->mode = initial;
    return 0;
@@ -32,7 +31,7 @@ Lookahead₋scan₋Artwork(
   __builtin_int_t symbols, char32̄_t text[], 
   enum Artwork₋token₋symbol * kind, 
   union Artwork₋symbol₋token₋detail * detail, 
-  struct Scanner₋ctxt * s₋ctxt, 
+  struct Scanner₋ctxt * lexer, 
   void (^regular𝘖rIdent)(int symbols, char32̄_t * start)
 )
 {
@@ -51,6 +50,7 @@ Lookahead₋scan₋Artwork(
    }
    
    typedef int (^type)(char32̄_t unicode);
+   typedef void (^collect)(char32̄_t);
    typedef void (^action)(void);
    typedef void (^work)(char32̄_t);
    
@@ -60,13 +60,13 @@ Lookahead₋scan₋Artwork(
     s₋ctxt->symbols₋in₋regular += 1; };
    
    type digit = ^(char32̄_t c) { return U'0' <= c && c <= U'9'; };
-   type derender₋newline = ^(char32̄_t c) { return c == U'\xa'; }; /* de- = completely = fullgångna. */
+   type derender₋newline = ^(char32̄_t c) { return c == U'\xa'; };
    type newline = ^(char32̄_t c) { return derender₋newline(c) || c == U'\xd'; };
    type whitespace = ^(char32̄_t c) { return c == U' ' || U'\t' == c || newline(c); };
    type letter = ^(char32̄_t c) { return (U'a' <= c && c <= U'z') || (U'A' <= c && c <= U'Z'); };
    type letter₋alt₋digit = ^(char32̄_t c) { return letter(c) || digit(c); };
-   type base₋5₋character = ^(char32̄_t c) { return U'B' <= c && c <= U'E'; };
-   type base₋16₋character = ^(char32̄_t c) { return U'A' <= c && c <= U'Z'; };
+   type base₋five₋character = ^(char32̄_t c) { return U'B' <= c && c <= U'E'; };
+   type base₋sixteen₋character = ^(char32̄_t c) { return U'A' <= c && c <= U'Z'; };
    type period = ^(char32̄_t c) { return c == U'.'; };
    
    action presentable₋token = ^{

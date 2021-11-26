@@ -73,7 +73,7 @@ rule library
 build $objs/account-italian.o: c ClibTwinbeam/account-italian.c
 build $objs/amend-augment.o: c ClibTwinbeam/amend-augment.c
 build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
-build $objs/avant-garde.o: c ClibTwinbeam/avant-garde.c
+build $objs/bōcstaf-codex.o: c ClibTwinbeam/bōcstaf-codex.c
 build $objs/chronolog-y.o: c ClibTwinbeam/chronolog-y.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
 build $objs/kiddle-table.o: c ClibTwinbeam/kiddle-table.c
