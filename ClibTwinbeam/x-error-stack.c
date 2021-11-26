@@ -56,7 +56,7 @@ uint8_t * pop(struct ¹stack * 🅧) a⃝
    return bytes;
 }
 
-int count(struct ¹stack * 🅧) a⃝ { return 🅧->pos; }
+__builtin_int_t count(struct ¹stack * 🅧) a⃝ { return 🅧->pos; }
 
 int empty(struct ¹stack * 🅧) a⃝ { return 🅧->pos == 0; }
 
