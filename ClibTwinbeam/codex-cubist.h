@@ -1,6 +1,6 @@
-/*  avant-garde.h | graphics and image memory. */
+/*  codex-cubist.h | graphics and image memory. */
 
-/*
+/*  No left-recursion and somtimes backtracking alt. recursive-ascent:
   
   E․𝘨 .size 89.0  .offset -5.0, 12.0  .origo 50.0, 50.0 .columned 1
   
