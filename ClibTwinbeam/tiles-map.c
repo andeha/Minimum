@@ -56,7 +56,8 @@ EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes) { return rea
   Copy8Memory((ByteAlignedRef)new_words, (ByteAlignedRef)p, old_bytes);
   Heap₋unalloc(p);
   return new_words;
-}
-EXT₋C void * Heap₋valloc(__builtin_int_t bytes) { return valloc(bytes); } */
+} */
+
+EXT₋C void * Heap₋valloc(__builtin_int_t bytes) { return valloc(bytes); }
 
 
