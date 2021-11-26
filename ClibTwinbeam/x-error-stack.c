@@ -7,7 +7,8 @@ int init₋stack(struct ¹stack * 🆇, short bytes₋per₋elem) a⃝
    🆇->initial₋area₋alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
    🆇->area₋dealloc = ^(void * p) { Heap₋unalloc(p); };
    🆇->area₋realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); };
-   🆇->pos=0; 🆇->size=8; 🆇->words = 
+   __builtin_int_t count = 1 + 4096/bytes₋per₋element;
+   🆇->pos=0; 🆇->size=count; 🆇->words = 
     (uint8_t *)🆇->initial₋area₋alloc(🆇->size*bytes₋per₋elem);
    if (🆇->words == ΨΛΩ) { 🆇->size=0; return -1; }
    🆇->elem₋bytesize=bytes₋per₋elem;
