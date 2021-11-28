@@ -73,7 +73,7 @@ rule library
 build $objs/account-italian.o: c ClibTwinbeam/account-italian.c
 build $objs/amend-augment.o: c ClibTwinbeam/amend-augment.c
 build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
-build $objs/bōcstaf-codex.o: c ClibTwinbeam/bōcstaf-codex.c
+build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
 build $objs/chronolog-y.o: c ClibTwinbeam/chronolog-y.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
 build $objs/kiddle-table.o: c ClibTwinbeam/kiddle-table.c
@@ -93,7 +93,7 @@ build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
 build $objs/endian-base.o: cc ClibTwinbeam/endian-base.cpp
 build $objs/present-print.o: cc ClibTwinbeam/present-print.cpp
 build libClibTwinbeam: library $objs/account-italian.o $objs/amend-augment.o $
- $objs/arabic-edit.o $objs/avant-garde.o $objs/chronolog-y.o                 $
+ $objs/arabic-edit.o $objs/cubist-codex.o $objs/chronolog-y.o                $
  $objs/float-short.o $objs/kiddle-table.o $objs/lock-arrange.o               $
  $objs/o-binary.o $objs/queue-invent.o $objs/round-fixed.o                   $
  $objs/search-symbol.o $objs/semantic-symbol.o $objs/thread-fork.o           $
