@@ -1,6 +1,6 @@
-/*  codex-cubist.h | for graphics and image memory. */
+/*  yello-cubist.h | graphics and image memory. */
 
-/*  No left-recursion and somtimes backtracking alt. recursive-ascent:
+/* No left-recursion and somtimes backtracking alt. recursive-ascent:
   
   E․𝘨 .size 89.0  .offset -5.0, 12.0  .origo 50.0, 50.0 .columned 1
   
@@ -16,32 +16,32 @@
   
   real-literal -> '-'* digit+ '.' digit*
   
-  statement <- 'start-line' real ',' real
-  statement <- 'add-line' real ',' real
-  statement <- 'last-line' real ',' real
-  statement <- 'base16-image' [a-z]+                               and not base 21
-  statement <- 'utf8-text' ␜ <text> ␜
-  statement <- 'next'
-  statement <- 'azimuth' azimuth-flavor real ',' real ',' real ',' real
-  azimuth-flavor <- 'relative' | unit 'absolut' 
-  statement <- identifier '<-' 'cyan' real ',' real ',' real ',' real 
+  statement -> 'start-line' real ',' real
+  statement -> 'add-line' real ',' real
+  statement -> 'last-line' real ',' real
+  statement -> 'base16-image' [a-z]+                               and not base 21
+  statement -> 'utf8-text' ␜ <text> ␜
+  statement -> 'next'
+  statement -> 'azimuth' azimuth-flavor real ',' real ',' real ',' real
+  azimuth-flavor -> 'relative' | unit 'absolut' 
+  statement -> identifier '<-' 'cyan' real ',' real ',' real ',' real 
    'mangenta' real ',' real ',' real ',' real 
    'yellow' real ',' real ',' real ',' real 
    'black' real ',' real ',' real ',' real color-unit real
-  statement <- 'color-clog' identifier 'on' identifier 
-  statement <- 'pressure' ⬷ with later relative alt. absolut ∓ADSR F
-  color-unit <- 'relative' | 'absolute'
-  statement <- 'ellipsoid' '(' real ',' real ')' 'and' '(' real ',' real ')'
-  statement <- 'intention' 'inner' | 'middle' | 'outer'
-  statement <- 'bleed' real unit
+  statement -> 'color-clog' identifier 'on' identifier 
+  statement -> 'pressure' ⬷ with later relative alt. absolut ∓ADSR F
+  color-unit -> 'relative' | 'absolute'
+  statement -> 'ellipsoid' '(' real ',' real ')' 'and' '(' real ',' real ')'
+  statement -> 'intention' 'inner' | 'middle' | 'outer'
+  statement -> 'bleed' real unit
   
-  unit <- 'mm'
-  unit <- 'cm'
-  unit <- 'in'
-  unit <- 'pc'
-  unit <- 'throu'
+  unit -> 'mm'
+  unit -> 'cm'
+  unit -> 'in'
+  unit -> 'pc'
+  unit -> 'throu'
   
-  two-level <- 'frame' statement-list 'closed' ⬷ a․𝘬․a 'draft'.
+  two-level -> 'frame' statement-list 'closed' ⬷ a․𝘬․a 'draft'.
   
  */
 
@@ -76,7 +76,7 @@ enum Artwork₋scanner₋mode { initial, regular,
 struct Scanner₋ctxt {
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t idx₋unicode; /* ⬷ and not idx₋u8s. */
-  struct sequent ongoing; int negative;
+  struct sequent ongoing;
   char32̄_t regular[1024]; short symbols₋in₋regular;
   enum Artwork₋scanner₋mode mode;
 };
