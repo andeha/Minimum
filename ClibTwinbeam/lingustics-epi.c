@@ -15,12 +15,12 @@ import Setjmp;
   term -> factor / factor
   term -> factor
   
-  factor -> - unary
-  factor -> + unary
-  factor -> unary
+  factor -> affidare
+  factor -> - affidare
+  factor -> + affidare
   
-  unary -> circum ^ circum
-  unary -> circum
+  affidare -> circum ^ circum
+  affidare -> circum
   
   circum -> real-literal
   circum -> integer-literal
@@ -31,7 +31,7 @@ import Setjmp;
  */
 
 /* factor -> unary @ N(sigma,my), [max,min], [min,max], [mA] */
-/* unary -> circum 'basväljare' circum   ⬷ hilbertväljare */
+/* unary -> circum 'basväljare' circum  ⬷ hilbertväljare. */
 
 /*
   
@@ -39,7 +39,7 @@ import Setjmp;
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
     -g -std=c18 -lc++ lingustics-epi.c ../Releases/libClibTwinbeam.a
   
-  ./x86_epitom-7 /tmp/test.txt
+  ./x86_epitom-7 ./test.txt
   
  */
 
@@ -318,16 +318,17 @@ again:
  *  unicode parser.
  */
 
-enum token lookahead, retrospect; /* ⬷ later struct token_fifo * tf for LL(k). */
-Stack 🥞;
- 
+enum token lookahead, retrospect; /* alternatively back-pack. */
+Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
+/* ⬷ later struct token_fifo * tf for LL(k). */
+
 static void match(enum token expected, lexer * background, 
  struct token₋detail * gal₋out)
 {
    if (lookahead == expected) { 
      /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
-     lookahead = next₋token(background,gal₋out); }
-   else { Diagnos(1,gal₋out,0,"error: syntax expected ⬚, got ⬚.", 
+     lookahead = next₋token(background,gal₋out);
+   } else { Diagnos(1,gal₋out,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
     ﹟s(tokenname(lookahead))); }
 }
@@ -336,18 +337,22 @@ static void parse₋assign(lexer * ctx);
 static void parse₋expr(lexer * ctx);
 static void parse₋term(lexer * ctx);
 static void parse₋factor(lexer * ctx);
-static void parse₋unary(lexer * ctx);
+static void parse₋affidare(lexer * ctx);
 static void parse₋circum(lexer * ctx);
 
 void Ⓑ() { print("ASSIGN "); }
-void Ⓒ(enum token op) { print("ADD "); 
-   if (empty(&🥞)) { return; }
-   uint8_t * r = pop(&🥞), *l=pop(&🥞);
+void Ⓒ(enum token op) { print("BIADD/BISUB "); 
+   if (count(&🥞) < 2) { return; }
+   uint8_t *young=pop(&🥞), *old=pop(&🥞);
+   Sequent r={ .detail.bits=*(__uint128_t *)old }, 
+    l={ .detail.bits=*(__uint128_t *)young };
+   Sequent both = (op == PLUS_KEYWORD ? __builtin_fixpoint_add(l,r) : 
+    __builtin_fixpoint_sub(l,r));
    uint32_t item=13; uint8_t * bitem = (uint8_t *)&item;
-   if (push(&🥞,bitem)) { return; }
+   if (push(&🥞,(uint8_t *)&both.detail.bits)) { return; }
 }
-void Ⓓ() { print("MULT "); }
-void Ⓔ() { print("SIGN "); }
+void Ⓓ() { print("BIMULT/BIDIV "); }
+void Ⓔ() { print("+/-/± "); }
 void Ⓕ() { print("ASSOC "); }
 void Ⓖ() { print("LITERAL "); }
 void Ⓗ() { print("FUNCT "); }
@@ -381,14 +386,15 @@ static void parse₋term(lexer * s₋ctxt)
 
 static void parse₋factor(lexer * s₋ctxt)
 { struct token₋detail gal;
-   parse₋unary(s₋ctxt);
-   while (lookahead == PLUS_KEYWORD || lookahead == MINUS_KEYWORD) {
-     match(lookahead,s₋ctxt,&gal);
-     parse₋unary(s₋ctxt); Ⓔ();
+   if (lookahead == MINUS_KEYWORD || lookahead == PLUS_KEYWORD) {
+     while (lookahead == MINUS_KEYWORD || lookahead == PLUS_KEYWORD) {
+       match(lookahead,s₋ctxt,&gal);
+     }
    }
+   parse₋affidare(s₋ctxt); Ⓔ();
 }
 
-static void parse₋unary(lexer * s₋ctxt)
+static void parse₋affidare(lexer * s₋ctxt)
 { struct token₋detail gal;
    parse₋circum(s₋ctxt);
    if (lookahead == CIRCUM_KEYWORD) {
@@ -441,6 +447,21 @@ again:
  *  main function.
  */
 
+/* void set₋parse(int count, char8₋t * filenames[])
+{ lexer file₋bag; struct token₋detail file₋notes;
+   for (short i=0; i<count; ++i) {
+     char8₋t * model = (char8₋t *)filenames[i];
+     if (context₋init(model,&file₋bag)) { print("non-valid ⬚\n", ﹟s(model)); }
+     if (init₋stack(&🥞,16)) { return; }
+     lookahead = next₋token(&file₋bag,&file₋notes);
+     parse₋assign(&file₋bag);
+     lookahead = next₋token(&file₋bag,&file₋notes);
+     if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
+     else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
+     stack₋unalloc(&🥞); context₋deinit(&file₋bag);
+   }
+} */
+
 int
 main(
   int argc, 
@@ -453,15 +474,16 @@ main(
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
    if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 1; }
    if (bag.symbols == 0) { return 2; }
-/* debugbuild ⤐ print₋unicodes(bag.text₋heap); print("\n"); 
+  /* debugbuild ⤐ print₋unicodes(bag.text₋heap); print("\n"); 
     print₋tokens(&bag,&notes); ⬷ debugbuild */
-   short bytes₋per₋elem = 4;
+   short bytes₋per₋elem = 16;
    if (init₋stack(&🥞,bytes₋per₋elem)) { return 2; }
    lookahead = next₋token(&bag,&notes); parse₋assign(&bag); lookahead = 
     next₋token(&bag,&notes);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
    /* stack₋unalloc(&🥞); */
+   /* set₋parse(3, { "./express/comment.txt", "./express/optimal.txt", "./express/natural.txt" }); */
    return 0;
 }
 
