@@ -1,20 +1,20 @@
-/*  codex-cubist.h | graphics and image memory. */
+/*  codex-cubist.h | for graphics and image memory. */
 
 /*  No left-recursion and somtimes backtracking alt. recursive-ascent:
   
   E․𝘨 .size 89.0  .offset -5.0, 12.0  .origo 50.0, 50.0 .columned 1
   
-  program <- directive-list statement-list-nandalt-twolevel
-  directive-list <- directive directive-list
-  statement-list-alt-hierarchy <- statement statement-list
-  statement-list alt. directive-list <- empty
+  program -> directive-list statement-list-nandalt-twolevel
+  directive-list -> directive directive-list
+  statement-list-alt-hierarchy -> statement statement-list
+  statement-list alt. directive-list -> empty
   
-  directive <- '.pixel-height' real 
-  directive <- '.origo' real ',' real
-  directive <- '.offset' real ',' real
-  directive <- '.columned' natural
+  directive -> '.pixel-height' real 
+  directive -> '.origo' real ',' real
+  directive -> '.offset' real ',' real
+  directive -> '.columned' natural
   
-  real-literal <- '-'* digit+ '.' digit*
+  real-literal -> '-'* digit+ '.' digit*
   
   statement <- 'start-line' real ',' real
   statement <- 'add-line' real ',' real
