@@ -447,21 +447,6 @@ again:
  *  main function.
  */
 
-/* void set₋parse(int count, char8₋t * filenames[])
-{ lexer file₋bag; struct token₋detail file₋notes;
-   for (short i=0; i<count; ++i) {
-     char8₋t * model = (char8₋t *)filenames[i];
-     if (context₋init(model,&file₋bag)) { print("non-valid ⬚\n", ﹟s(model)); }
-     if (init₋stack(&🥞,16)) { return; }
-     lookahead = next₋token(&file₋bag,&file₋notes);
-     parse₋assign(&file₋bag);
-     lookahead = next₋token(&file₋bag,&file₋notes);
-     if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
-     else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
-     stack₋unalloc(&🥞); context₋deinit(&file₋bag);
-   }
-} */
-
 int
 main(
   int argc, 
