@@ -1,11 +1,15 @@
 /*  􀥳 lingustics-epi.c | an epitomic recursive descent parser. */
 
 import ClibTwinbeam;
+import Stdlib;
 import Setjmp;
 
 /*
   
-  assign -> Ident = expr ;
+  program -> assign
+  program -> expr
+  
+  assign -> Ident = expr ';' alternatively '\n\
   
   expr -> term + term
   expr -> term - term
@@ -39,7 +43,7 @@ import Setjmp;
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
     -g -std=c18 -lc++ lingustics-epi.c ../Releases/libClibTwinbeam.a
   
-  ./x86_epitom-7 ./test.txt
+  ./x86_epitom-7 ./express/comment.txt
   
  */
 
@@ -56,7 +60,7 @@ typedef struct lexer {
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t column₋first, column₋last;
   enum lexer₋mode mode; short symbols₋in₋regular; short symbols₋in₋fract;
-  char32̄_t regular[2048]; Sequent ongoing; short fract₋𝟶to𝟿s[2049];
+  char32̄_t regular[2048]; Sequenta ongoing; short fract₋𝟶to𝟿s[2049];
   char8₋t * src₋path;
 } lexer;
 
@@ -104,7 +108,7 @@ inexorable void context₋deinit(lexer * ctx)
    Fall⒪⒲(ctx->src₋path);
 }
 
-enum token { END₋OF₋TRANSMISSION=1, 
+enum token { END₋OF₋TRANSMISSION=1, ASSIGNTERMINATING₋END₋OF₋LINE, 
  VAR_KEYWORD, IDENT, EQUALS_KEYWORD, NUMERIC₋CONST, SEMICOLON, 
  LTE_KEYWORD, GTE_KEYWORD, GT_KEYWORD, LT_KEYWORD, 
  PLUS_KEYWORD, MINUS_KEYWORD, MULT_KEYWORD, DIV_KEYWORD, CIRCUM_KEYWORD, 
@@ -114,16 +118,17 @@ enum token { END₋OF₋TRANSMISSION=1,
 struct token₋detail {
   union {
     struct Regular𝘖rIdent { int symbols; char32̄_t * start; } regular𝘖rIdent;
-    Sequent literal;
+    Sequenta literal;
   } store;
   int kind;
   __builtin_int_t lineno₋first, column₋first, column₋last, lineno₋last;
-  lexer * src;
+  lexer * predecessor₋src;
 };
 
 char * tokenname(enum token gritty)
 {
   switch (gritty) {
+  case ASSIGNTERMINATING₋END₋OF₋LINE: return "statement-separative-eol";
   case END₋OF₋TRANSMISSION: return "eot";
   case VAR_KEYWORD: return "var";
   case IDENT: return "Ident";
@@ -169,9 +174,9 @@ void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * te
     first₋column = ahead->column₋first, 
     linecount = 1 + ahead->lineno₋last - lineno₋first, 
     last₋column = ahead->column₋last;
-    src₋path = ahead->src->src₋path; 
+    src₋path = ahead->predecessor₋src->src₋path;
   } else if (type == 0) {
-    
+   /* see --[Twinbeam]--<Radiosymbol>--<AST.h> */
   }
   typedef void (^Utf8)(char8₋t * u8s, __builtin_int_t bytes);
   Utf8 out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
@@ -190,7 +195,7 @@ enum token next₋token(lexer * s₋ctxt,
 {
    __builtin_int_t i,symbols=s₋ctxt->symbols;
    𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 char32̄_t ucode, ucode₊₁; int uc₋last=0;
-   detail₋out->src = s₋ctxt;
+   detail₋out->predecessor₋src = s₋ctxt;
    
    typedef int (^type)(char32̄_t unicode);
    typedef void (^collect)(char32̄_t);
@@ -231,7 +236,8 @@ enum token next₋token(lexer * s₋ctxt,
 #define STATE(s) (s == s₋ctxt->mode)
    
    perform increment₋simplebook = ^{ s₋ctxt->lineno₋first+=1, s₋ctxt->lineno₋last+=1; };
-   perform sample₋location = ^{
+   
+   perform sample₋window = ^{
      detail₋out->lineno₋first=s₋ctxt->lineno₋first;
      detail₋out->lineno₋last=s₋ctxt->lineno₋last;
      detail₋out->column₋first=s₋ctxt->column₋first;
@@ -242,12 +248,12 @@ enum token next₋token(lexer * s₋ctxt,
     case identifier: detail₋out->kind=1; 
      detail₋out->store.regular𝘖rIdent.symbols=s₋ctxt->symbols;
      detail₋out->store.regular𝘖rIdent.start=s₋ctxt->text₋heap;
-     sample₋location();
+     sample₋window();
      reset(); return IDENT/*IFIER*/;
     case number₋literal: detail₋out->kind=2; 
      /* s₋ctxt->ongoing is valid and s₋ctxt->fract₋0to9 is still. */
      int₋to₋sequent(0,&(detail₋out->store.literal));
-     sample₋location();
+     sample₋window();
      reset(); return NUMERIC₋CONST; /* ⬷ relative-to-letters big-endian. */
     case lex₋error: Diagnos(2,s₋ctxt,1,"error: scanner error."); return 0;
     case completion: return END₋OF₋TRANSMISSION;
@@ -260,8 +266,8 @@ again:
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
    if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; s₋ctxt->column₋last=s₋ctxt->column₋first; }
    if (!STATE(mode₋initial)) { s₋ctxt->column₋last+=1; }
-   if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); }
-   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
+   
+   if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
     { NEXT(mode₋multiline₋comment); }
    else if (STATE(mode₋multiline₋comment) && ucode == U'*' && ucode₊₁ == U'/')
     { NEXT(mode₋initial); s₋ctxt->tip₋unicode += 1; }
@@ -275,6 +281,9 @@ again:
     if (derender₋newline(ucode)) { increment₋simplebook(); }
     }
    else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
+   else if (STATE(mode₋initial) && derender₋newline(ucode)) {
+    increment₋simplebook(); /* sample₋window();
+    return ASSIGNTERMINATING₋END₋OF₋LINE; */ } /* ⬷ new line alternatively semicolon. */
    else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
@@ -284,15 +293,15 @@ again:
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); }
    }
-   else if (STATE(mode₋initial) && ucode == U'=') { sample₋location(); return EQUALS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'-') { sample₋location(); return MINUS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'+') { sample₋location(); return PLUS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'*') { sample₋location(); return MULT_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'(') { sample₋location(); return LPAREN_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U')') { sample₋location(); return RPAREN_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U';') { sample₋location(); return SEMICOLON; }
+   else if (STATE(mode₋initial) && ucode == U'=') { sample₋window(); return EQUALS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'-') { sample₋window(); return MINUS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'+') { sample₋window(); return PLUS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'*') { sample₋window(); return MULT_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'(') { sample₋window(); return LPAREN_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U')') { sample₋window(); return RPAREN_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U';') { sample₋window(); return SEMICOLON; }
    else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
-    { sample₋location(); return DIV_KEYWORD; }
+    { sample₋window(); return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
    else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
    else if (STATE(mode₋integer) && period(ucode) && !is₋integer₋last()) { NEXT(mode₋fract); }
@@ -303,7 +312,7 @@ again:
     }
    else if (STATE(mode₋integer) && digit(ucode))
     {
-    Sequent ten=piano₋ten(),augment;
+    Sequenta ten=piano₋ten(),augment;
     s₋ctxt->ongoing=mult_sequent(ten,s₋ctxt->ongoing);
     int₋to₋sequent(ucode - U'0',&augment);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,augment);
@@ -312,7 +321,7 @@ again:
    else if (STATE(mode₋fract) && digit(ucode) && is₋fractional₋last())
     {
     append₋to₋fraction(ucode);
-    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequent lessthanone;
+    int count₋upto64 = s₋ctxt->symbols₋in₋fract; struct sequent lessthanone;
     rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&lessthanone);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,lessthanone);
     confess(number₋literal);
@@ -336,10 +345,10 @@ Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
 static void match(enum token expected, lexer * background, 
  struct token₋detail * gal₋out)
 {
-   if (lookahead == expected) { 
+   if (lookahead == expected) {
      /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
      lookahead = next₋token(background,gal₋out);
-   } else { Diagnos(1,gal₋out,0,"error: syntax expected ⬚, got ⬚.", 
+   } else { Diagnos(2,background,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
     ﹟s(tokenname(lookahead))); }
 }
@@ -454,6 +463,19 @@ again:
    i += 1; goto again;
 }
 
+void debugbuild(lexer * ctx, struct token₋detail * notes)
+{
+   print₋unicodes(ctx->text₋heap);
+   print("\n");
+   print₋tokens(ctx,notes);
+   ctx->tip₋unicode=0;
+   ctx->lineno₋first=1; ctx->lineno₋last=1;
+   ctx->column₋first=1; ctx->column₋last=1;
+   ctx->symbols₋in₋regular=0; ctx->symbols₋in₋fract=0;
+   ctx->ongoing=accumulative₋zero();
+   ctx->mode=mode₋initial;
+}
+
 /*
  *  main function.
  */
@@ -470,8 +492,7 @@ main(
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
    if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 1; }
    if (bag.symbols == 0) { return 2; }
-  /* debugbuild ⤐ print₋unicodes(bag.text₋heap); print("\n"); 
-    print₋tokens(&bag,&notes); ⬷ debugbuild */
+   debugbuild(&bag,&notes);
    short bytes₋per₋elem = 16;
    if (init₋stack(&🥞,bytes₋per₋elem)) { return 2; }
    lookahead = next₋token(&bag,&notes); parse₋assign(&bag); lookahead = 
