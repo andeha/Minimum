@@ -356,6 +356,14 @@ static void match(enum token expected, lexer * context,
     ﹟s(tokenname(lookahead))); }
 }
 
+static void optional₋sometime₋match(enum token expected, enum token conditional, 
+ lexer * context, struct token₋detail * gal₋out)
+{
+  if (lookahead == expected && retrospect == conditional) {
+    match(expected,lexer,gal₋out,0);
+  }
+}
+
 static void parse₋assign(lexer * ctx);
 static void parse₋expr(lexer * ctx);
 static void parse₋term(lexer * ctx);
