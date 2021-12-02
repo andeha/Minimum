@@ -341,12 +341,12 @@ struct token₋detail current;
 Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
 /* ⬷ later struct token_fifo * tf for LL(k). */
 
-static void match(enum token expected, lexer * background, 
+static void match(enum token expected, lexer * context, 
  struct token₋detail * gal₋out)
 {
    if (lookahead == expected) {
      /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
-     lookahead = next₋token(background,gal₋out);
+     lookahead = next₋token(context,gal₋out);
      current = *gal₋out;
    } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
@@ -437,7 +437,7 @@ static void parse₋circum(lexer * s₋ctxt)
       match(RPAREN_KEYWORD,s₋ctxt,&gal);
     }
     break;
-   default: Diagnos(1,&gal,0,"error: expecting IDENT, LPAREN and NUMERIC₋CONST, "
+   default: Diagnos(1,&current,0,"error: expecting IDENT, LPAREN and NUMERIC₋CONST, "
     "got ⬚.", ﹟s(tokenname(lookahead))); break;
    }
 }
