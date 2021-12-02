@@ -337,7 +337,7 @@ again:
  */
 
 enum token lookahead, retrospect; /* alternatively back-pack. */
-struct token₋detail current;
+struct token₋detail current, gal₋out₊₁;
 Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
 /* ⬷ later struct token_fifo * tf for LL(k). */
 
@@ -347,7 +347,11 @@ static void match(enum token expected, lexer * context,
    if (lookahead == expected) {
      /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
      lookahead = next₋token(context,gal₋out);
-     current = *gal₋out;
+     current = *gal₋out; /* first time */
+     /* and for LL(1) continue with retrospect = next₋token(context,gal₋out₊₁); */
+     /* current=gal₋out₊₁; lookahead = retrospect; at first call to match. */
+     /* and consecutive calls only retrospect = next₋token(context,gal₋out₊₁) and */
+     /* current=gal₋out₊₁; lookahead=retrospect; */ /* shifting-non-first */
    } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
     ﹟s(tokenname(lookahead))); }
