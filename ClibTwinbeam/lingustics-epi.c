@@ -348,7 +348,7 @@ static void match(enum token expected, lexer * context,
      /* print("equal tokens '⬚' matched", ﹟s(tokenname(expected))); */
      if (first₋time) { lookahead = next₋token(context,gal₋out);
      current = *gal₋out; } /* ⬷ first time */
-     /* for LL(1) second time compares to */
+     /* for LL(1) second time relates to */
      if (!first₋time) { current=gal₋out₊₁; lookahead = retrospect; }
      retrospect = next₋token(context,&gal₋out₊₁);
    } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
