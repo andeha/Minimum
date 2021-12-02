@@ -96,6 +96,14 @@ again:
    goto again;
 }
 
+typedef void (^Context₋dealloc)(void *);
+Context₋dealloc Fall⒪⒲ = ^(void * p) { free(p); };
+
+inexorable void context₋deinit(lexer * ctx)
+{
+   Fall⒪⒲(ctx->src₋path);
+}
+
 enum token { END₋OF₋TRANSMISSION=1, 
  VAR_KEYWORD, IDENT, EQUALS_KEYWORD, NUMERIC₋CONST, SEMICOLON, 
  LTE_KEYWORD, GTE_KEYWORD, GT_KEYWORD, LT_KEYWORD, 
@@ -144,24 +152,27 @@ EXT₋C long write(int fd, const void * s, long unsigned nbyte);
 EXT₋C int print﹟(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
 
+typedef struct token₋detail detail;
+
 void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * text, ...)
 { va_prologue(text); char8₋t * src₋path;
   __builtin_int_t lineno₋first, first₋column, linecount, last₋column;
-  if (type == 3) {
-    
-  } else if (type == 2) { lexer * s₋ctxt = (lexer *)ctx;
-     lineno₋first = s₋ctxt->lineno₋first, 
-     first₋column = s₋ctxt->column₋first, 
-     linecount = 1 + s₋ctxt->lineno₋last - lineno₋first, 
-     last₋column = s₋ctxt->column₋last; /* ⬷ diagnos-2. */
-     src₋path = s₋ctxt->src₋path;
+  if (type == 2) { lexer * s₋ctxt = (lexer *)ctx;
+    lineno₋first = s₋ctxt->lineno₋first, 
+    first₋column = s₋ctxt->column₋first, 
+    linecount = 1 + s₋ctxt->lineno₋last - lineno₋first, 
+    last₋column = s₋ctxt->column₋last; /* ⬷ diagnos-2. */
+    src₋path = s₋ctxt->src₋path;
   } else if (type == 1) { struct token₋detail * ahead = 
      (struct token₋detail *)ctx;
     lineno₋first = ahead->lineno₋first, 
     first₋column = ahead->column₋first, 
     linecount = 1 + ahead->lineno₋last - lineno₋first, 
     last₋column = ahead->column₋last;
-    src₋path = ahead->src->src₋path; }
+    src₋path = ahead->src->src₋path; 
+  } else if (type == 0) {
+    
+  }
   typedef void (^Utf8)(char8₋t * u8s, __builtin_int_t bytes);
   Utf8 out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
   print(out,"⬚:⬚:⬚—⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(first₋column), 
@@ -273,15 +284,15 @@ again:
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); }
    }
-   else if (STATE(mode₋initial) && ucode == U'=') { return EQUALS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'-') { return MINUS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'+') { return PLUS_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'*') { return MULT_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U'(') { return LPAREN_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U')') { return RPAREN_KEYWORD; }
-   else if (STATE(mode₋initial) && ucode == U';') { return SEMICOLON; }
+   else if (STATE(mode₋initial) && ucode == U'=') { sample₋location(); return EQUALS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'-') { sample₋location(); return MINUS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'+') { sample₋location(); return PLUS_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'*') { sample₋location(); return MULT_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U'(') { sample₋location(); return LPAREN_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U')') { sample₋location(); return RPAREN_KEYWORD; }
+   else if (STATE(mode₋initial) && ucode == U';') { sample₋location(); return SEMICOLON; }
    else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
-    { return DIV_KEYWORD; }
+    { sample₋location(); return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
    else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
    else if (STATE(mode₋integer) && period(ucode) && !is₋integer₋last()) { NEXT(mode₋fract); }
@@ -342,14 +353,14 @@ static void parse₋circum(lexer * ctx);
 
 void Ⓑ() { print("ASSIGN "); }
 void Ⓒ(enum token op) { print("BIADD/BISUB "); 
-   if (count(&🥞) < 2) { return; }
-   uint8_t *young=pop(&🥞), *old=pop(&🥞);
-   Sequent r={ .detail.bits=*(__uint128_t *)old }, 
-    l={ .detail.bits=*(__uint128_t *)young };
-   Sequent both = (op == PLUS_KEYWORD ? __builtin_fixpoint_add(l,r) : 
-    __builtin_fixpoint_sub(l,r));
-   uint32_t item=13; uint8_t * bitem = (uint8_t *)&item;
-   if (push(&🥞,(uint8_t *)&both.detail.bits)) { return; }
+  if (count(&🥞) < 2) { return; }
+  uint8_t *young=pop(&🥞), *old=pop(&🥞);
+  Sequenta r={ .detail.bits=*(__uint128_t *)old }, 
+   l={ .detail.bits=*(__uint128_t *)young };
+  Sequenta both = (op == PLUS_KEYWORD ? __builtin_fixpoint_add(l,r) : 
+   __builtin_fixpoint_sub(l,r));
+  uint32_t item=13; uint8_t * bitem = (uint8_t *)&item;
+  if (push(&🥞,(uint8_t *)&both.detail.bits)) { return; }
 }
 void Ⓓ() { print("BIMULT/BIDIV "); }
 void Ⓔ() { print("+/-/± "); }
@@ -469,6 +480,7 @@ main(
    else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
    /* stack₋unalloc(&🥞); */
    /* set₋parse(3, { "./express/comment.txt", "./express/optimal.txt", "./express/natural.txt" }); */
+   context₋deinit(&bag);
    return 0;
 }
 

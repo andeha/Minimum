@@ -170,34 +170,34 @@ typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 /* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
 /* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
-typedef struct sequent Sequent;
+typedef struct sequent Sequenta;
 EXT₋C₂
-inexorable void int₋to₋sequent(int64_t ℤ, Sequent * ℝ);
-inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], Sequent * ℝ);
+inexorable void int₋to₋sequent(int64_t ℤ, Sequenta * ℝ);
+inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], Sequenta * ℝ);
 /* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
-void print₋sequent(Sequent 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
+void print₋sequent(Sequenta 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
  integers, struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), 
  void (^nonvalid)()); /* ⬷ TeX 103 §. */
-Sequent add_sequent(Sequent x₁, Sequent x₂);
-Sequent minus_sequent(Sequent x₁, Sequent x₂);
+Sequenta add_sequent(Sequenta x₁, Sequenta x₂);
+Sequenta minus_sequent(Sequenta x₁, Sequenta x₂);
 void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, uint64_t * int₋hi, uint64_t * hi₋prec);
-Sequent mult_sequent(Sequent x₁, Sequent x₂);
-Sequent reciproc_sequent(Sequent yb);
-Sequent div_sequent(Sequent x₁, Sequent x₂, int integer₋division);
+Sequenta mult_sequent(Sequenta x₁, Sequenta x₂);
+Sequenta reciproc_sequent(Sequenta yb);
+Sequenta div_sequent(Sequenta x₁, Sequenta x₂, int integer₋division);
 /* the symbol 'div' requires __attribute__((overloadable)); */
-Sequent product₋abelian(); /* ⬷ a․𝘬․a '1'. */
-Sequent accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
-Sequent piano₋ten(); /* ⬷ a․𝘬․a '10'. */
-Sequent negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-Sequent sequent₋floor(Sequent x);
-Sequent operator_minus(Sequent x);
-Sequent mod_sequent(Sequent x₁, Sequent x₂);
-int Newton(computational f, computational f₋prim, Sequent * x₀, 
+Sequenta product₋abelian(); /* ⬷ a․𝘬․a '1'. */
+Sequenta accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
+Sequenta piano₋ten(); /* ⬷ a․𝘬․a '10'. */
+Sequenta negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
+Sequenta sequent₋floor(Sequenta x);
+Sequenta operator_minus(Sequenta x);
+Sequenta mod_sequent(Sequenta x₁, Sequenta x₂);
+int Newton(computational f, computational f₋prim, Sequenta * x₀, 
  void (^ping)(enum Newtoncontrol * ctrl));
-Sequent 𝟷𝟸𝟹𝟺₋atan(Sequent y, Sequent x);
-int trapezoid(Sequent (^f)(Sequent), Sequent delta₋t, 
- Sequent min, void (^memory)(Sequent integrale, 
- Sequent t₋acc, int * stop));
+Sequenta 𝟷𝟸𝟹𝟺₋atan(Sequenta y, Sequenta x);
+int trapezoid(Sequent (^f)(Sequenta), Sequenta delta₋t, 
+ Sequenta min, void (^memory)(Sequenta integrale, 
+ Sequenta t₋acc, int * stop));
 EXT₋C₋FROM
 
 #define __builtin_fixpoint_add add_sequent
@@ -542,7 +542,7 @@ struct chronology₋date { int32_t y,m,d; };
 struct chronology₋time { int32_t h,m,s; chronology₋UQ32 partials; };
 EXT₋C struct chronology₋date chronology₋date(chronology₋instant timestamp);
 EXT₋C struct chronology₋time chronology₋sinceMidnight(chronology₋instant timestamp);
-EXT₋C int chronology₋integers₋encode(int32_t parts[6], chronology₋UQ32 frac, chronology₋instant * instant);
+EXT₋C int chronology₋timestamp(int32_t parts[6], chronology₋UQ32 frac, chronology₋instant * instant);
 EXT₋C chronology₋instant chronology₋addSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
 EXT₋C chronology₋instant chronology₋subtractSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
 EXT₋C int chronology₋dayofweek(chronology₋instant timestamp, int * wd);
