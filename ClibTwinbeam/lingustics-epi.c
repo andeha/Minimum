@@ -342,16 +342,15 @@ Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
 /* ⬷ later struct token_fifo * tf for LL(k). */
 
 static void match(enum token expected, lexer * context, 
- struct token₋detail * gal₋out)
+ struct token₋detail * gal₋out, int first₋time)
 {
    if (lookahead == expected) {
-     /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
-     lookahead = next₋token(context,gal₋out);
-     current = *gal₋out; /* first time */
-     /* and for LL(1) continue with retrospect = next₋token(context,gal₋out₊₁); */
-     /* current=gal₋out₊₁; lookahead = retrospect; at first call to match. */
-     /* and consecutive calls only retrospect = next₋token(context,gal₋out₊₁) and */
-     /* current=gal₋out₊₁; lookahead=retrospect; */ /* shifting-non-first */
+     /* print("equal tokens '⬚' matched", ﹟s(tokenname(expected))); */
+     if (first₋time) { lookahead = next₋token(context,gal₋out);
+     current = *gal₋out; } /* ⬷ first time */
+     /* for LL(1) second time compares to */
+     if (!first₋time) { current=gal₋out₊₁; lookahead = retrospect; }
+     retrospect = next₋token(context,&gal₋out₊₁);
    } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
     ﹟s(tokenname(lookahead))); }
@@ -384,17 +383,17 @@ void Ⓘ() { print("BIND-PARAM "); }
 
 static void parse₋assign(lexer * s₋ctxt)
 { struct token₋detail gal;
-   match(IDENT,s₋ctxt,&gal);
-   match(EQUALS_KEYWORD,s₋ctxt,&gal);
+   match(IDENT,s₋ctxt,&gal,1);
+   match(EQUALS_KEYWORD,s₋ctxt,&gal,0);
    parse₋expr(s₋ctxt);
-   match(SEMICOLON,s₋ctxt,&gal); Ⓑ();
+   match(SEMICOLON,s₋ctxt,&gal,0); Ⓑ();
 }
 
 static void parse₋expr(lexer * s₋ctxt)
 { struct token₋detail gal;
    parse₋term(s₋ctxt);
    while (lookahead == PLUS_KEYWORD || lookahead == MINUS_KEYWORD) {
-     match(lookahead,s₋ctxt,&gal);
+     match(lookahead,s₋ctxt,&gal,0);
      parse₋term(s₋ctxt); Ⓒ(lookahead);
    }
 }
@@ -403,7 +402,7 @@ static void parse₋term(lexer * s₋ctxt)
 { struct token₋detail gal;
    parse₋factor(s₋ctxt);
    while (lookahead == MULT_KEYWORD || lookahead == DIV_KEYWORD) {
-     match(lookahead,s₋ctxt,&gal);
+     match(lookahead,s₋ctxt,&gal,0);
      parse₋factor(s₋ctxt); Ⓓ();
    }
 }
@@ -412,7 +411,7 @@ static void parse₋factor(lexer * s₋ctxt)
 { struct token₋detail gal;
    if (lookahead == MINUS_KEYWORD || lookahead == PLUS_KEYWORD) {
      while (lookahead == MINUS_KEYWORD || lookahead == PLUS_KEYWORD) {
-       match(lookahead,s₋ctxt,&gal);
+       match(lookahead,s₋ctxt,&gal,0);
      }
    }
    parse₋affidare(s₋ctxt); Ⓔ();
@@ -422,7 +421,7 @@ static void parse₋affidare(lexer * s₋ctxt)
 { struct token₋detail gal;
    parse₋circum(s₋ctxt);
    if (lookahead == CIRCUM_KEYWORD) {
-     match(CIRCUM_KEYWORD,s₋ctxt,&gal);
+     match(CIRCUM_KEYWORD,s₋ctxt,&gal,0);
      parse₋circum(s₋ctxt); Ⓕ();
    }
 }
@@ -430,15 +429,15 @@ static void parse₋affidare(lexer * s₋ctxt)
 static void parse₋circum(lexer * s₋ctxt)
 { struct token₋detail gal;
    switch (lookahead) {
-   case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal); Ⓖ(); break;
-   case LPAREN_KEYWORD: match(LPAREN_KEYWORD,s₋ctxt,&gal); 
-    parse₋expr(s₋ctxt); match(RPAREN_KEYWORD,s₋ctxt,&gal); break;
-   case IDENT: match(IDENT,s₋ctxt,&gal); 
+   case NUMERIC₋CONST: match(NUMERIC₋CONST,s₋ctxt,&gal,0); Ⓖ(); break;
+   case LPAREN_KEYWORD: match(LPAREN_KEYWORD,s₋ctxt,&gal,0); 
+    parse₋expr(s₋ctxt); match(RPAREN_KEYWORD,s₋ctxt,&gal,0); break;
+   case IDENT: match(IDENT,s₋ctxt,&gal,0); 
     if (lookahead == LPAREN_KEYWORD) {
-      match(LPAREN_KEYWORD,s₋ctxt,&gal);
+      match(LPAREN_KEYWORD,s₋ctxt,&gal,0);
       if (lookahead == RPAREN_KEYWORD) { Ⓗ(); }
       else { parse₋expr(s₋ctxt); Ⓘ(); }
-      match(RPAREN_KEYWORD,s₋ctxt,&gal);
+      match(RPAREN_KEYWORD,s₋ctxt,&gal,0);
     }
     break;
    default: Diagnos(1,&current,0,"error: expecting IDENT, LPAREN and NUMERIC₋CONST, "
