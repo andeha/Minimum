@@ -9,7 +9,7 @@ import Setjmp;
   program -> assign
   program -> expr
   
-  assign -> Ident = expr ';' alternatively '\n\
+  assign -> Ident = expr ';' alternatively '\n'
   
   expr -> term + term
   expr -> term - term
@@ -156,8 +156,6 @@ uint32_t diagnosis₋count=0;
 EXT₋C long write(int fd, const void * s, long unsigned nbyte);
 EXT₋C int print﹟(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, __builtin_va_list argument);
-
-typedef struct token₋detail detail;
 
 void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * text, ...)
 { va_prologue(text); char8₋t * src₋path;
@@ -339,6 +337,7 @@ again:
  */
 
 enum token lookahead, retrospect; /* alternatively back-pack. */
+struct token₋detail current;
 Stack 🥞; /* ...and backtrack (vol 5) alternatively argument-stack. */
 /* ⬷ later struct token_fifo * tf for LL(k). */
 
@@ -348,7 +347,8 @@ static void match(enum token expected, lexer * background,
    if (lookahead == expected) {
      /* print("equal ⬚ ", ﹟s(tokenname(expected))); */
      lookahead = next₋token(background,gal₋out);
-   } else { Diagnos(2,background,0,"error: syntax expected ⬚, got ⬚.", 
+     current = *gal₋out;
+   } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
     ﹟s(tokenname(expected)), 
     ﹟s(tokenname(lookahead))); }
 }
@@ -486,17 +486,15 @@ main(
   const char * argv[]
 )
 {
-   lexer bag; struct token₋detail notes;
-   const char * binary = argv[0];
+   lexer bag; const char * binary = argv[0];
    if (argc != 2) { print("usage: ⬚ file \n", ﹟s(binary)); }
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
    if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 1; }
    if (bag.symbols == 0) { return 2; }
-   debugbuild(&bag,&notes);
-   short bytes₋per₋elem = 16;
+   debugbuild(&bag,&current); short bytes₋per₋elem = 16;
    if (init₋stack(&🥞,bytes₋per₋elem)) { return 2; }
-   lookahead = next₋token(&bag,&notes); parse₋assign(&bag); lookahead = 
-    next₋token(&bag,&notes);
+   lookahead = next₋token(&bag,&current);
+   parse₋assign(&bag); lookahead = next₋token(&bag,&current);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
    else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
    /* stack₋unalloc(&🥞); */
