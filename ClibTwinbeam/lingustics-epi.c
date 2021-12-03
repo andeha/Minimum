@@ -108,7 +108,7 @@ inexorable void context₋deinit(lexer * ctx)
    Fall⒪⒲(ctx->src₋path);
 }
 
-enum token { END₋OF₋TRANSMISSION=1, ASSIGNTERMINATING₋END₋OF₋LINE, 
+enum token { END₋OF₋TRANSMISSION=1, TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN, 
  VAR_KEYWORD, IDENT, EQUALS_KEYWORD, NUMERIC₋CONST, SEMICOLON, 
  LTE_KEYWORD, GTE_KEYWORD, GT_KEYWORD, LT_KEYWORD, 
  PLUS_KEYWORD, MINUS_KEYWORD, MULT_KEYWORD, DIV_KEYWORD, CIRCUM_KEYWORD, 
@@ -128,7 +128,7 @@ struct token₋detail {
 char * tokenname(enum token gritty)
 {
   switch (gritty) {
-  case ASSIGNTERMINATING₋END₋OF₋LINE: return "statement-separative-eol";
+  case TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN: return "statement-separative-eol";
   case END₋OF₋TRANSMISSION: return "eot";
   case VAR_KEYWORD: return "var";
   case IDENT: return "Ident";
@@ -240,6 +240,7 @@ enum token next₋token(lexer * s₋ctxt,
      detail₋out->lineno₋last=s₋ctxt->lineno₋last;
      detail₋out->column₋first=s₋ctxt->column₋first;
      detail₋out->column₋last=s₋ctxt->column₋last;
+     s₋ctxt->integer₋alt₋fract₋regular₋passed = false;
    };
    
    🧵(identifier,number₋literal,lex₋error,completion) {
@@ -264,12 +265,16 @@ again:
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
    if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; s₋ctxt->column₋last=s₋ctxt->column₋first; }
    if (!STATE(mode₋initial)) { s₋ctxt->column₋last+=1; }
-   
-   if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
+   if (STATE(mode₋initial) && derender₋newline(ucode)) {
+    increment₋simplebook(); if (s₋ctxt->integer₋alt₋fract₋regular₋passed) { 
+     sample₋window(); return TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN; } }
+   else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
+   else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
+   else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
     { NEXT(mode₋multiline₋comment); }
    else if (STATE(mode₋multiline₋comment) && ucode == U'*' && ucode₊₁ == U'/')
     { NEXT(mode₋initial); s₋ctxt->tip₋unicode += 1; }
-  else if (STATE(mode₋multiline₋comment) /* && ucode != U'*' && ucode₊₁ != U'/' */)
+   else if (STATE(mode₋multiline₋comment) /* && ucode != U'*' && ucode₊₁ != U'/' */)
     { if (derender₋newline(ucode)) { increment₋simplebook(); } }
    else if (STATE(mode₋initial) && ucode₊₁ == U'/' && ucode == U'/')
     { NEXT(mode₋singleline₋comment); }
@@ -279,11 +284,6 @@ again:
     if (derender₋newline(ucode)) { increment₋simplebook(); }
     }
    else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
-   else if (STATE(mode₋initial) && derender₋newline(ucode)) {
-    increment₋simplebook(); /* sample₋window();
-    return integer₋alt₋fract₋regular₋passed ASSIGNTERMINATING₋END₋OF₋LINE; */ } /* ⬷ new line alternatively semicolon. */
-   else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
-   else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
      append₋to₋regular(ucode);
      if (is₋regular₋last()) { confess(identifier); } else { NEXT(mode₋multiregular); }
