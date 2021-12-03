@@ -61,7 +61,7 @@ typedef struct lexer {
   __builtin_int_t column₋first, column₋last;
   enum lexer₋mode mode; short symbols₋in₋regular; short symbols₋in₋fract;
   char32̄_t regular[2048]; Sequenta ongoing; short fract₋𝟶to𝟿s[2049];
-  char8₋t * src₋path;
+  char8₋t * src₋path; int integer₋alt₋fract₋regular₋passed;
 } lexer;
 
 char8₋t * utf8dupn(char8₋t * u8s, __builtin_int_t maxu8bytes)
@@ -281,7 +281,7 @@ again:
    else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
    else if (STATE(mode₋initial) && derender₋newline(ucode)) {
     increment₋simplebook(); /* sample₋window();
-    return ASSIGNTERMINATING₋END₋OF₋LINE; */ } /* ⬷ new line alternatively semicolon. */
+    return integer₋alt₋fract₋regular₋passed ASSIGNTERMINATING₋END₋OF₋LINE; */ } /* ⬷ new line alternatively semicolon. */
    else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
