@@ -356,12 +356,12 @@ static void match(enum token expected, lexer * context,
     ﹟s(tokenname(lookahead))); }
 }
 
-static void optional₋sometime₋match(enum token expected, enum token conditional, 
+static int optional₋sometime₋match(enum token expected, enum token conditional, 
  lexer * context, struct token₋detail * gal₋out)
 {
-  if (lookahead == expected && retrospect == conditional) {
-    match(expected,lexer,gal₋out,0);
-  }
+  int selected = (lookahead == expected && retrospect == conditional);
+  if (selected) { match(expected,context,gal₋out,0); }
+  return selected;
 }
 
 static void parse₋assign(lexer * ctx);
@@ -388,6 +388,12 @@ void Ⓕ() { print("ASSOC "); }
 void Ⓖ() { print("LITERAL "); }
 void Ⓗ() { print("FUNCT "); }
 void Ⓘ() { print("BIND-PARAM "); }
+
+static void parse₋program(lexer * s₋ctxt)
+{ struct token₋detail gal;
+   if (optional₋sometime₋match(IDENT,EQUALS_KEYWORD,s₋ctxt,&gal)) { parse₋assign(s₋ctxt); }
+   else { parse₋expr(s₋ctxt); }
+}
 
 static void parse₋assign(lexer * s₋ctxt)
 { struct token₋detail gal;
