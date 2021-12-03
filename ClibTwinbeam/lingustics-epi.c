@@ -87,6 +87,7 @@ inexorable int context₋init(char8₋t * utf8txtpath, lexer * ctx)
    ctx->src₋path=utf8dupn(utf8txtpath,maxu8bytes);
    ctx->ongoing=accumulative₋zero();
    ctx->mode=mode₋initial;
+   ctx->integer₋alt₋fract₋regular₋passed = false;
 again:
    if (i >= bytesActual) { ctx->symbols = j; 
      *(ctx->text₋heap + ctx->symbols) = U'\x4';
