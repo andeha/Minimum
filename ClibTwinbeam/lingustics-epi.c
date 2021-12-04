@@ -241,7 +241,7 @@ enum token next₋token(lexer * s₋ctxt,
      detail₋out->lineno₋last=s₋ctxt->lineno₋last;
      detail₋out->column₋first=s₋ctxt->column₋first;
      detail₋out->column₋last=s₋ctxt->column₋last;
-     s₋ctxt->integer₋alt₋fract₋regular₋passed = false;
+     s₋ctxt->integer₋alt₋fract₋regular₋passed = true;
    };
    
    🧵(identifier,number₋literal,lex₋error,completion) {
@@ -266,9 +266,11 @@ again:
    ucode = s₋ctxt->text₋heap[i], ucode₊₁ = (uc₋last ? 0 : s₋ctxt->text₋heap[i+1]);
    if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; s₋ctxt->column₋last=s₋ctxt->column₋first; }
    if (!STATE(mode₋initial)) { s₋ctxt->column₋last+=1; }
-   if (STATE(mode₋initial) && derender₋newline(ucode)) {
-    increment₋simplebook(); if (s₋ctxt->integer₋alt₋fract₋regular₋passed) { 
-     sample₋window(); return TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN; } }
+   if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); 
+    if (s₋ctxt->integer₋alt₋fract₋regular₋passed) { sample₋window(); 
+      s₋ctxt->integer₋alt₋fract₋regular₋passed = false;
+      return TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN; }
+   }
    else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && ucode == U'/' && ucode₊₁ == U'*')
@@ -287,10 +289,10 @@ again:
    else if (STATE(mode₋singleline₋comment)) { /* do nothing */ }
    else if (STATE(mode₋initial) && letter(ucode)) {
      append₋to₋regular(ucode);
-     if (is₋regular₋last()) { confess(identifier); } else { NEXT(mode₋multiregular); }
+     if (is₋regular₋last()) { confess(identifier); } else { NEXT(mode₋multiregular); } /* next derender-newline may terminate statement. */
    } else if (STATE(mode₋multiregular) && letter₋alt₋digit(ucode)) {
      append₋to₋regular(ucode);
-     if (is₋regular₋last()) { confess(identifier); }
+     if (is₋regular₋last()) { confess(identifier); } /* ⬷ next derender-newline may terminate statement. */
    }
    else if (STATE(mode₋initial) && ucode == U'=') { sample₋window(); return EQUALS_KEYWORD; }
    else if (STATE(mode₋initial) && ucode == U'-') { sample₋window(); return MINUS_KEYWORD; }
@@ -302,12 +304,12 @@ again:
    else if (STATE(mode₋initial) && ucode₊₁ != U'/' && ucode₊₁ != U'*' && ucode == U'/')
     { sample₋window(); return DIV_KEYWORD; }
    else if (STATE(mode₋initial) && period(ucode)) { NEXT(mode₋fract); }
-   else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); }
+   else if (STATE(mode₋integer) && period(ucode) && is₋integer₋last()) { confess(number₋literal); } /* next derender-newline may terminate statement. */
    else if (STATE(mode₋integer) && period(ucode) && !is₋integer₋last()) { NEXT(mode₋fract); }
    else if (STATE(mode₋initial) && digit(ucode))
     {
     int₋to₋sequent(ucode - U'0',&s₋ctxt->ongoing);
-    if (is₋integer₋last()) { confess(number₋literal); } else { NEXT(mode₋integer); }
+    if (is₋integer₋last()) { confess(number₋literal); } else { NEXT(mode₋integer); } /* next derender-newline may terminate statement. */
     }
    else if (STATE(mode₋integer) && digit(ucode))
     {
@@ -315,7 +317,7 @@ again:
     s₋ctxt->ongoing=mult_sequent(ten,s₋ctxt->ongoing);
     int₋to₋sequent(ucode - U'0',&augment);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,augment);
-    if (is₋integer₋last()) { confess(number₋literal); }
+    if (is₋integer₋last()) { confess(number₋literal); } /* next derender-newline may terminate statement. */
     }
    else if (STATE(mode₋fract) && digit(ucode) && is₋fractional₋last())
     {
@@ -323,7 +325,7 @@ again:
     int count₋upto64 = s₋ctxt->symbols₋in₋fract; struct sequent lessthanone;
     rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&lessthanone);
     s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,lessthanone);
-    confess(number₋literal);
+    confess(number₋literal); /* next derender-newline may terminate statement. */
     }
    else if (STATE(mode₋fract) && digit(ucode))
     {
@@ -372,12 +374,15 @@ static void parse₋factor(lexer * ctx);
 static void parse₋affidare(lexer * ctx);
 static void parse₋circum(lexer * ctx);
 
-void Ⓑ() { print("ASSIGN "); }
+void Ⓑ(struct token₋detail regular₋alt₋ident) { print(" ⬚ ", ﹟d(regular₋alt₋ident.kind)); 
+  print("ASSIGN to '⬚' ", ﹟S₁(regular₋alt₋ident.store.regular𝘖rIdent.symbols, 
+   regular₋alt₋ident.store.regular𝘖rIdent.start));
+}
 void Ⓒ(enum token op) { print("BIADD/BISUB "); 
   if (count(&🥞) < 2) { return; }
-  uint8_t *young=pop(&🥞), *old=pop(&🥞);
+  uint8_t *untrialed=pop(&🥞), *old=pop(&🥞);
   Sequenta r={ .detail.bits=*(__uint128_t *)old }, 
-   l={ .detail.bits=*(__uint128_t *)young };
+   l={ .detail.bits=*(__uint128_t *)untrialed };
   Sequenta both = (op == PLUS_KEYWORD ? __builtin_fixpoint_add(l,r) : 
    __builtin_fixpoint_sub(l,r));
   uint32_t item=13; uint8_t * bitem = (uint8_t *)&item;
@@ -397,11 +402,11 @@ static void parse₋program(lexer * s₋ctxt)
 }
 
 static void parse₋assign(lexer * s₋ctxt)
-{ struct token₋detail gal;
-   match(IDENT,s₋ctxt,&gal,1);
-   match(EQUALS_KEYWORD,s₋ctxt,&gal,0);
+{ struct token₋detail gal₋b, gal₋a;
+   match(IDENT,s₋ctxt,&gal₋b,1);
+   match(EQUALS_KEYWORD,s₋ctxt,&gal₋a,0);
    parse₋expr(s₋ctxt);
-   match(SEMICOLON,s₋ctxt,&gal,0); Ⓑ();
+   match(SEMICOLON,s₋ctxt,&gal₋a,0); Ⓑ(gal₋b);
 }
 
 static void parse₋expr(lexer * s₋ctxt)
