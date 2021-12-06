@@ -406,7 +406,11 @@ static void parse₋assign(lexer * s₋ctxt)
    match(IDENT,s₋ctxt,&gal₋b,1);
    match(EQUALS_KEYWORD,s₋ctxt,&gal₋a,0);
    parse₋expr(s₋ctxt);
-   match(SEMICOLON,s₋ctxt,&gal₋a,0); Ⓑ(gal₋b);
+   if (lookahead == SEMICOLON) { match(SEMICOLON,s₋ctxt,&gal₋a,0); }
+   if (lookahead == TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN) {
+     match(TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN,s₋ctxt,&gal₋a,0);
+   }
+   Ⓑ(gal₋b);
 }
 
 static void parse₋expr(lexer * s₋ctxt)
