@@ -314,17 +314,17 @@ again:
    else if (STATE(mode₋integer) && digit(ucode))
     {
     Sequenta ten=piano₋ten(),augment;
-    s₋ctxt->ongoing=mult_sequent(ten,s₋ctxt->ongoing);
+    s₋ctxt->ongoing=__builtin_fixpoint_mul(ten,s₋ctxt->ongoing);
     int₋to₋sequent(ucode - U'0',&augment);
-    s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,augment);
+    s₋ctxt->ongoing=__builtin_fixpoint_add(s₋ctxt->ongoing,augment);
     if (is₋integer₋last()) { confess(number₋literal); } /* next derender-newline may terminate statement. */
     }
    else if (STATE(mode₋fract) && digit(ucode) && is₋fractional₋last())
     {
     append₋to₋fraction(ucode);
-    int count₋upto64 = s₋ctxt->symbols₋in₋fract; struct sequent lessthanone;
-    rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&lessthanone);
-    s₋ctxt->ongoing=add_sequent(s₋ctxt->ongoing,lessthanone);
+    int count₋upto64 = s₋ctxt->symbols₋in₋fract; Sequenta less₋than₋one;
+    rounded₋fraction(count₋upto64,s₋ctxt->fract₋𝟶to𝟿s,&less₋than₋one);
+    s₋ctxt->ongoing=__builtin_fixpoint_add(s₋ctxt->ongoing,less₋than₋one);
     confess(number₋literal); /* next derender-newline may terminate statement. */
     }
    else if (STATE(mode₋fract) && digit(ucode))
