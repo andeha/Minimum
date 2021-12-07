@@ -46,22 +46,40 @@ struct sequent subtract_sequent(struct sequent x₁, struct sequent x₂)
   return diff;
 }
 
-void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, uint64_t * int₋hi, 
- uint64_t * hi₋prec)
-{
-   /* __uint256_t sum₋times₋2¹²⁶ = x₁ * x₂;
-   *std = (__uint128_t)(sum₋times₋2¹²⁶>>63);
-   *int₋hi=0;
-   *hi₋prec=0; */
+uint8_t 𝟽₋op₋bytereverse(uint8_t b) {
+  return ((b * 0x8020LU & 0x88440LU) * 0x10101LU >> 16 | 
+   (b*0x802LU& 0x22110LU));
 }
-/* __uint128_t int₋mask = (__uint128_t)0xFFFFFFFF<<64 | 0x80000000; */
-/* __uint128_t fract₋mask = 0x7fffffff; */
+
+uint64_t bitswap₋63(uint64_t word, int reversed)
+{
+   union 𝟼𝟺₋bits𝟼to𝟼swap { uint8_t bytes[4]; uint64_t word; } one₋word = { .word=word };
+   uint8_t bytes_0 = 𝟽₋op₋bytereverse(one₋word.bytes[0]);
+   uint8_t bytes_1 = 𝟽₋op₋bytereverse(one₋word.bytes[1]);
+   uint8_t bytes_2 = 𝟽₋op₋bytereverse(one₋word.bytes[2]);
+   uint8_t bytes_3 = 𝟽₋op₋bytereverse(one₋word.bytes[3]);
+   one₋word.bytes[0] = bytes_3; one₋word.bytes[1] = bytes_2;
+   one₋word.bytes[2] = bytes_1; one₋word.bytes[3] = bytes_0;
+   one₋word.word >>= 1;
+   return one₋word.word;
+} /* ⬷ primitive named DBITSWAP in Mips. */
+
+void unsigned₋multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * y, uint64_t * hi)
+{
+   __uint128_t frac₋mask = 0x7fffffff, int₋mask = (__uint128_t)0xFFFFFFFF<<64 | 
+    0x80000000, int₋x₁ = x₁ >> 63, int₋x₂ = x₂ >> 63, int₋y = int₋x₂ * int₋x₁, 
+   frac₋x₁ = frac₋mask & x₁, frac₋x₂ = frac₋mask & x₂;
+   frac₋x₁ = bitswap₋63((uint64_t)frac₋x₁,0);
+   frac₋x₂ = bitswap₋63((uint64_t)frac₋x₂,0);
+   __uint128_t frac₋y = frac₋x₁ * frac₋x₂;
+   bitswap₋63((uint64_t)frac₋y,1);
+} /* __uint256_t sum₋times₋2¹²⁶ = x₁ * x₂; */
 
 struct sequent multiply_sequent(struct sequent x₁, struct sequent x₂)
-{ int lneg=0, rneg=0; __uint128_t inner; uint64_t int₋hi, hi₋prec; struct sequent y;
+{ int lneg=0, rneg=0; __uint128_t inner; uint64_t upper; struct sequent y;
    if (x₁.detail.frac < 0) { lneg = 1; x₁.detail.frac = -x₁.detail.frac; }
    if (x₂.detail.frac < 0) { rneg = 1; x₂.detail.frac = -x₂.detail.frac; }
-   multiply(x₁.detail.bits,x₂.detail.bits,&inner,&int₋hi,&hi₋prec);
+   unsigned₋multiply(x₁.detail.bits,x₂.detail.bits,&inner,&upper);
    if (lneg ^ rneg) { inner = -inner; }
    y.detail.bits = inner;
    y.valid = 1;
