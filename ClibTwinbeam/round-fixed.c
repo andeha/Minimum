@@ -48,12 +48,13 @@ struct sequent subtract_sequent(struct sequent x₁, struct sequent x₂)
 
 uint8_t 𝟽₋op₋bytereverse(uint8_t b) {
   return ((b * 0x8020LU & 0x88440LU) * 0x10101LU >> 16 | 
-   (b*0x802LU& 0x22110LU));
+   (b*0x802LU & 0x22110LU));
 }
 
 uint64_t bitswap₋63(uint64_t word, int reversed)
 {
    union 𝟼𝟺₋bits𝟼to𝟼swap { uint8_t bytes[4]; uint64_t word; } one₋word = { .word=word };
+   if (reversed) { one₋word.word <<= 1; }
    uint8_t bytes_0 = 𝟽₋op₋bytereverse(one₋word.bytes[0]);
    uint8_t bytes_1 = 𝟽₋op₋bytereverse(one₋word.bytes[1]);
    uint8_t bytes_2 = 𝟽₋op₋bytereverse(one₋word.bytes[2]);
