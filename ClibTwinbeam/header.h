@@ -92,7 +92,8 @@ MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask,
 
 typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
  deactivates the unused c++ builtin type char8_t not found in llvm-c code. */
-typedef uint32_t char32̄_t;
+typedef unsigned int char32̄_t; /* ⬷ from uchar.h and do-not-use-char32_t. */
+/* A C language U"abc" is 'const unsigned int' and a c++ language U"abc" is 'const char32_t *'. */
 
 struct Bitfield { const char32̄_t * regular; uint32_t mask; const char32̄_t * text; };
 struct AnnotatedRegister { const char32̄_t * header; int regcnt; struct Bitfield * regs; 
@@ -153,9 +154,10 @@ EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * �
 EXT₋C __builtin_int_t Utf8BytesUntilNull(char8₋t * u8s, __builtin_int_t maxutf8bytes);
 EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras);
 
-#define UNITTEST(symbol) extern "C" void Unittest_##symbol()
+#define UNITTEST(symbol) EXT₋C void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
- ﹟s(s), ﹟s(__FUNCTION__), ﹟s(__FILE__), ﹟d(__LINE__)); exit(-1); }
+ ﹟s7((char *)s), ﹟s7((char *)__FUNCTION__), ﹟s7((char *)__FILE__),        \
+ ﹟d(__LINE__)); exit(-1); }
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
 EXT₋C int atexit(void(*func)(void));
 EXT₋C void exit(int status);
@@ -173,38 +175,42 @@ enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 typedef struct sequent Sequenta;
 EXT₋C₂
 inexorable void int₋to₋sequent(int64_t ℤ, Sequenta * ℝ);
-inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], Sequenta * ℝ);
-/* ⬷ a․𝘬․a digits_to_sequent and 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
+inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], 
+ Sequenta * ℝ); /* ⬷ a․𝘬․a digits_to_sequent and 
+ 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
 void print₋sequent(Sequenta 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
  integers, struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), 
  void (^nonvalid)()); /* ⬷ TeX 103 §. */
 Sequenta add_sequent(Sequenta x₁, Sequenta x₂);
-Sequenta minus_sequent(Sequenta x₁, Sequenta x₂);
-void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, uint64_t * int₋hi, uint64_t * hi₋prec);
-Sequenta mult_sequent(Sequenta x₁, Sequenta x₂);
+Sequenta subtract_sequent(Sequenta x₁, Sequenta x₂);
+void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, 
+ uint64_t * int₋hi, uint64_t * hi₋prec);
+Sequenta multiply_sequent(Sequenta x₁, Sequenta x₂);
 Sequenta reciproc_sequent(Sequenta yb);
-Sequenta div_sequent(Sequenta x₁, Sequenta x₂, int integer₋division);
-/* the symbol 'div' requires __attribute__((overloadable)); */
+Sequenta divide_sequent₂(Sequenta x₁, Sequenta x₂, int integer₋division);
 Sequenta product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 Sequenta accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
 Sequenta piano₋ten(); /* ⬷ a․𝘬․a '10'. */
 Sequenta negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-Sequenta sequent₋floor(Sequenta x);
 Sequenta operator_minus(Sequenta x);
-Sequenta mod_sequent(Sequenta x₁, Sequenta x₂);
+Sequenta absolute_sequent(Sequenta x);
+Sequenta sequent₋floor(Sequenta x);
+Sequenta sequent₋modulo(Sequenta x₁, Sequenta x₂);
 int Newton(computational f, computational f₋prim, Sequenta * x₀, 
  void (^ping)(enum Newtoncontrol * ctrl));
 Sequenta 𝟷𝟸𝟹𝟺₋atan(Sequenta y, Sequenta x);
-int trapezoid(Sequent (^f)(Sequenta), Sequenta delta₋t, 
+int trapezoid(Sequenta (^f)(Sequenta), Sequenta delta₋t, 
  Sequenta min, void (^memory)(Sequenta integrale, 
  Sequenta t₋acc, int * stop));
 EXT₋C₋FROM
 
 #define __builtin_fixpoint_add add_sequent
-#define __builtin_fixpoint_sub minus_sequent
-#define __builtin_fixpoint_mul mult_sequent
-#define __builtin_fixpoint_div div_sequent
+#define __builtin_fixpoint_sub subtract_sequent
+#define __builtin_fixpoint_mul multiply_sequent
+#define __builtin_fixpoint_div divide_sequent₂
 #define __builtin_fixpoint_rcp reciproc_sequent
+#define __builtin_fixpoint_negate operator_minus
+/* #define __builtin_fixpoint_modulo sequent₋modulo */
 /* #define __builtin_fixpoint_sqrt 
 #define __builtin_fixpoint_rsqrt
 #define __builtin_fixpoint_fmadd(a,b,c)
@@ -417,14 +423,11 @@ typedef struct Arg₋𝓟 {
 EXT₋C Argᴾ ﹟d(__builtin_int_t d);
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x);
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b);
-EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝;
-EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝;
-EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝;
-EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝;
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32̄_t * unterminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝;
-EXT₋C Argᴾ ﹟c(char8₋t c) a⃝;
+EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) /* a⃝ */;
+EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) /* a⃝ */;
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) /* a⃝ */;
+EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */;
+EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */;
 EXT₋C Argᴾ ﹟C(char32̄_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
 EXT₋C Argᴾ ﹟U(__uint128_t U);
