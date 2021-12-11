@@ -201,7 +201,9 @@ int Newton(computational f, computational f₋prim, Sequenta * x₀,
 Sequenta 𝟷𝟸𝟹𝟺₋atan(Sequenta y, Sequenta x);
 int trapezoid(Sequenta (^f)(Sequenta), Sequenta delta₋t, 
  Sequenta min, void (^memory)(Sequenta integrale, 
- Sequenta t₋acc, int * stop));
+ Sequenta t₋acc, int * stop)); /* see [Inside Interesting 
+ Integrals, Paul J. Nahin, Undergraduate Lecture Notes in 
+ Physics, Springer Nature, Switzerland, 2020] for insights. */
 EXT₋C₋FROM
 
 #define __builtin_fixpoint_add add_sequent
