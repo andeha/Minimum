@@ -52,7 +52,7 @@ inexorable void printGreetings()
 {
    print("▞ twinbeam exercised...please stand-by. ▚\n"); 
    print("test harness for clibTwinbeam.a, release "
-     "⬚\n⬚\n\n", ﹟s(SHA1GIT), ﹟s(BUILDINFO_COPYRIGHT_MESSAGE));
+     "⬚\n⬚\n\n", ﹟s7(SHA1GIT), ﹟s7(BUILDINFO_COPYRIGHT_MESSAGE));
    /* ⬷ Epson MX-80 166 and 169. */
 }
 

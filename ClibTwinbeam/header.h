@@ -42,10 +42,10 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 #define TriboolUnarbitrated 0xFFFFFFFFFFFFFFFD
 #endif
 typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
-typedef unsigned short      uint16_t; /* cf. Q16. */
-typedef __builtin_uint_t Tribool; /* ⬷ cf․ 'obekant', 'icke-lös' and 'embargo-₍im₎material'. */
+typedef unsigned short      uint16_t; /* 𝘊f․ Q16. */
+typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant', 'icke-lös' and 'embargo-₍im₎material'. */
 #define FOCAL /* ⬷ embossed inexorable. */
-#define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */ 
+#define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
 #define SELDOM /* long-running and will be executed without task switch and is uncontaining 'yield'. */
@@ -78,22 +78,25 @@ int Details_in_C(uint64_t pid, int32_t cross);
 
 MACRO __builtin_uint_t 🔎(__builtin_uint_t var) { return *((__builtin_uint_t 
  /* volatile */ *) var); }
-#if defined __cplusplus
-MACRO __builtin_uint_t& 🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
- *(__builtin_uint_t /* volatile */ *)var; }
 MACRO __builtin_uint_t TrailingZeros(__builtin_uint_t x) { if (x == 0) { return 
  sizeof(x)*8; } x=(x^(x-1))>>1; int c=0; for (; x; c++) { x >>= 1; } return c; }
+#if !defined(__cplusplus)
+MACRO __builtin_uint_t * 🔧(__builtin_uint_t var) { return (__builtin_uint_t *)var; }
+#else
 MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask, 
  void (^update)(__builtin_uint_t& shifted) = ^(__builtin_uint_t&) { } ) {
  __builtin_uint_t word = *symbol, shift=TrailingZeros(mask), orig = mask&word,
  shifted = orig>>shift; if (update) update(shifted); __builtin_uint_t fresh =
  (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
+MACRO __builtin_uint_t& 🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
+ *(__builtin_uint_t /* volatile */ *)var; }
 #endif
 
 typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
- deactivates the unused c++ builtin type char8_t not found in llvm-c code. */
+ deactivates the unused c++ builtin type char8_t not found in llvm-c source. */
 typedef unsigned int char32̄_t; /* ⬷ from uchar.h and do-not-use-char32_t. */
-/* A C language U"abc" is 'const unsigned int' and a c++ language U"abc" is 'const char32_t *'. */
+/* A C language U"abc" is of 'const unsigned int' width and a c++ language 
+ U"abc" is 'const char32_t *'. */
 
 struct Bitfield { const char32̄_t * regular; uint32_t mask; const char32̄_t * text; };
 struct AnnotatedRegister { const char32̄_t * header; int regcnt; struct Bitfield * regs; 
@@ -151,6 +154,7 @@ EXT₋C short Utf8Followers(char8₋t leadOr8Bit);
 /* ⬷ The C language char32_t is typealias CChar32 = Unicode.Scalar. */
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
+/* ⬷ downward from 127 the ASCII table is del, ~, }, |, {, z, y, ... */
 EXT₋C __builtin_int_t Utf8BytesUntilNull(char8₋t * u8s, __builtin_int_t maxutf8bytes);
 EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras);
 
@@ -542,15 +546,21 @@ typedef struct ¹stack Stack;
 
 typedef uint64_t chronology₋instant;
 typedef uint32_t chronology₋UQ32;
-typedef int32_t chronology₋relative;
-struct chronology₋date { int32_t y,m,d; };
-struct chronology₋time { int32_t h,m,s; chronology₋UQ32 partials; };
+typedef int32_t chronology₋Q31;
+struct chronology₋relative { int32_t seconds; chronology₋Q31 frac; };
+struct chronology₋date { int32_t y,M,d; }; /* 1-12 and 1-31 */
+struct chronology₋time { int32_t h,m,s; chronology₋UQ32 partial; };
 EXT₋C struct chronology₋date chronology₋date(chronology₋instant timestamp);
-EXT₋C struct chronology₋time chronology₋sinceMidnight(chronology₋instant timestamp);
-EXT₋C int chronology₋timestamp(int32_t parts[6], chronology₋UQ32 frac, chronology₋instant * instant);
-EXT₋C chronology₋instant chronology₋addSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
-EXT₋C chronology₋instant chronology₋subtractSeconds(chronology₋instant relative, uint32_t seconds, chronology₋UQ32 frac);
+EXT₋C struct chronology₋relative chronology₋since₋midnight₁(chronology₋instant ts);
+EXT₋C struct chronology₋time chronology₋since₋midnight₂(chronology₋instant ts);
+EXT₋C chronology₋instant chronology₋timestamp(int32_t parts[6], chronology₋UQ32 frac);
+EXT₋C chronology₋instant add₋seconds(chronology₋instant relative, uint32_t seconds, 
+ chronology₋UQ32 frac);
+EXT₋C chronology₋instant subtract₋seconds(chronology₋instant relative, uint32_t 
+ seconds, chronology₋UQ32 deduct₋frac);
 EXT₋C int chronology₋dayofweek(chronology₋instant timestamp, int * wd);
+EXT₋C void Present₋instant(chronology₋instant timestamp, int incl₋frac, 
+ void (^out)(char digitHyphenColonPeriodOrSpace));
 
 #if defined __x86_64__ || defined __armv8a__ || defined Kirkbridge
 union treeint { struct { int64_t key; uint64_t val; } keyvalue; __uint128_t bits; };

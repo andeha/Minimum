@@ -76,7 +76,7 @@ enum Artwork₋scanner₋mode { initial, regular,
 struct Scanner₋ctxt {
   __builtin_int_t lineno₋first, lineno₋last;
   __builtin_int_t idx₋unicode; /* ⬷ and not idx₋u8s. */
-  struct sequent ongoing;
+  struct sequent ongoing; int unary₋negative; 
   char32̄_t regular[1024]; short symbols₋in₋regular;
   enum Artwork₋scanner₋mode mode;
 };
