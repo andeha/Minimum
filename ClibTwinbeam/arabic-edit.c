@@ -241,6 +241,7 @@ char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
        return rope₋index(root₋node->right,idx - lhs₋weight);
      }
    }
+   return U'\x0';
 } /* index execution time is propotional to depth of tree. */
 
 
