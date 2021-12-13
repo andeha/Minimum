@@ -245,6 +245,8 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32̄_t text[],
    
    typedef void (^rule)(void);
    
+   /* non-terminals in the grammar: */
+   
    rule statement = ^{
      if (lookahead.kind == start₋line) { consume(); match(real); match(comma₋0x2c); match(real); }
      else if (lookahead.kind == add₋line) { consume(); match(real); match(comma₋0x2c); match(real); }
@@ -261,6 +263,7 @@ int Parse₋Artwork₋LL₍1₎(__builtin_int_t symbols, char32̄_t text[],
    rule directive₋list = ^{ directive(); directive₋list(); };
    rule program = ^{ directive₋list(); statement₋list(); };
    
+   // lookahead = ;
    program();
    
    return 0;

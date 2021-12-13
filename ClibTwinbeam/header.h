@@ -217,7 +217,7 @@ EXT₋C₋FROM
 #define __builtin_fixpoint_rcp reciproc_sequent
 #define __builtin_fixpoint_negate operator_minus
 /* #define __builtin_fixpoint_modulo sequent₋modulo */
-/* #define __builtin_fixpoint_sqrt 
+/* #define __builtin_fixpoint_sqrt
 #define __builtin_fixpoint_rsqrt
 #define __builtin_fixpoint_fmadd(a,b,c)
 #define __builtin_fixpoint_min
@@ -554,10 +554,10 @@ EXT₋C struct chronology₋date chronology₋date(chronology₋instant timestam
 EXT₋C struct chronology₋relative chronology₋since₋midnight₁(chronology₋instant ts);
 EXT₋C struct chronology₋time chronology₋since₋midnight₂(chronology₋instant ts);
 EXT₋C chronology₋instant chronology₋timestamp(int32_t parts[6], chronology₋UQ32 frac);
-EXT₋C chronology₋instant add₋seconds(chronology₋instant relative, uint32_t seconds, 
- chronology₋UQ32 frac);
-EXT₋C chronology₋instant subtract₋seconds(chronology₋instant relative, uint32_t 
- seconds, chronology₋UQ32 deduct₋frac);
+EXT₋C chronology₋instant add₋seconds(chronology₋instant relative, uint32_t 
+ seconds, chronology₋UQ32 frac);
+EXT₋C chronology₋instant subtract₋seconds(chronology₋instant relative, 
+ uint32_t seconds, chronology₋UQ32 deduct₋frac);
 EXT₋C int chronology₋dayofweek(chronology₋instant timestamp, int * wd);
 EXT₋C void Present₋instant(chronology₋instant timestamp, int incl₋frac, 
  void (^out)(char digitHyphenColonPeriodOrSpace));
@@ -618,6 +618,26 @@ EXT₋C int Set₋text(struct Unicodes symbols, struct A₋point start, int mode
 EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
 EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
+
+typedef __builtin_int_t version₋ts;
+struct timeserie { Structa pendingchanges; void * currents, *noncommits; 
+ Structa checkpoints, versions, events, temporals; 
+ version₋ts version, earliest; };
+enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove };
+union historypod {
+  __uint128_t machineunsigned;
+  simd_tᵦ two₋real;
+  union Q6364 fixed;
+};
+
+EXT₋C timeserie₋init(version₋ts * revision, struct timeserie * 🅹);
+EXT₋C timeserie₋uninit(struct timeserie * 🅹);
+EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
+ (^eventually₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ struct timeserie * 🅙);
+EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
+ (^eventually)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ struct timeserie * 🅙);
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
