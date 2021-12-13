@@ -460,7 +460,7 @@ EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 struct structa {
   __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
   void * treelist, *cached₋tile;
-};
+}; /* ⬷ a․𝘬․a Tape. */
 
 typedef struct structa Structa;
 typedef void * (^Leaf₋alloc)(short bytes);
@@ -615,7 +615,7 @@ EXT₋C int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, st
 /* ⬷ arbitrary number of other points. ⤐ */
 typedef void (^Visual)(struct Plate layer, bool * stop);
 EXT₋C int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, Visual plates);
-EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋23, int ansamla);
+EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋22, int ansamla);
 EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
@@ -627,16 +627,33 @@ enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove }
 union historypod {
   __uint128_t machineunsigned;
   simd_tᵦ two₋real;
-  union Q6364 fixed;
+  union Q6463 fixed;
 };
 
-EXT₋C timeserie₋init(version₋ts * revision, struct timeserie * 🅹);
-EXT₋C timeserie₋uninit(struct timeserie * 🅹);
+EXT₋C int timeserie₋init(version₋ts * revision, struct timeserie * 🅹);
+EXT₋C void timeserie₋uninit(struct timeserie * 🅹);
+EXT₋C void timeserie₋rollback(struct timeserie * 🅙);
+struct timeserie₋entry₁ { struct Unicodes key; union historypod entry; 
+ struct 𝟽bit₋text entry₋id; };
+struct timeserie₋entry₂ { struct Unicodes key; union historypod * entry; 
+ struct 𝟽bit₋text entry₋id; };
+typedef void (^Temporary₋entry)(struct 𝟽bit₋text reference, union historypod 
+ entry, version₋ts revision, int * bye);
+EXT₋C void timeserie₋commit(version₋ts * revision, Temporary₋entry row, 
+ struct timeserie * 🅙);
+EXT₋C int timeserie₋first(struct timeserie * 🅙, version₋ts * instant);
+EXT₋C int timeserie₋last(struct timeserie * 🅙, version₋ts * instant);
+EXT₋C int timeserie₋end(struct timeserie * 🅙, version₋ts * instant);
+EXT₋C int timeserie₋remove(struct Unicodes key, struct timeserie * 🅙);
+EXT₋C int timeserie₋create(struct timeserie₋entry₁ initial, struct timeserie * 🅙);
+EXT₋C int timeserie₋delta(struct timeserie₋entry₂ relative, union historypod * 
+ absolute, struct timeserie * 🅙);
+EXT₋C int timeserie₋update(struct timeserie₋entry₂ absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
  struct timeserie * 🅙);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
  struct timeserie * 🅙);
 
 #if defined __mips__ && !defined NON₋SIMD
