@@ -633,10 +633,10 @@ union historypod {
 EXT₋C timeserie₋init(version₋ts * revision, struct timeserie * 🅹);
 EXT₋C timeserie₋uninit(struct timeserie * 🅹);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^eventually₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ (^search₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
  struct timeserie * 🅙);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^eventually)(struct Unicodes key[], struct timeserie value[], int permanent), 
+ (^search₋found)(struct Unicodes key[], struct timeserie value[], int permanent), 
  struct timeserie * 🅙);
 
 #if defined __mips__ && !defined NON₋SIMD
