@@ -41,22 +41,25 @@ static void modified₋julian₋to₋volksaga(q631 day, int32_t * M
    i = (𝟺𝟶𝟶𝟶 * (𝟷 + l)) / 𝟷𝟺𝟼𝟷𝟶𝟶𝟷;
    l -= 𝟷𝟺𝟼𝟷 * i / 𝟺 + 𝟹𝟷;
    j = 𝟾𝟶 * l / 𝟸𝟺𝟺𝟽;
-   *d = (int32_t)((l - 𝟸𝟺𝟺𝟽 * j / 𝟾𝟶) >> 𝟸);
+   *d = (int32_t)((l - 𝟸𝟺𝟺𝟽 * j / 𝟾𝟶) >> 1);
    l = j / 𝟷𝟷;
    *M = (int32_t)((j + 𝟸 - 𝟷𝟸 * l) >> 𝟷);
    *y = (int32_t)((𝟷𝟶𝟶 * (n - 𝟺𝟿) + i + l) >> 𝟷);
   return;
-}
+} /* Gregorian and proleptic Gregorian. */
+
+static int64_t patch_m_minus_14_div_12(int64_t m)
+{ return m <= 2 ? -1 : 0; }
 
 static q631 volksaga₋to₋modified₋julian(int32_t d /* 1-31 */, 
  int32_t m /* 1-12 */, int32_t y)
 { int64_t D=d,M=m,Y=y;
-   return ((( 1461 * ( Y + 4800 + (M - 14) / 12)) / 4) +
-    (367 * (M - 2 - 12 * ((M - 14) / 12))) / 12 - 
-    (3 * ((Y + 4900 + (M - 14)/12) / 100 )) / 4 + D - 32075)<<1;
-}
+   return ((( 1461 * ( Y + 4800 + patch_m_minus_14_div_12(M))) / 4) +
+    (367 * (M - 2 - 12 * (patch_m_minus_14_div_12(M)))) / 12 - 
+    (3 * ((Y + 4900 + patch_m_minus_14_div_12(M)) / 100 )) / 4 + D - 32075)<<1;
+} /* Gregorian and proleptic Gregorian. */
 
-#define ModifiedJulianToJulianAugment 4800001
+#define ModifiedJulianToJulianAugment 4800001 /* Julian day '0' is 12:00 GMT Jan 1, 4713 B.C. */
 
 static int32_t ModifiedJulianToJulian(q631 day)
 {
@@ -107,7 +110,7 @@ chronology₋instant chronology₋timestamp(int32_t parts[6], chronology₋UQ32 
    tm_mday=(int)parts[2], tm_mon=(int)parts[1], tm_year=(int)parts[0];
    struct tm t₁ = { tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, 0, 0, 0, 0, 0 };
    Unix₋instant t₂ = timegm(&t₁);
-   chronology₋instant t₃ = t₂ - 1;
+   chronology₋instant t₃ = t₂ + 2208988800; /* 1900-01-01 00:00:00 to 1970-01-01 00:00:00 (70 years) */
    return t₃;
 #else
    q631 at = volksaga₋to₋modified₋julian(parts[2],parts[1],parts[0]);
@@ -184,7 +187,7 @@ void Present₋instant(chronology₋instant ts, int incl₋frac,
    Base𝕫((__builtin_int_t)on₋clock.m, 10, 2, ^(char 𝟬to𝟵and₋) { out(𝟬to𝟵and₋); });    out(':');
    Base𝕫((__builtin_int_t)on₋clock.s, 10, 2, ^(char 𝟬to𝟵and₋) { out(𝟬to𝟵and₋); });
    if (incl₋frac) { out('.'); unionᵢ ntp₋stomp ntp; ntp.bits = ts;
-     uint32_t s = 10*(s % ntp.mil.frac) + 6, delta=10;
+     uint32_t s = 10*(s % ntp.mil.frac) + 5, delta=10;
      do {
        if (delta > ntp.mil.frac) { s += 0x40000000 - 50000000; }
        out('0' + s/ntp.mil.frac); delta *= 10;

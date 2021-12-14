@@ -620,9 +620,9 @@ EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, 
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
 typedef __builtin_int_t version₋ts;
-struct timeserie { Structa pendingchanges; void * currents, *noncommits; 
+struct timeserie { Structa pendingchanges; void * currents, *uncommits; 
  Structa checkpoints, versions, events, temporals; 
- version₋ts version, earliest; };
+ version₋ts *revision, earliest; unsigned short snapshot₋cycle; };
 enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove };
 union historypod {
   __uint128_t machineunsigned;
@@ -630,25 +630,26 @@ union historypod {
   union Q6463 fixed;
 };
 
-EXT₋C int timeserie₋init(version₋ts * revision, struct timeserie * 🅹);
+EXT₋C int timeserie₋init(version₋ts * revision, unsigned short snapshot₋cycle, 
+ struct timeserie * 🅹);
 EXT₋C void timeserie₋uninit(struct timeserie * 🅹);
 EXT₋C void timeserie₋rollback(struct timeserie * 🅙);
 struct timeserie₋entry₁ { struct Unicodes key; union historypod entry; 
- struct 𝟽bit₋text entry₋id; };
+ struct 𝟽bit₋text reference; };
 struct timeserie₋entry₂ { struct Unicodes key; union historypod * entry; 
- struct 𝟽bit₋text entry₋id; };
-typedef void (^Temporary₋entry)(struct 𝟽bit₋text reference, union historypod 
+ struct 𝟽bit₋text reference; };
+typedef void (^temporary₋entry)(struct 𝟽bit₋text reference, union historypod 
  entry, version₋ts revision, int * bye);
-EXT₋C void timeserie₋commit(version₋ts * revision, Temporary₋entry row, 
+EXT₋C void timeserie₋commit(version₋ts * revision, temporary₋entry row, 
  struct timeserie * 🅙);
 EXT₋C int timeserie₋first(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋last(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋end(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋remove(struct Unicodes key, struct timeserie * 🅙);
-EXT₋C int timeserie₋create(struct timeserie₋entry₁ initial, struct timeserie * 🅙);
-EXT₋C int timeserie₋delta(struct timeserie₋entry₂ relative, union historypod * 
- absolute, struct timeserie * 🅙);
-EXT₋C int timeserie₋update(struct timeserie₋entry₂ absolute, struct timeserie * 🅙);
+EXT₋C int timeserie₋create(struct timeserie₋entry₁ * initial, struct timeserie * 🅙);
+EXT₋C int timeserie₋delta(struct timeserie₋entry₂ * relative, union historypod * 
+ current, struct timeserie * 🅙);
+EXT₋C int timeserie₋update(struct timeserie₋entry₂ * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
  struct timeserie * 🅙);
