@@ -647,15 +647,16 @@ EXT₋C int timeserie₋last(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋end(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋remove(struct Unicodes key, struct timeserie * 🅙);
 EXT₋C int timeserie₋create(struct timeserie₋entry₁ * initial, struct timeserie * 🅙);
+typedef union historypod (*Timeserie₋summation)(union historypod x₁, union historypod x₂);
 EXT₋C int timeserie₋delta(struct timeserie₋entry₂ * relative, union historypod * 
- current, struct timeserie * 🅙);
+ current, struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C int timeserie₋update(struct timeserie₋entry₂ * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
- struct timeserie * 🅙);
+ struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
- struct timeserie * 🅙);
+ struct timeserie * 🅙, Timeserie₋summation addition);
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
