@@ -2,7 +2,8 @@
 
 import ClibTwinbeam;
 
-__builtin_int_t TetrasUntilNull(char32̄_t * ucs, __builtin_int_t maxtetras)
+inexorable __builtin_int_t TetrasUntilNull(char32̄_t * ucs, 
+ __builtin_int_t maxtetras)
 { __builtin_int_t i=0;
 again:
    if (i >= maxtetras) { return maxtetras; }
@@ -16,14 +17,11 @@ again:
 EXT₋C Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
-EXT₋C Argᴾ ﹟s(const char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)u8s }, 4 }; }
-EXT₋C Argᴾ ﹟s(char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=u8s }, 4 }; }
-EXT₋C Argᴾ ﹟s(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟s(/* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, char32̄_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, unterminated₋uc } }, 5 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝ { return Argᴾ { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; }
-EXT₋C Argᴾ ﹟c(char8₋t c) a⃝ { return Argᴾ { { .c=c }, 6 }; }
-EXT₋C Argᴾ ﹟c(/* signed */ char c) a⃝ { return Argᴾ { { .c=(char8₋t)c }, 6 }; }
+EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) /* a⃝ */ { return Argᴾ { { .u8s=(char8₋t *)u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) /* a⃝ */ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) /* a⃝ */ { return Argᴾ { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */ { return Argᴾ { { .c=c }, 6 }; }
+EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */ { return Argᴾ { { .c=(char8₋t)c }, 6 }; }
 EXT₋C Argᴾ ﹟C(char32̄_t C) { return Argᴾ { { .uc=C }, 7 }; }
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C Argᴾ ﹟U(__uint128_t U) { return Argᴾ { { .U=U }, 11 }; }
@@ -117,7 +115,7 @@ again:
       case 2: out𝕟(a.value.x); break;                                           \
       case 3: 𝟷𝟶𝟷𝟷𝟶₋out(a.value.b); break;                                       \
       case 4: u8c₋stream(a.value.u8s); break;                                   \
-      case 5: unicode₋stream(a.value.ucs.tetras, a.value.ucs.start); break;     \
+      case 5: unicode₋stream(a.value.ucs.tetras, a.value.ucs.unicodes); break;  \
       case 6: eight₋bit₋symbol(a.value.c); break;                               \
       case 7: unicode₋symbol(a.value.uc); break;                                
 #ifndef UNEXISTING₋IEEE754
@@ -132,7 +130,7 @@ again:
 #endif
       case 13: Register₋reflect(a.value.x); break;                              \
       case 88: unicode₋stream(a.value.chapter.ingress.tetras,                   \
-       a.value.chapter.ingress.start); break;                                   \
+       a.value.chapter.ingress.unicodes); break;                                \
       default: /* if (a.kind >= 0) imprint[a.kind](a); else */                  \
         unicode₋symbol(U'?'); break; }
     }
@@ -248,11 +246,11 @@ NumberformatCatalogue₋Present(
          Present((regs + i), val, init, is₋𝟷𝟼₋bits, maxwidth, out);
       }
    };
-   print(out, "⬚\n", ﹟s(Vt99::bright));
+   print(out, "⬚\n", ﹟s7(Vt99::bright));
    Present(out,Critic(ar->header));
-   print(out, "⬚ = ⬚ 0x", ﹟s(Vt99::reset), ﹟s(Vt99::reverse));
-   Base𝕟((__builtin_uint_t)numerics, 16, 8, ^(char 𝟶to𝟿) { print(out,"⬚", ﹟c(𝟶to𝟿)); });
-   print(out, "⬚\n\n", ﹟s(Vt99::reset));
+   print(out, "⬚ = ⬚ 0x", ﹟s7(Vt99::reset), ﹟s7(Vt99::reverse));
+   Base𝕟((__builtin_uint_t)numerics, 16, 8, ^(char 𝟶to𝟿) { print(out,"⬚", ﹟c7(𝟶to𝟿)); });
+   print(out, "⬚\n\n", ﹟s7(Vt99::reset));
    present(ar->regcnt,ar->regs,numerics,ar->init);
    Present(out,Critic(ar->footnote));
    print(out,"\n\n");

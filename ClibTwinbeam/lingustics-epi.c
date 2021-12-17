@@ -6,10 +6,10 @@ import Setjmp;
 
 /*
   
-  program -> assign
-  program -> expr
+  program -> assign                         (storage)
+  program -> expr                           (-ives)
   
-  assign -> Ident = expr ';' alternatively '\n'
+  assign -> Ident = expr ';' alternatively '\n' at console
   
   expr -> term + term
   expr -> term - term
@@ -41,7 +41,7 @@ import Setjmp;
   
   clang -o x86_epitom-7 -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
-    -g -std=c18 -lc++ lingustics-epi.c ../Releases/libClibTwinbeam.a
+    -g -std=c2x -lc++ lingustics-epi.c ../Releases/libClibTwinbeam.a
   
   ./x86_epitom-7 ./express/comment.txt
   
@@ -61,7 +61,7 @@ typedef struct lexer {
   __builtin_int_t column₋first, column₋last;
   enum lexer₋mode mode; short symbols₋in₋regular; short symbols₋in₋fract;
   char32̄_t regular[2048]; Sequenta ongoing; short fract₋𝟶to𝟿s[2049];
-  char8₋t * src₋path; int integer₋alt₋fract₋regular₋passed;
+  char8₋t * src₋path; int integer₋alt₋fract₋or₋regular₋passed;
 } lexer;
 
 char8₋t * utf8dupn(char8₋t * u8s, __builtin_int_t maxu8bytes)
@@ -87,7 +87,7 @@ inexorable int context₋init(char8₋t * utf8txtpath, lexer * ctx)
    ctx->src₋path=utf8dupn(utf8txtpath,maxu8bytes);
    ctx->ongoing=accumulative₋zero();
    ctx->mode=mode₋initial;
-   ctx->integer₋alt₋fract₋regular₋passed = false;
+   ctx->integer₋alt₋fract₋or₋regular₋passed = false;
 again:
    if (i >= bytesActual) { ctx->symbols = j; 
      *(ctx->text₋heap + ctx->symbols) = U'\x4';
@@ -241,7 +241,7 @@ enum token next₋token(lexer * s₋ctxt,
      detail₋out->lineno₋last=s₋ctxt->lineno₋last;
      detail₋out->column₋first=s₋ctxt->column₋first;
      detail₋out->column₋last=s₋ctxt->column₋last;
-     s₋ctxt->integer₋alt₋fract₋regular₋passed = true;
+     s₋ctxt->integer₋alt₋fract₋or₋regular₋passed = false;
    };
    
    🧵(identifier,number₋literal,lex₋error,completion) {
@@ -267,9 +267,9 @@ again:
    if (STATE(mode₋initial)) { s₋ctxt->column₋first+=1; s₋ctxt->column₋last=s₋ctxt->column₋first; }
    if (!STATE(mode₋initial)) { s₋ctxt->column₋last+=1; }
    if (STATE(mode₋initial) && derender₋newline(ucode)) { increment₋simplebook(); 
-    if (s₋ctxt->integer₋alt₋fract₋regular₋passed) { sample₋window(); 
-      s₋ctxt->integer₋alt₋fract₋regular₋passed = false;
-      return TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN; }
+    if (s₋ctxt->integer₋alt₋fract₋or₋regular₋passed) { sample₋window(); 
+      s₋ctxt->integer₋alt₋fract₋or₋regular₋passed = false;
+      return TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN; } /* do not return after a semicolon. */
    }
    else if (STATE(mode₋initial) && newline(ucode)) { /* do nothing */ }
    else if (STATE(mode₋initial) && whitespace(ucode)) { /* do nothing */ }
@@ -349,8 +349,8 @@ static void match(enum token expected, lexer * context,
 {
    if (lookahead == expected) {
      /* print("equal tokens '⬚' matched", ﹟s(tokenname(expected))); */
-     if (first₋time) { lookahead = next₋token(context,gal₋out);
-     current = *gal₋out; } /* ⬷ first time */
+     if (first₋time) { lookahead = next₋token(context,gal₋out); 
+      current = *gal₋out; } /* ⬷ first time */
      /* for LL(1) second time relates to */
      if (!first₋time) { current=gal₋out₊₁; lookahead = retrospect; }
      retrospect = next₋token(context,&gal₋out₊₁);
@@ -406,10 +406,8 @@ static void parse₋assign(lexer * s₋ctxt)
    match(IDENT,s₋ctxt,&gal₋b,1);
    match(EQUALS_KEYWORD,s₋ctxt,&gal₋a,0);
    parse₋expr(s₋ctxt);
-   if (lookahead == SEMICOLON) { match(SEMICOLON,s₋ctxt,&gal₋a,0); }
-   if (lookahead == TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN) {
-     match(TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN,s₋ctxt,&gal₋a,0);
-   }
+   match(SEMICOLON,s₋ctxt,&gal₋a,0);
+   /* match(TERMINATING₋END₋OF₋LINE₋AND₋ASSIGN,s₋ctxt,&gal₋a,0); */
    Ⓑ(gal₋b);
 }
 

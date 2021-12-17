@@ -32,16 +32,16 @@ UNITTEST(Timeserie₋1)
    version₋ts ordin = 102;
    struct Unicodes interesting₋keys = { { 5, U"intox" }, { 6, U"weight" }, { 6, U"milage" } };
    state₋before(3,interesting₋keys,ordin, 
-     ^(int count, struct Unicodes key[], struct timeserie₋entry row[], int permanent[]) {
+     ^(int count, struct timeserie₋entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) {
-        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(key.tetras,key.unicodes), 
+        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(row.key.tetras,row.key.unicodes), 
          ﹟λ(Argᴾ₋output scalar, void * context)); }
       }
      }, &serie1,two₋real₋addition);
    print("\n"); state₋after(3,interesting₋keys,ordin, 
-    ^(int count, struct Unicodes key[], struct timeserie₋entry row[], int permanent[]) {
+    ^(int count, struct timeserie₋entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) {
-        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(key.tetras,key.unicodes), 
+        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(row.key.tetras,row.key.unicodes), 
          ﹟λ(Argᴾ₋output scalar, void * context)); }
       }
     }, &serie1,two₋real₋addition);
@@ -54,7 +54,7 @@ UNITTEST(Timeserie₋1)
    );
    
    int incl₋tables=1;
-   Present₋timeserie₋details(&serie1,incl₋tables, 
+   Present₋timeserie₋transacts(&serie1,incl₋tables, 
     ^(char8₋t * u8s, __builtin_int_t bytes) {
       print("⬚", ﹟s8(u8s));
     }

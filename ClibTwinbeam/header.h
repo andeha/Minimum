@@ -2,16 +2,15 @@
 
 
 #if !defined __cplusplus
-#define inexorable
-#define structᵢ struct
-#define unionᵢ union
 #define MACRO static inline INLINED
+#define unionᵢ union
+#define structᵢ struct
 #else
 #define MACRO inline INLINED
-#define unionᵢ union __attribute__ ((internal_linkage))
-#define structᵢ struct __attribute__((internal_linkage))
-#define inexorable static __attribute__ ((internal_linkage))
+#define unionᵢ union __attribute__ ((always_inline))
+#define structᵢ struct __attribute__((always_inline))
 #endif /* ⬷ see 'nm' for details. */
+#define inexorable static INLINED
 #define INLINED __attribute__((always_inline))
 typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
@@ -144,7 +143,7 @@ EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short d
 #define false 0
 #define true (! false)
 
-struct 𝟽bit₋text { __builtin_int_t bytes; signed char * s; };
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * keyputs; };
 struct utf8₋text { __builtin_int_t bytes; char8₋t * u8s; };
 struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 
@@ -178,8 +177,8 @@ enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 /* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
 typedef struct sequent Sequenta;
 EXT₋C₂
-inexorable void int₋to₋sequent(int64_t ℤ, Sequenta * ℝ);
-inexorable void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], 
+void int₋to₋sequent(int64_t ℤ, Sequenta * ℝ);
+void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], 
  Sequenta * ℝ); /* ⬷ a․𝘬․a digits_to_sequent and 
  'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
 void print₋sequent(Sequenta 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
@@ -318,6 +317,7 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
 EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fall⒪⒲)(void *);
+EXT₋C void * (^Realloc)(void * p, __builtin_int_t to₋bytes);
 
 /* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
 struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
@@ -650,14 +650,14 @@ EXT₋C int timeserie₋delta(struct timeserie₋entry * relative, union history
  current, struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C int timeserie₋update(struct timeserie₋entry * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(int count, struct Unicodes key[], struct timeserie₋entry row[], 
- int permanent[]), struct timeserie * 🅙, Timeserie₋summation addition);
+ (^search₋found)(int count, struct timeserie₋entry row[], int permanent[]), 
+ struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(int count, struct Unicodes key[], struct timeserie₋entry row[], 
- int permanent[]), struct timeserie * 🅙, Timeserie₋summation addition);
+ (^search₋found)(int count, struct timeserie₋entry row[], int permanent[]), 
+ struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void Present₋timeserie₋overview(unsigned columns, struct timeserie * 🅙, 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
-EXT₋C void Present₋timeserie₋details(struct timeserie * 🅙, int incl₋tables, 
+EXT₋C void Present₋timeserie₋transacts(struct timeserie * 🅙, int incl₋tables, 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
 #if defined __mips__ && !defined NON₋SIMD

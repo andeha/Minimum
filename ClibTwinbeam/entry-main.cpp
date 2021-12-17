@@ -7,14 +7,16 @@ import ClibTwinbeam;
     -g -std=c++20 -lc++ decalogue.cpp eight-utf.cpp endian-base.cpp            \
      entry-main.cpp present-print.cpp                                          \
     unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp                        \
-    account-italian.o amend-augment.o arabic-edit.o cubist-codex.o             \
-    chronolog-y.o float-short.o kiddle-table.o lock-arrange.o o-binary.o       \
-    queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o             \
+    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
+    unittests/ᛟ-test-timeserie.cpp                                             \
+    account-italian-1.o account-italian-2.o amend-augment.o arabic-edit.o      \
+    cubist-codex.o chronolog-y.o float-short.o kiddle-table.o lock-arrange.o   \
+    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
     thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c18 account-italian-1.c account-italian-2.c amend-augment.c        \
+    -g -std=c2x account-italian-1.c account-italian-2.c amend-augment.c        \
     arabic-edit.c cubist-codex.c chronolog-y.c float-short.c kiddle-table.c    \
     lock-arrange.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
     semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c                \
@@ -30,14 +32,16 @@ import ClibTwinbeam;
     -g -std=c++20 -lc++ -target arm64-apple-macos11 -march=armv8.4a+tme+fp16   \
     decalogue.cpp eight-utf.cpp endian-base.cpp entry-main.cpp                 \
     present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
-    account-italian.o amend-augment.o arabic-edit.o cubist-codex.o             \
-    float-short.o kiddle-table.o lock-arrange.o o-binary.o queue-invent.o      \
-    round-fixed.o search-symbol.o semantic-symbol.o thread-fork.o tiles-map.o  \
-    x-error-stack.o x-partial-referen.o */
+    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
+    unittests/ᛟ-test-timeserie.cpp                                             \
+    account-italian-1.o account-italian-2.o amend-augment.o arabic-edit.o      \
+    cubist-codex.o float-short.o kiddle-table.o lock-arrange.o o-binary.o      \
+    queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o             \
+    thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c18 -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
+    -g -std=c2x -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
     account-italian-1.c account-italian-2.c amend-augment.c arabic-edit.c      \
     cubist-codex.c chronolog-y.c float-short.c kiddle-table.c lock-arrange.c   \
     o-binary.c queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c  \
@@ -65,10 +69,10 @@ runUnitTest(
   void (^completion)(const char *symbol, uint64_t dt)
 )
 {
-    typedef void (*Testcase)(); void (*testcase)() = (Testcase)addr;
-    uint64_t startInstant = cycles(); testcase();
-    uint64_t dt = cycles() - startInstant;
-    completion(symbol,dt);
+   typedef void (*Testcase)(); void (*testcase)() = (Testcase)addr;
+   uint64_t startInstant = cycles(); testcase();
+   uint64_t dt = cycles() - startInstant;
+   completion(symbol,dt);
 }
 
 inexorable void lastChance(int debug)
@@ -89,32 +93,35 @@ RunUnittests(
   int64_t * timetotal
 )
 {
-    __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
-    extern void Symbols(const char * utf8exepath /*, int * is₋debug */, 
-     void (^callback)(const char *, uint64_t, int *));
-    Symbols(execfilePath, /* is₋debug, */ ^(const char * sym, uint64_t addr, int * stop) {
-       if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
-          print("\nRunning ⬚ from 0x⬚\n\n", ﹟s7(sym), ﹟x((__builtin_uint_t)addr));
-          runUnitTest((void *)addr, sym, ^(const char * symbol, uint64_t dt) {
-             print("\n\nEND ");
-             Base𝕟(dt, 10, 0,^(char 𝟶to𝟿) { print("⬚", ﹟c7(𝟶to𝟿)); });
-             print(" ns when running ⬚\n", ﹟s7(symbol));
-             *timetotal += dt;
-          });
-          ++count;
-       }
-    });
-    
-    return count;
+   __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
+   extern void Symbols(const char * utf8exepath /*, int * is₋debug */, 
+    void (^callback)(const char *, uint64_t, int *));
+   Symbols(execfilePath, /* is₋debug, */ ^(const char * sym, uint64_t addr, int * stop) {
+     if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
+       print("\nRunning ⬚ from 0x⬚\n\n", ﹟s7(sym), ﹟x((__builtin_uint_t)addr));
+       runUnitTest((void *)addr, sym, ^(const char * symbol, uint64_t dt) {
+         print("\n\nEND ");
+         Base𝕟(dt, 10, 0,^(char 𝟶to𝟿) { print("⬚", ﹟c7(𝟶to𝟿)); });
+         print(" ns when running ⬚\n", ﹟s7(symbol));
+         *timetotal += dt;
+       });
+       ++count;
+     }
+   });
+   
+   return count;
 }
+
+auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
+auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
+auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); };
 
 int
 main(
   int argc,
   const char * argv[]
 )
-{
-    printGreetings();
+{  printGreetings();
     int64_t nanosecs = 0; 
 #if defined _NDEBUG
     int debug=1;

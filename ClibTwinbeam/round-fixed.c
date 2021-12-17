@@ -205,7 +205,7 @@ void print₋sequent(struct sequent 𝕏,
     s = 10*(s % unity.detail.frac);
     delta *= 10;
    } while (s <= delta);
-   integers.bytes=i, integers.start=ints, fracts.bytes=j, fracts.start=fts;
+   integers.bytes=i, integers.keyputs=ints, fracts.bytes=j, fracts.keyputs=fts;
    digits(neg,integers,fracts);
 } /* #define EN₋TVÅ₋SUCCESSION₋AUTO₋OCH₋API / * b7874fba */
 

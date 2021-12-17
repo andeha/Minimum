@@ -2,10 +2,6 @@
 
 import ClibTwinbeam;
 
-auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
-auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); };
-
 UNITTEST(Rope)
 {
    void ﹡opaque₁=ΨΛΩ, ﹡opaque₂=ΨΛΩ;
