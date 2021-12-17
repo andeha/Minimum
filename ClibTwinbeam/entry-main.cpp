@@ -14,10 +14,11 @@ import ClibTwinbeam;
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c18 account-italian.c amend-augment.c arabic-edit.c cubist-codex.c \
-    chronolog-y.c float-short.c kiddle-table.c lock-arrange.c o-binary.c       \
-    queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c             \
-    thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c */
+    -g -std=c18 account-italian-1.c account-italian-2.c amend-augment.c        \
+    arabic-edit.c cubist-codex.c chronolog-y.c float-short.c kiddle-table.c    \
+    lock-arrange.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
+    semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c                \
+    x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
    $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
@@ -37,9 +38,9 @@ import ClibTwinbeam;
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c18 -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
-    account-italian.c amend-augment.c arabic-edit.c cubist-codex.c             \
-    chronolog-y.c float-short.c kiddle-table.c lock-arrange.c o-binary.c       \
-    queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c             \
+    account-italian-1.c account-italian-2.c amend-augment.c arabic-edit.c      \
+    cubist-codex.c chronolog-y.c float-short.c kiddle-table.c lock-arrange.c   \
+    o-binary.c queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c  \
     thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c */
 
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"       \
@@ -87,19 +88,20 @@ RunUnittests(
   const char32_t * regex,
   const char32_t * blacklist,
   bool doNotRun,
+  int * debug,
   int64_t * timetotal
 )
 {
     __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
-    extern void Symbols(const char * utf8exepath, void (^callback)(const
-      char *, uint64_t, int *));
-    Symbols(execfilePath, ^(const char * sym, uint64_t addr, int * stop) {
+    extern void Symbols(const char * utf8exepath /*, int * debug */, 
+     void (^callback)(const char *, uint64_t, int *));
+    Symbols(execfilePath, /* debug, */ ^(const char * sym, uint64_t addr, int * stop) {
        if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
-          print("\nRunning ⬚ from 0x⬚\n\n", ﹟s(sym), ﹟x((__builtin_uint_t)addr));
+          print("\nRunning ⬚ from 0x⬚\n\n", ﹟s7(sym), ﹟x((__builtin_uint_t)addr));
           runUnitTest((void *)addr, sym, ^(const char * symbol, uint64_t dt) {
              print("\n\nEND ");
-             Base𝕟(dt, 10, 0,^(char 𝟶to𝟿) { print("⬚", ﹟c(𝟶to𝟿)); });
-             print(" ns when running ⬚\n", ﹟s(symbol));
+             Base𝕟(dt, 10, 0,^(char 𝟶to𝟿) { print("⬚", ﹟c7(𝟶to𝟿)); });
+             print(" ns when running ⬚\n", ﹟s7(symbol));
              *timetotal += dt;
           });
           ++count;

@@ -620,9 +620,9 @@ EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, 
 typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
 typedef __builtin_int_t version₋ts;
-struct timeserie { Structa pendingchanges; void * currents, *uncommits; 
- Structa checkpoints, versions, events, temporals; 
- version₋ts *revision, earliest; unsigned short snapshot₋cycle; };
+struct timeserie { Structa pendings; void * currents, *uncommits; 
+ Structa points, versions, events, temporals; 
+ version₋ts *revision, earliest; unsigned short checkpoint₋modulo; };
 enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove };
 union historypod {
   __uint128_t machineunsigned;
@@ -634,29 +634,31 @@ EXT₋C int timeserie₋init(version₋ts * revision, unsigned short snapshot₋
  struct timeserie * 🅹);
 EXT₋C void timeserie₋uninit(struct timeserie * 🅹);
 EXT₋C void timeserie₋rollback(struct timeserie * 🅙);
-struct timeserie₋entry₁ { struct Unicodes key; union historypod entry; 
+struct timeserie₋entry { struct Unicodes key; union historypod entry; 
  struct 𝟽bit₋text reference; };
-struct timeserie₋entry₂ { struct Unicodes key; union historypod * entry; 
- struct 𝟽bit₋text reference; };
+typedef union historypod (*Timeserie₋summation)(union historypod x₁, union historypod x₂);
 typedef void (^temporary₋entry)(struct 𝟽bit₋text reference, union historypod 
  entry, version₋ts revision, int * bye);
-EXT₋C void timeserie₋commit(version₋ts * revision, temporary₋entry row, 
- struct timeserie * 🅙);
+EXT₋C int timeserie₋commit(version₋ts * revision, temporary₋entry row, 
+ struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C int timeserie₋first(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋last(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋end(struct timeserie * 🅙, version₋ts * instant);
 EXT₋C int timeserie₋remove(struct Unicodes key, struct timeserie * 🅙);
-EXT₋C int timeserie₋create(struct timeserie₋entry₁ * initial, struct timeserie * 🅙);
-typedef union historypod (*Timeserie₋summation)(union historypod x₁, union historypod x₂);
-EXT₋C int timeserie₋delta(struct timeserie₋entry₂ * relative, union historypod * 
+EXT₋C int timeserie₋create(struct timeserie₋entry * initial, struct timeserie * 🅙);
+EXT₋C int timeserie₋delta(struct timeserie₋entry * relative, union historypod * 
  current, struct timeserie * 🅙, Timeserie₋summation addition);
-EXT₋C int timeserie₋update(struct timeserie₋entry₂ * absolute, struct timeserie * 🅙);
+EXT₋C int timeserie₋update(struct timeserie₋entry * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
  struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
  struct timeserie * 🅙, Timeserie₋summation addition);
+EXT₋C void Present₋timeserie₋overview(unsigned columns, struct timeserie * 🅙, 
+ void (^out)(char8₋t * u8s, __builtin_int_t bytes));
+EXT₋C void Present₋timeserie₋details(struct timeserie * 🅙, int incl₋tables, 
+ void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
