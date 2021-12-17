@@ -4,8 +4,8 @@ import ClibTwinbeam;
 
 union historypod two₋real₋addition(union historypod x₁, union historypod x₂)
 {
-   simd_tᵦ onesum = __builtin_simd_addᵦ(x₁.two₋real,x₂.two₋real);
-   union historypod sum = { .two₋real=onesum };
+   simd_tᵦ inner = __builtin_simd_addᵦ(x₁.two₋real,x₂.two₋real);
+   union historypod sum = { .two₋real=inner };
    return sum;
 }
 
@@ -34,14 +34,14 @@ UNITTEST(Timeserie₋1)
    state₋before(3,interesting₋keys,ordin, 
      ^(int count, struct Unicodes key[], struct timeserie₋entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) {
-        if (permanent[i]) { print("⬚: ⬚", ﹟S₁(key.tetras,key.unicodes), 
+        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(key.tetras,key.unicodes), 
          ﹟λ(Argᴾ₋output scalar, void * context)); }
       }
      }, &serie1,two₋real₋addition);
    print("\n"); state₋after(3,interesting₋keys,ordin, 
     ^(int count, struct Unicodes key[], struct timeserie₋entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) {
-        if (permanent[i]) { print("⬚: ⬚", ﹟S₁(key.tetras,key.unicodes), 
+        if (permanent[i]) { print("⬚: ⬚\n", ﹟S₁(key.tetras,key.unicodes), 
          ﹟λ(Argᴾ₋output scalar, void * context)); }
       }
     }, &serie1,two₋real₋addition);
