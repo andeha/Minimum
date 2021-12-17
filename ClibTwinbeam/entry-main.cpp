@@ -88,7 +88,7 @@ RunUnittests(
   const char32_t * regex,
   const char32_t * blacklist,
   bool doNotRun,
-  int * debug,
+  /* int * debug, */
   int64_t * timetotal
 )
 {
@@ -118,9 +118,8 @@ main(
 )
 {
     printGreetings();
-    int64_t nanosecs = 0;
-    __builtin_int_t units = RunUnittests(argv[0], U"", U"", false, &nanosecs);
-    atexit(lastChance);
+    int64_t nanosecs = 0; /* int is₋debug=0; */
+    __builtin_int_t units = RunUnittests(argv[0], U"", U"", false /*, &is₋debug */, &nanosecs);
     print("\nUnit(s): ⬚\nTotal: ⬚ ns\n\n", ﹟d(units), ﹟d(nanosecs));
     print("𝐴𝑢𝑡𝑜𝑚𝑎𝑡𝑒𝑑 𝑡𝑒𝑠𝑡𝑠 𝑑𝑖𝑑 𝑛𝑜𝑡 𝑓𝑖𝑛𝑑 𝑎𝑛𝑦 𝑒𝑟𝑟𝑜𝑟𝑠 😐 \n");
     return 0;
