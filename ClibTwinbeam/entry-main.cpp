@@ -71,13 +71,10 @@ runUnitTest(
     completion(symbol,dt);
 }
 
-inexorable void lastChance()
+inexorable void lastChance(int debug)
 {
-#if defined(_DEBUG)
-    print("\nThe binary is a debug build.\n\n");
-#else
-    print("\nThe binary is a release build.\n\n");
-#endif
+  if (debug) print("\nThe binary is a debug build.\n\n");
+  else print("\nThe binary is a release build.\n\n");
 }
 
 #pragma mark glue and boilerplate
@@ -88,14 +85,14 @@ RunUnittests(
   const char32_t * regex,
   const char32_t * blacklist,
   bool doNotRun,
-  /* int * debug, */
+  /* int * is₋debug, */
   int64_t * timetotal
 )
 {
     __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
-    extern void Symbols(const char * utf8exepath /*, int * debug */, 
+    extern void Symbols(const char * utf8exepath /*, int * is₋debug */, 
      void (^callback)(const char *, uint64_t, int *));
-    Symbols(execfilePath, /* debug, */ ^(const char * sym, uint64_t addr, int * stop) {
+    Symbols(execfilePath, /* is₋debug, */ ^(const char * sym, uint64_t addr, int * stop) {
        if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
           print("\nRunning ⬚ from 0x⬚\n\n", ﹟s7(sym), ﹟x((__builtin_uint_t)addr));
           runUnitTest((void *)addr, sym, ^(const char * symbol, uint64_t dt) {
@@ -118,10 +115,16 @@ main(
 )
 {
     printGreetings();
-    int64_t nanosecs = 0; /* int is₋debug=0; */
-    __builtin_int_t units = RunUnittests(argv[0], U"", U"", false /*, &is₋debug */, &nanosecs);
+    int64_t nanosecs = 0; 
+#if defined _NDEBUG
+    int debug=1;
+#else
+    int debug=0;
+#endif
+    __builtin_int_t units = RunUnittests(argv[0], U"", U"", false /*, &debug */, &nanosecs);
     print("\nUnit(s): ⬚\nTotal: ⬚ ns\n\n", ﹟d(units), ﹟d(nanosecs));
     print("𝐴𝑢𝑡𝑜𝑚𝑎𝑡𝑒𝑑 𝑡𝑒𝑠𝑡𝑠 𝑑𝑖𝑑 𝑛𝑜𝑡 𝑓𝑖𝑛𝑑 𝑎𝑛𝑦 𝑒𝑟𝑟𝑜𝑟𝑠 😐 \n");
+    lastChance(debug);
     return 0;
 }
 
