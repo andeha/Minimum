@@ -144,9 +144,9 @@ EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short d
 #define false 0
 #define true (! false)
 
-struct 𝟽bit₋text { __builtin_int_t bytes; signed char * start; };
-struct utf8₋text { __builtin_int_t bytes; char8₋t * start; };
-struct Unicodes { __builtin_int_t tetras; char32̄_t * start; };
+struct 𝟽bit₋text { __builtin_int_t bytes; signed char * s; };
+struct utf8₋text { __builtin_int_t bytes; char8₋t * u8s; };
+struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 
 EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
@@ -630,8 +630,8 @@ union historypod {
   union Q6463 fixed;
 };
 
-EXT₋C int timeserie₋init(version₋ts * revision, unsigned short snapshot₋cycle, 
- struct timeserie * 🅹);
+EXT₋C int timeserie₋init(version₋ts * revision, version₋ts earliest, 
+ unsigned short snapshot₋cycle, struct timeserie * 🅹);
 EXT₋C void timeserie₋uninit(struct timeserie * 🅹);
 EXT₋C void timeserie₋rollback(struct timeserie * 🅙);
 struct timeserie₋entry { struct Unicodes key; union historypod entry; 
@@ -650,11 +650,11 @@ EXT₋C int timeserie₋delta(struct timeserie₋entry * relative, union history
  current, struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C int timeserie₋update(struct timeserie₋entry * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
- struct timeserie * 🅙, Timeserie₋summation addition);
+ (^search₋found)(int count, struct Unicodes key[], struct timeserie₋entry row[], 
+ int permanent[]), struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(struct Unicodes key[], struct timeserie entry[], int permanent), 
- struct timeserie * 🅙, Timeserie₋summation addition);
+ (^search₋found)(int count, struct Unicodes key[], struct timeserie₋entry row[], 
+ int permanent[]), struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C void Present₋timeserie₋overview(unsigned columns, struct timeserie * 🅙, 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 EXT₋C void Present₋timeserie₋details(struct timeserie * 🅙, int incl₋tables, 
