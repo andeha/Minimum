@@ -11,7 +11,8 @@ objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
 gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
  -fno-signed-char -fno-builtin -Wno-c++20-designator -Wno-c99-designator     $
  -Wincomplete-umbrella -Wmodule-conflict -Wno-nullability-completeness
-moduleflags = -fmodules-ts -fimplicit-modules -fmodule-map-file=./ClibTwinbeam/module.modulemap
+moduleflags = -fmodules-ts -fimplicit-modules                                $
+ -fmodule-map-file=./ClibTwinbeam/module.modulemap
 commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 tmacr-version = 
 # -mmacosx-version-min=11.5
@@ -72,18 +73,19 @@ rule library
 
 build $objs/account-italian-1.o: c ClibTwinbeam/account-italian-1.c
 build $objs/account-italian-2.o: c ClibTwinbeam/account-italian-2.c
-build $objs/amend-augment.o: c ClibTwinbeam/amend-augment.c
+build $objs/amend-tape.o: c ClibTwinbeam/amend-tape.c
 build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
 build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
-build $objs/chronolog-y.o: c ClibTwinbeam/chronolog-y.c
+build $objs/chrono-logy.o: c ClibTwinbeam/chrono-logy.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
 build $objs/kiddle-table.o: c ClibTwinbeam/kiddle-table.c
-build $objs/lock-arrange.o: c ClibTwinbeam/lock-arrange.c
+build $objs/lock-attempt.o: c ClibTwinbeam/lock-attempt.c
 build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
 build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-symbol.o: c ClibTwinbeam/search-symbol.c
 build $objs/semantic-symbol.o: c ClibTwinbeam/semantic-symbol.c
+build $objs/symbol-texts.o: c ClibTwinbeam/symbol-texts.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
 build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
@@ -94,13 +96,14 @@ build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
 build $objs/endian-base.o: cc ClibTwinbeam/endian-base.cpp
 build $objs/present-print.o: cc ClibTwinbeam/present-print.cpp
 build libClibTwinbeam: library $objs/account-italian-1.o                     $
- $objs/account-italian-2.o $objs/amend-augment.o $objs/arabic-edit.o         $
- $objs/cubist-codex.o $objs/chronolog-y.o $objs/float-short.o                $
- $objs/kiddle-table.o $objs/lock-arrange.o $objs/o-binary.o                  $
+ $objs/account-italian-2.o $objs/amend-tape.o $objs/arabic-edit.o            $
+ $objs/chrono-logy.o $objs/cubist-codex.o $objs/float-short.o                $
+ $objs/kiddle-table.o $objs/lock-attempt.o $objs/o-binary.o                  $
  $objs/queue-invent.o $objs/round-fixed.o $objs/search-symbol.o              $
- $objs/semantic-symbol.o $objs/thread-fork.o $objs/tiles-map.o               $
- $objs/x-error-stack.o $objs/x-partial-referen.o $objs/decalogue.o           $
- $objs/eight-utf.o $objs/endian-base.o $objs/present-print.o
+ $objs/semantic-symbol.o $objs/symbol-texts.o $objs/thread-fork.o            $
+ objs/tiles-map.o $objs/x-error-stack.o $objs/x-partial-referen.o            $
+ $objs/decalogue.o $objs/eight-utf.o $objs/endian-base.o                     $
+ $objs/present-print.o
 build $appname: primary-compile-macswift histories.swift enriching.swift     $
  main.swift Data+Base16.swift
 build Minimum.app: assemble-macapp $appname
