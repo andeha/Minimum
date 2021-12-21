@@ -8,7 +8,7 @@ __attribute__ ((target("f16c")))
 #endif
 half₋to₋float(half /* unsigned short */ 𝟷𝟼₋bits)
 {
-#if defined __armv8a__X
+#if defined __armv8a__
   float16x8_t a = { 𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
   float32x4_t b = __builtin_arm_mve_vcvtbq_f32_f16(a);
   return b[0];
