@@ -1,13 +1,19 @@
-/* 􀓩 ruin-edit.c a․𝘬․a shatter-edit.c | non-interval-node is weight alt․ text. */
+/*  􀓩 arabic-edits.c | node stores 'characters to left' and in leaf text too. */
 
 import ClibTwinbeam;
 
-structᵢ internal₋rope₋heap {
-  void (^text₋dealloc)(void *);
-  void (^heap₋dealloc)(void *);
-  void * (^heap₋alloc)(__builtin_int_t bytes);
-  void * (^text₋alloc)(__builtin_int_t bytes);
-};
+unicode₋shatter branch₋to₋shatter(struct Unicodes ucs)
+{
+   __builtin_int_t bytes = ucs.tetras*4;
+   void * storage = Alloc(bytes);
+   Copy8Memory(storage,(ByteAlignedRef)(ucs.unicodes),bytes);
+   return (unicode₋shatter)storage;
+}
+
+void unalloc₋shatter(unicode₋shatter shatter)
+{
+   Fall⒪⒲(shatter);
+}
 
 inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
 {
@@ -15,25 +21,24 @@ inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
   return node->left == ΨΛΩ && node->right == ΨΛΩ;
 }
 
-void unalloc₋rope(void ᶿ﹡ opaque, void (^heap₋dealloc)(void *), 
- void (^text₋dealloc)(void *))
+void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem)
 {
    if (opaque == ΨΛΩ) { return; }
    struct node * node = (struct node *)opaque;
    if (is₋leaf₋node(opaque)) {
-    union Tetra𝘖rUnicode * text = (union Tetra𝘖rUnicode *)(node->payload.keyvalue.val);
-    text₋dealloc(text);
-    heap₋dealloc(opaque);
+    unicode₋shatter text = (unicode₋shatter)(node->payload.keyvalue.val);
+    dynmem.text₋dealloc(text);
+    dynmem.node₋dealloc(opaque);
    }
    else {
-     unalloc₋rope(node->left,heap₋dealloc,text₋dealloc);
-     unalloc₋rope(node->right,heap₋dealloc,text₋dealloc);
-     heap₋dealloc(opaque);
+     unalloc₋rope(node->left,dynmem);
+     unalloc₋rope(node->right,dynmem);
+     dynmem.node₋dealloc(opaque);
    }
 }
 
 inexorable int rope₋wedge(struct node * root, struct node * leaf, 
- struct node ** branch, void * (^node₋alloc)(__builtin_int_t bytes)) {
+ struct node ** branch, void * (*node₋alloc)(__builtin_int_t bytes)) {
    struct node * node = (struct node *)node₋alloc(sizeof(struct node));
    if (node == ΨΛΩ) { return -1; }
    if (root == ΨΛΩ) {
@@ -55,22 +60,20 @@ inexorable int rope₋wedge(struct node * root, struct node * leaf,
    return 0;
 }; /* ⬷ a․𝘬․a make₋branch₋alternatively₋two. */
 
-int rope₋append₋text(void ᶿ﹡* opaque₋root, union Tetra𝘖rUnicode * 
- length₋prefixed₋text, void (^text₋dealloc)(void *), 
- void (^heap₋dealloc)(void *), void * (^heap₋alloc)(__builtin_int_t bytes))
+int rope₋append₋text(void ᶿ﹡* opaque₋root, unicode₋shatter text, struct two₋memory 
+ dynmem)
 { struct node *root₋node=(struct node *)*opaque₋root, 
     *branch₋node=(struct node *)ΨΛΩ, /* non-root and root branch. */
     *leaf₋node=(struct node *)ΨΛΩ;
-   leaf₋node = (struct node *)heap₋alloc(sizeof(struct node));
-   int32_t weight = length₋prefixed₋text[0].count;
+   leaf₋node = (struct node *)dynmem.node₋alloc(sizeof(struct node));
+   int32_t weight = dynmem.text₋bytesize(text);
    leaf₋node->payload.keyvalue.key = weight;
    /* ⬷ a․𝘬․a alloc₋node₋copy₋text₋and₋assign₋reference. */
-   leaf₋node->payload.keyvalue.val = 
-    (__builtin_uint_t)&(length₋prefixed₋text[1].uc);
+   leaf₋node->payload.keyvalue.val = (__builtin_uint_t)text;
    if (*opaque₋root == ΨΛΩ) { *opaque₋root = leaf₋node; return 0; } /* ⬷ ground ends. */
    if (is₋leaf₋node(root₋node)) {
-     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,heap₋alloc)) {
-       unalloc₋rope(leaf₋node,heap₋dealloc,text₋dealloc); return -2; }
+     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,dynmem.node₋alloc)) {
+       unalloc₋rope(leaf₋node,dynmem); return -2; }
      *opaque₋root = branch₋node;
    } else {
      if (root₋node->left == ΨΛΩ) {
@@ -91,8 +94,8 @@ int rope₋append₋text(void ᶿ﹡* opaque₋root, union Tetra𝘖rUnicode *
         root₋node->right->payload.keyvalue.val;
        return 0;
      }
-     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,heap₋alloc)) {
-       unalloc₋rope(leaf₋node,heap₋dealloc,text₋dealloc);
+     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,dynmem.node₋alloc)) {
+       unalloc₋rope(leaf₋node,dynmem);
        return -3; }
      *opaque₋root = branch₋node;
    }
@@ -100,7 +103,7 @@ int rope₋append₋text(void ᶿ﹡* opaque₋root, union Tetra𝘖rUnicode *
 }
 
 inexorable int rope₋append₋rope(void ᶿ﹡* opaque, void ᶿ﹡ rhs, 
- void * (^node₋alloc)(__builtin_int_t bytes))
+ void * (*node₋alloc)(__builtin_int_t bytes))
 { struct node *branch₋root=ΨΛΩ, *root₋node=(struct node *)opaque, 
     *rhs₋node=(struct node *)rhs;
    if (rhs == ΨΛΩ) { return 0; }
@@ -115,8 +118,8 @@ inexorable int rope₋append₋rope(void ᶿ﹡* opaque, void ᶿ﹡ rhs,
 
 inexorable __builtin_int_t fibonacci(__builtin_int_t n)
 {
-  __builtin_int_t coefficients[] = {0,1,1,2,3,5,8,13,21,34,55,89,144,233,
-   377,610,987,1597,2584,4181,6765};
+  __builtin_int_t coefficients[] = { 0,1,1,2,3,5,8,13,21,34,55,89,144,233, 
+   377,610,987,1597,2584,4181,6765 };
   return n < 20 ? coefficients[n] : 6765;
 }
 
@@ -125,16 +128,15 @@ inexorable void balance₋rope(void ᶿ﹡ opaque)
    
 } /* length is string weight + number of nodes to root. */
 
-inexorable void ground₋include(union Tetra𝘖rUnicode * length₋prefixed₋text, 
- struct node ** new₋root, struct internal₋rope₋heap * coalesced₋ops)
+inexorable void ground₋include(unicode₋shatter text, 
+ struct node ** new₋root, struct two₋memory dynmem)
 {
    int always₋zero = rope₋append₋text((void **)new₋root, 
-    length₋prefixed₋text, coalesced₋ops->text₋dealloc, 
-    coalesced₋ops->heap₋dealloc, coalesced₋ops->heap₋alloc);
+    text, dynmem);
 }
 
 inexorable int rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx, 
- void ᶿ﹡* lhs, void ᶿ﹡* rhs, struct internal₋rope₋heap * coalesced)
+ void ᶿ﹡* lhs, void ᶿ﹡* rhs, struct two₋memory dynmem)
 { struct node *out₋lhs=(struct node *)ΨΛΩ, *out₋rhs=(struct node *)ΨΛΩ, 
     *root₋node=(struct node *)opaque;
    if (idx > rope₋length(opaque)) { return -1; }
@@ -146,23 +148,24 @@ inexorable int rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
      struct node * elem = (struct node *)pop(&node₋stack);
      if (is₋leaf₋node(elem)) {
        __builtin_int_t weight = elem->payload.keyvalue.key;
-       union Tetra𝘖rUnicode * text = (union Tetra𝘖rUnicode *)(elem->payload.keyvalue.val);
-       if (idx > current₋idx + weight) { ground₋include(text,&out₋lhs,coalesced); }
-       else if (idx <= current₋idx) { ground₋include(text,&out₋rhs,coalesced); }
+       unicode₋shatter heap₋text = (char32̄_t *)elem->payload.keyvalue.val;
+       __builtin_int_t symbols = 1 + dynmem.text₋bytesize(heap₋text)/4;
+       /* ⬷ and 'Heap₋object₋size' for length of text. */
+       if (idx > current₋idx + weight) { ground₋include(heap₋text,&out₋lhs,dynmem); }
+       else if (idx <= current₋idx) { ground₋include(heap₋text,&out₋rhs,dynmem); }
        else {
-         int32_t symbols = text->count;
          __builtin_int_t tetra₋offset = idx - current₋idx, 
           lhs₋symbol₋tetras = tetra₋offset, 
           rhs₋symbol₋tetras = symbols - tetra₋offset, 
           lhs₋symbol₋bytes=4*lhs₋symbol₋tetras, rhs₋symbol₋bytes=4*rhs₋symbol₋tetras;
-         void * leaf₁ = coalesced->text₋alloc(4 + lhs₋symbol₋bytes);
-         void * leaf₂ = coalesced->text₋alloc(4 + rhs₋symbol₋bytes);
-         ((union Tetra𝘖rUnicode *)leaf₁)->count = lhs₋symbol₋tetras;
-         ((union Tetra𝘖rUnicode *)leaf₂)->count = rhs₋symbol₋tetras;
-         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)leaf₁)), (ByteAlignedRef)(uint8_t *)(1+text), lhs₋symbol₋bytes);
-         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)leaf₂)), (ByteAlignedRef)(uint8_t *)(1+text+tetra₋offset), rhs₋symbol₋bytes);
-         ground₋include(leaf₁,&out₋lhs,coalesced);
-         ground₋include(leaf₂,&out₋rhs,coalesced);
+         void * leaf₁ = dynmem.text₋alloc(4 + lhs₋symbol₋bytes);
+         void * leaf₂ = dynmem.text₋alloc(4 + rhs₋symbol₋bytes);
+         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)leaf₁)), 
+          (ByteAlignedRef)(uint8_t *)(1+heap₋text), lhs₋symbol₋bytes);
+         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)leaf₂)), 
+          (ByteAlignedRef)(uint8_t *)(1+heap₋text+tetra₋offset), rhs₋symbol₋bytes);
+         ground₋include(leaf₁,&out₋lhs,dynmem);
+         ground₋include(leaf₂,&out₋rhs,dynmem);
        }
        current₋idx += weight;
      }
@@ -174,44 +177,36 @@ inexorable int rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
    *lhs=out₋lhs; *rhs=out₋rhs;
    return 0;
 error₋and₋dealloc:
-   unalloc₋rope(&out₋lhs,coalesced->heap₋dealloc,coalesced->text₋dealloc);
-   unalloc₋rope(&out₋rhs,coalesced->heap₋dealloc,coalesced->text₋dealloc);
+   unalloc₋rope(&out₋lhs,dynmem);
+   unalloc₋rope(&out₋rhs,dynmem);
    return -1;
 }
 
 int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge, 
- void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
- void * (^node₋alloc)(__builtin_int_t bytes), 
- void * (^text₋alloc)(__builtin_int_t bytes))
+ struct two₋memory dynmem)
 {
    void *tmp₋lhs=ΨΛΩ, *tmp₋rhs=ΨΛΩ;
-   struct internal₋rope₋heap coalesced₋ops = { text₋dealloc, heap₋dealloc, 
-    node₋alloc, text₋alloc };
-   if (rope₋split(*opaque,idx,&tmp₋lhs,&tmp₋lhs,&coalesced₋ops)) { return -1; }
-   if (rope₋append₋rope(&tmp₋lhs,wedge,node₋alloc)) { return -2; }
-   if (rope₋append₋rope(&tmp₋lhs,tmp₋rhs,node₋alloc)) { return -3; }
+   if (rope₋split(*opaque,idx,&tmp₋lhs,&tmp₋lhs,dynmem)) { return -1; }
+   if (rope₋append₋rope(&tmp₋lhs,wedge,dynmem.node₋alloc)) { return -2; }
+   if (rope₋append₋rope(&tmp₋lhs,tmp₋rhs,dynmem.node₋alloc)) { return -3; }
    *opaque = tmp₋lhs;
    /* unalloc₋rope(tmp₋lhs,heap₋dealloc); */
-   unalloc₋rope(tmp₋rhs,heap₋dealloc,text₋dealloc);
+   unalloc₋rope(tmp₋rhs,dynmem);
    return 0;
 } /* insertion is propotional to the depth of the node to insert. */
 
 int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len, 
- void (^text₋dealloc)(void *), void (^heap₋dealloc)(void *), 
- void * (^node₋alloc)(__builtin_int_t bytes), 
- void * (^text₋alloc)(__builtin_int_t bytes))
+ struct two₋memory dynmem)
 {
    void *tmp₋lhs=ΨΛΩ, *tmp₋rhs=ΨΛΩ;
    __builtin_int_t length = rope₋length(*opaque);
    if (length < idx || length < idx + len) { return -1; }
-   struct internal₋rope₋heap coalesced₋ops = { text₋dealloc, heap₋dealloc, 
-    node₋alloc, text₋alloc };
-   if (rope₋split(*opaque,idx,&tmp₋lhs,&tmp₋rhs,&coalesced₋ops)) { return -2; }
-   unalloc₋rope(opaque,heap₋dealloc,text₋dealloc);
-   if (rope₋append₋rope(*opaque,tmp₋lhs,node₋alloc)) { return -3; }
-   if (rope₋split(tmp₋rhs,len,&tmp₋lhs,&tmp₋rhs,&coalesced₋ops)) { return -4; }
-   if (rope₋append₋rope(opaque,tmp₋rhs,node₋alloc)) { return -5; }
-   unalloc₋rope(tmp₋lhs,heap₋dealloc,text₋dealloc);
+   if (rope₋split(*opaque,idx,&tmp₋lhs,&tmp₋rhs,dynmem)) { return -2; }
+   unalloc₋rope(opaque,dynmem);
+   if (rope₋append₋rope(*opaque,tmp₋lhs,dynmem.node₋alloc)) { return -3; }
+   if (rope₋split(tmp₋rhs,len,&tmp₋lhs,&tmp₋rhs,dynmem)) { return -4; }
+   if (rope₋append₋rope(opaque,tmp₋rhs,dynmem.node₋alloc)) { return -5; }
+   unalloc₋rope(tmp₋lhs,dynmem);
    return 0;
 }
 
@@ -242,6 +237,6 @@ char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
      }
    }
    return U'\x0';
-} /* index execution time is propotional to depth of tree. */
+} /* ⬷ index execution time is propotional to depth of tree. */
 
 

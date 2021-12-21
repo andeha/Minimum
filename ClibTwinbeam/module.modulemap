@@ -1,9 +1,10 @@
 /*  􀾟 module.modulemap | for later harmonization C++ and Swift. */
 
-/* module ClibTwinbeam_with_History {
+module ClibTwinbeam_with_History {
   header "header.h"
+  header "account-italian.h"
   header "history.h"
-} */
+}
 
 module ClibTwinbeam_and_cCubist {
   header "header.h"
@@ -16,11 +17,26 @@ module ClibTwinbeam_and_ionist {
 }
 
 module ClibTwinbeam_with_inneraccount {
+  /* use Intel_Simd use Arm_Simd */
   header "header.h"
   header "account-italian.h"
 }
 
-module ClibTwinbeam { requires macos header "header.h" }
+module Arm_Simd { requires macos, neon 
+  header "header.h"
+  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
+}
+
+module Intel_Simd { requires macos, sse4
+  header "header.h"
+  textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
+  textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
+  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/emmintrin.h"
+}
+
+module ClibTwinbeam { requires macos 
+  header "header.h"
+}
 
 module Types [system]
 { requires macos

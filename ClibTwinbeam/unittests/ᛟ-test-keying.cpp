@@ -1,18 +1,22 @@
-/* ᛟ-test-keying.cpp | texteditors and the terminal editing line. */
+/*  ᛟ-test-keying.cpp | texts and editor. */
 
 import ClibTwinbeam;
 
-UNITTEST(Rope)
+UNITTEST(Rope₋keyput₋1)
 {
-   void ﹡opaque₁=ΨΛΩ, ﹡opaque₂=ΨΛΩ;
-   if (rope₋append₋text(opaque₁, U"hello world")) { ENSURE(false, "return 1"); }
-   if (rope₋append₋text(opaque₂, U" this ")) { ENSURE(false, "return 2"); }
-   if (rope₋insert(opaque₁,5,opaque₂)) { ENSURE(false, "return 3"); }
-   if (rope₋delete(opaque₁,11,2)) { ENSURE(false, "return 4"); }
-   __builtin_int_t count = rope₋length(opaque₁);
-   char c = rope₋index(opaque₁,7);
-   rope₋free(opaque₁);
-   rope₋free(opaque₂);
+   void *opaque1=ΨΛΩ, *opaque2=ΨΛΩ;
+   struct two₋memory dynmem = { Heap₋unalloc, Heap₋unalloc, Heap₋alloc, Heap₋alloc,
+    Heap₋object₋size };
+   struct Unicodes text1 = { 11, UC("hello world") }, text2 = { 8, UC(" thesis ") };
+   unicode₋shatter shat1=branch₋to₋shatter(text1), shat2=branch₋to₋shatter(text2);
+   if (rope₋append₋text(&opaque1,shat1,dynmem)) { ENSURE(false, "append-1 failed"); }
+   if (rope₋append₋text(&opaque2,shat2,dynmem)) { ENSURE(false, "append-2 failed"); }
+   if (rope₋insert(&opaque1,5,&opaque2,dynmem)) { ENSURE(false, "insert failed"); }
+   if (rope₋delete(&opaque1,11,2,dynmem)) { ENSURE(false, "delete failed"); }
+   __builtin_int_t count = rope₋length(opaque1);
+   char c = rope₋index(opaque1,7);
+   unalloc₋rope(opaque1,dynmem);
+   unalloc₋rope(opaque2,dynmem);
 }
 
 

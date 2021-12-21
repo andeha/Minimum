@@ -9,17 +9,17 @@ import ClibTwinbeam;
     unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp                        \
     unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
     unittests/ᛟ-test-timeserie.cpp                                             \
-    account-italian-1.o account-italian-2.o amend-augment.o arabic-edit.o      \
-    cubist-codex.o chronolog-y.o float-short.o kiddle-table.o lock-arrange.o   \
+    account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
+    cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
     o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
     thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c2x account-italian-1.c account-italian-2.c amend-augment.c        \
-    arabic-edit.c cubist-codex.c chronolog-y.c float-short.c kiddle-table.c    \
-    lock-arrange.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
-    semantic-symbol.c thread-fork.c tiles-map.c x-error-stack.c                \
+    -g -std=c2x account-italian-1.c account-italian-2.c amend-tape.c           \
+    arabic-edit.c cubist-codex.c chrono-logy.c float-short.c kiddle-table.c    \
+    lock-attempt.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
+    semantic-symbol.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c \
     x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
@@ -34,16 +34,17 @@ import ClibTwinbeam;
     present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
     unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
     unittests/ᛟ-test-timeserie.cpp                                             \
-    account-italian-1.o account-italian-2.o amend-augment.o arabic-edit.o      \
-    cubist-codex.o float-short.o kiddle-table.o lock-arrange.o o-binary.o      \
-    queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o             \
-    thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
+    account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
+    cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
+    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
+    symbol-texts.c thread-fork.o tiles-map.o x-error-stack.o                   \
+    x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c2x -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
-    account-italian-1.c account-italian-2.c amend-augment.c arabic-edit.c      \
-    cubist-codex.c chronolog-y.c float-short.c kiddle-table.c lock-arrange.c   \
+    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
+    cubist-codex.c chrono-logy.c float-short.c kiddle-table.c lock-attempt.c   \
     o-binary.c queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c  \
     thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c */
 

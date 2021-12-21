@@ -149,6 +149,7 @@ struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 
 #define KEYPUTS(x) ((signed char *)(x))
 #define UC(x) ((char32̄_t *)(U##x))
+#define U8(x) ((char8₋t *)(u8##x))
 
 EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
@@ -339,6 +340,7 @@ int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟)
 EXT₋C₋FROM
 
 EXT₋C void * Heap₋alloc(__builtin_int_t bytes);
+EXT₋C __builtin_int_t Heap₋object₋size(void * p);
 EXT₋C void Heap₋unalloc(void * p);
 EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes);
 
@@ -492,9 +494,14 @@ struct two₋memory {
   void (*node₋dealloc)(void *);
   void * (*node₋alloc)(__builtin_int_t bytes);
   void * (*text₋alloc)(__builtin_int_t bytes);
+  __builtin_int_t (*text₋bytesize)(void *);
 };
 
-EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, struct Unicodes text, struct two₋memory dynmem); 
+typedef char32̄_t * unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
+EXT₋C void unalloc₋shatter(unicode₋shatter shat);
+EXT₋C unicode₋shatter branch₋to₋shatter(struct Unicodes ucs);
+EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
+ struct two₋memory dynmem); 
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
  void ᶿ﹡ wedge, struct two₋memory dynmem);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
@@ -502,6 +509,7 @@ EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx,
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
+/* ⬷ a․𝘬․a mutable₋string. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
 struct two₋command₋queue { }; */
