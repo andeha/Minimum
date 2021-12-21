@@ -1,25 +1,24 @@
 /* 􀣚 present-print.cpp | 'det' blev icke-klart och presenterades som 'ordning olika'. */
 
 import ClibTwinbeam;
+import Stdio;
 
-inexorable __builtin_int_t TetrasUntilNull(char32̄_t * ucs, 
- __builtin_int_t maxtetras)
-{ __builtin_int_t i=0;
-again:
-   if (i >= maxtetras) { return maxtetras; }
-   char32̄_t * uc = ucs + i;
-   if (*uc == 0x0000) { return i; }
-   ++i; goto again;
-}
-
-#pragma mark - Inte₋ger₋s
+/* #define UNEXISTING₋IEEE754 */
 
 EXT₋C Argᴾ ﹟d(__builtin_int_t d) { return Argᴾ { .value.d=d, .kind=1 }; }
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { return Argᴾ { { .x=x }, 2 }; }
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { return Argᴾ { { .b=b }, 3 }; }
-EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) /* a⃝ */ { return Argᴾ { { .u8s=(char8₋t *)u8s }, 4 }; }
-EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) /* a⃝ */ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
-EXT₋C Argᴾ ﹟S₁(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) /* a⃝ */ { return Argᴾ { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)u8s }, 4 }; }
+EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) a⃝ { return Argᴾ { { .u8s=(char8₋t *)s }, 4 }; }
+EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝ { 
+  return Argᴾ { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) a⃝ {
+  __builtin_int_t tetras=TetrasUntilNull((char32̄_t *)zero₋terminated₋uc,BUILTIN₋INT₋MAX);
+ return Argᴾ { { .ucs={ tetras, (char32̄_t *)zero₋terminated₋uc } }, 5 }; }
+EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, const /* signed */ char * s) a⃝ {
+ return Argᴾ { { .text₁={ characters, (signed char *)s } }, 100 }; }
+EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) a⃝ {
+ return Argᴾ { { .text₂={ bytes, (char8₋t *)u8s } }, 101 }; }
 EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */ { return Argᴾ { { .c=c }, 6 }; }
 EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */ { return Argᴾ { { .c=(char8₋t)c }, 6 }; }
 EXT₋C Argᴾ ﹟C(char32̄_t C) { return Argᴾ { { .uc=C }, 7 }; }
@@ -42,12 +41,7 @@ void Register₋reflect(__builtin_uint_t /* mask */) { }
 inexorable void Present(void (^out)(char8₋t * u8s, __builtin_int_t bytes), char32̄_t * terminated₋ucs)
 {
    __builtin_int_t tetras = TetrasUntilNull(terminated₋ucs,BUILTIN₋INT₋MAX);
-   print(out, "⬚", ﹟S₁(tetras,terminated₋ucs));
-}
-
-EXT₋C Argᴾ ﹟S₂(char32̄_t * terminated₋uc) {
-  __builtin_int_t tetras = TetrasUntilNull(terminated₋uc,BUILTIN₋INT₋MAX);
-  return Argᴾ { { .ucs={ tetras, terminated₋uc } }, 5 };
+   print(out, "⬚", ﹟S(tetras,terminated₋ucs));
 }
 
 inexorable void Coalesc₋present(void (^out)(int count, char32̄_t * unterminated₋ucs), int count, char32̄_t * unterminated₋ucs)
@@ -57,7 +51,7 @@ inexorable void Coalesc₋present(void (^out)(int count, char32̄_t * unterminat
 
 #pragma mark - in /retrospect/, hidden yet simple:
 
-#define UNEXISTING₋IEEE754
+EXT₋C Argᴾ ﹟F(double f, int format) { return Argᴾ { { .f₁=f } }; }
 
 EXT₋C
 int
@@ -90,7 +84,10 @@ print﹟(
     auto unicode₋symbol = ^(char32̄_t u) { UnicodeToUtf8(u, ^(char8₋t * u8s, 
      short bytes) { out(Critic(u8s),bytes); }); };
 #ifndef UNEXISTING₋IEEE754
-    auto out𝕕 = ^(double ℝ) { Format(ℝ, Ieee754form::Scientific, ^(char32̄_t uc) { unicode₋symbol(uc); }); };
+    auto out𝕕 = ^(double ℝ) {
+      /* Format(ℝ, Ieee754form::Scientific, ^(char32̄_t uc) { unicode₋symbol(uc); }); */
+      char buf[2048]; sprintf(buf, "%f",ℝ); u8c₋stream((char8₋t *)buf);
+    };
 #endif
     auto unicode₋stream = ^(int tetras, char32̄_t * unicodes) { __builtin_int_t 
       beam=0; while (beam < tetras) { char32̄_t uc = *(unicodes + beam); unicode₋symbol(uc); 
@@ -119,7 +116,7 @@ again:
       case 6: eight₋bit₋symbol(a.value.c); break;                               \
       case 7: unicode₋symbol(a.value.uc); break;                                
 #ifndef UNEXISTING₋IEEE754
-      case 8: out𝕕(double(a.value.f₂)); break;                                  \
+      case 8: out𝕕((double)(a.value.f₂)); break;                                \
       case 9: out𝕕(a.value.f₁); break;                                          
 #endif
 /*    case 10: { Argᴾ₋Unicode set = ^(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, \
