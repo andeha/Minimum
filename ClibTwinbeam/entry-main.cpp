@@ -12,7 +12,8 @@ import ClibTwinbeam;
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
     cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
     o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
-    thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
+    symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o                   \
+    x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
@@ -37,7 +38,7 @@ import ClibTwinbeam;
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
     cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
     o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
-    symbol-texts.c thread-fork.o tiles-map.o x-error-stack.o                   \
+    symbol-texts.c symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o    \
     x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
