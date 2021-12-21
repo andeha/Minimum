@@ -36,14 +36,16 @@ err:
 int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
   __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
   __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
-  void * outcome)
+  void * material)
 {
-   void * material = mapfileʳᵚ(canonicalUtf8RegularOrLinkpath, 
-     bytesOffset,pages𝘖rZero,bytesAugment,bytesActual);
-   if (material) { outcome=material; return 1; } else { return 0; }
+   void * outcome = mapfileʳᵚ(canonicalUtf8RegularOrLinkpath, 
+    bytesOffset,pages𝘖rZero,bytesAugment,bytesActual);
+   if (outcome) { material=outcome; return 1; } else { return 0; }
 }
 
 EXT₋C void * Heap₋alloc(__builtin_int_t bytes) { return malloc(bytes); }
+
+EXT₋C __builtin_int_t Heap₋object₋size(void * p) { return malloc_size(p); }
 
 EXT₋C void Heap₋unalloc(void * p) { free(p); }
 
