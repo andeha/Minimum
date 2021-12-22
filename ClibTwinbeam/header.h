@@ -486,8 +486,25 @@ EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
 /* auto leaf₋alloc = ^(int bytes) { return malloc(bytes); };
  let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-/* the 'overloadable' attribute in C-code not yet found in Swift code. */
-/* also page with table idx|offset. */
+
+typedef __builtin_uint_t structa₋middle₋index;
+
+struct structa {
+  structa₋middle₋index * index;
+  __builtin_int_t count, middleindex₋count, filled₋slots₋in₋last₋middleindex, filled₋slots₋in₋last₋tile;
+  unsigned bytes₋per₋item, bytes₋pertil₋ bytes₋per₋middleindex;
+}; /* ⬷ a․𝘬․a Tape. */
+
+EXT₋C int init₋structa(unsigned bytes₋per₋item. unsigned bytes₋per₋tile, struct structa * 🅰);
+EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
+EXT₋C int structa₋copy₋append(int count, void * bytesequence₋objects, struct structa * 🅐);
+EXT₋C void deinit₋structa(struct structa * 🅰);
+/* ...also pages with table index and offset. */
+/* ...the 'overloadable attribute in C-code not yet found in Swift code. */
+/* let register₋reflect = { (mask: __builtin_uint_t) -> Void in /‍* *‌/ } as
+ @convention(block) (__builtin_uint_t) -> Void */
+
+typedef struct structa Structa;
 
 struct two₋memory {
   void (*text₋dealloc)(void *);
