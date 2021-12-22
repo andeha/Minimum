@@ -22,12 +22,17 @@ module ClibTwinbeam_with_inneraccount {
   header "account-italian.h"
 }
 
-module Arm_Simd { requires macos, neon 
+module After_9 { requires macos 
+  header "header.h"
+  header "after_9.h"
+}
+
+module Arm_Simd { requires neon, macos 
   header "header.h"
   header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
 }
 
-module Intel_Simd { requires macos, sse4
+module Intel_Simd { requires sse4, macos 
   header "header.h"
   textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
   textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
@@ -51,6 +56,11 @@ module Stdio [system]
 module Unistd [system]
 { requires macos
   header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+}
+
+module CString [system]
+{ requires macos
+  header "/Library/Develoepr/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h"
 }
 
 module Stdlib [system]
