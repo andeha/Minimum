@@ -478,7 +478,8 @@ struct structa {
    filled₋slots₋in₋last₋middleindex, 
    filled₋bytes₋in₋last₋tile;
   unsigned bytes₋per₋item, bytes₋per₋tile, pointers₋per₋middleindex;
-}; /* ⬷ a․𝘬․a Tape and not '__builtin_int_t cached₋number; void *cached₋tile'. */
+}; /* ⬷ a․𝘬․a Tape and primary-memory so not '__builtin_int_t cached₋number; 
+ void *cached₋tile'. */
 
 EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned bytes₋per₋tile, struct structa * 🅰);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
@@ -525,11 +526,11 @@ struct two₋command₋queue { }; */
 union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 
-EXT₋C int init₋symbolpool(struct structa * 🅿);
-EXT₋C int optional₋uninit₋symbolpool(struct structa * 🅿);
-EXT₋C int copy₋append₋symbols(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
-EXT₋C int symbolpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
-EXT₋C struct Unicodes symbolpool₋at(struct structa * 🅟, Nonabsolute relative);
+EXT₋C int init₋regularpool(struct structa * 🅿);
+EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿);
+EXT₋C int copy₋append₋to₋regular(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
+EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
+EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
 /* ⬷ note operating system releases allocated memory space and pages when program ends. */
 /* ⬷ enough space to store all Unicode symbols in an utf-8 file 
  may be found from the file's byte length. */
@@ -551,14 +552,15 @@ template <typename Note> Note * jot(Unicodes token, struct symbolpool * 🅟)
 #endif
 
 struct poecilonyme { struct structa symbols; void ᶿ﹡ opaque; 
-  unsigned (*norm)(struct Unicode alt1, struct Unicodes alt2);
+  unsigned (*norm)(struct Unicodes alt₁, struct Unicodes alt₂);
 };
-int form₋ōnymon(Unicode key, Unicode value, int shares, struct thesaurus * 🅓);
-int dissociate₋isolate(Unicode key, Unicode value);
-int evidence₋related(Unicode key, void (^right)(int count, Unicode values[], 
- unsigned distance), struct thesaurus * 🅓);
-int thesaurus₋init(struct thesaurus * 🅳);
-int uninit₋thesaurus(struct thesaurus * 🅳);
+int form₋ōnymon(struct Unicodes key, struct Unicodes value, int shares, 
+ struct poecilonyme * 🅓);
+int dissociate₋isolate(struct Unicodes key, struct Unicodes value);
+int evidence₋related(struct Unicodes key, void (^right)(int count, 
+ struct Unicodes values[], unsigned distance), struct poecilonyme * 🅓);
+int thesaurus₋init(struct poecilonyme * 🅳);
+int uninit₋thesaurus(struct poecilonyme * 🅳);
 /* ⬷ a․𝘬․a 'company', 'association', 'thesaurus', liability₋alt₋indemnity 
  and 'unicode₋map'. */
 

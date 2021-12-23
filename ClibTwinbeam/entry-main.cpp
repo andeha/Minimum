@@ -9,16 +9,16 @@ import ClibTwinbeam;
     unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                      \
     unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                 \
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
-    cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
-    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-block.o   \
-    symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o                   \
+    cubist-codex.o chrono-logy.o float-short.o lock-attempt.o o-binary.o       \
+    queue-invent.o regular-pool.o round-fixed.o search-symbol.o                \
+    semantic-block.o symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o  \
     x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c  \
-    arabic-edit.c cubist-codex.c chrono-logy.c float-short.c kiddle-table.c    \
-    lock-attempt.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
+    arabic-edit.c cubist-codex.c chrono-logy.c float-short.c lock-attempt.c    \
+    o-binary.c queue-invent.c regular-pool.c round-fixed.c search-symbol.c     \
     semantic-block.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c  \
     x-partial-referen.c */
 
@@ -30,23 +30,25 @@ import ClibTwinbeam;
 /* clang -o arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__ \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c++20 -lc++ -target arm64-apple-macos11 -march=armv8.4a+tme+fp16   \
-    decalogue.cpp eight-utf.cpp endian-base.cpp entry-main.cpp                 \
-    present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
-    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
-    unittests/ᛟ-test-timeserie.cpp                                             \
+    -target-feature +sve decalogue.cpp eight-utf.cpp endian-base.cpp           \
+    entry-main.cpp present-print.cpp unittests/ᛟ-test-utf8.cpp                 \
+    unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                      \
+    unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                 \
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
-    cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
-    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-block.o   \
-    symbol-texts.c symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o    \
-    x-partial-referen.o */
+    cubist-codex.o chrono-logy.o float-short.o lock-attempt.o o-binary.o       \
+    queue-invent.o regular-pool.o round-fixed.o search-symbol.o                \
+    semantic-block.o symbol-texts.c symbol-texts.o thread-fork.o tiles-map.o   \
+    x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
+    -mfloat-abi-hard -D__ARM_FEATURE_SVE                                                        \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
     -g -std=c2x -target arm64-apple-macos11 -march=armv8.4a+crypto+tme+fp16    \
-    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
-    cubist-codex.c chrono-logy.c float-short.c kiddle-table.c lock-attempt.c   \
-    o-binary.c queue-invent.c round-fixed.c search-symbol.c semantic-symbol.c  \
-    thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c */
+    -msve-vector-bits=128 account-italian-1.c account-italian-2.c amend-tape.c \
+    arabic-edit.c cubist-codex.c chrono-logy.c float-short.c lock-attempt.c    \
+    o-binary.c queue-invent.c regular-pool.c round-fixed.c search-symbol.c     \
+    semantic-block.c thread-fork.c tiles-map.c x-error-stack.c                 \
+    x-partial-referen.c */
 
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"       \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
