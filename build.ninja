@@ -84,7 +84,7 @@ build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
 build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-symbol.o: c ClibTwinbeam/search-symbol.c
-build $objs/semantic-symbol.o: c ClibTwinbeam/semantic-symbol.c
+build $objs/semantic-block.o: c ClibTwinbeam/semantic-block.c
 build $objs/symbol-texts.o: c ClibTwinbeam/symbol-texts.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
@@ -100,7 +100,7 @@ build libClibTwinbeam: library $objs/account-italian-1.o                     $
  $objs/chrono-logy.o $objs/cubist-codex.o $objs/float-short.o                $
  $objs/kiddle-table.o $objs/lock-attempt.o $objs/o-binary.o                  $
  $objs/queue-invent.o $objs/round-fixed.o $objs/search-symbol.o              $
- $objs/semantic-symbol.o $objs/symbol-texts.o $objs/thread-fork.o            $
+ $objs/semantic-block.o $objs/symbol-texts.o $objs/thread-fork.o             $
  objs/tiles-map.o $objs/x-error-stack.o $objs/x-partial-referen.o            $
  $objs/decalogue.o $objs/eight-utf.o $objs/endian-base.o                     $
  $objs/present-print.o

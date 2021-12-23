@@ -22,14 +22,18 @@ module ClibTwinbeam_with_inneraccount {
   header "account-italian.h"
 }
 
-module After_9 { requires macos 
+module After_9 { requires cplusplus, macos 
   header "header.h"
-  header "after_9.h"
+  header "after-nine.h"
 }
 
-module Arm_Simd { requires neon, macos 
+module Arm_Simd { requires /* sve2, */ neon, macos 
+  config_macros __ARM_FEATURE_MVE /* =2 */
+ /* config_macros __ARM_FEATURE_SVE */
   header "header.h"
   header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
+  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_mve.h"
+  /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_sve.h" */
 }
 
 module Intel_Simd { requires sse4, macos 

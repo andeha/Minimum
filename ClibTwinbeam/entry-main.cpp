@@ -4,23 +4,22 @@ import ClibTwinbeam;
 
 /* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c++20 -lc++ decalogue.cpp eight-utf.cpp endian-base.cpp            \
-     entry-main.cpp present-print.cpp                                          \
-    unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp                        \
-    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
-    unittests/ᛟ-test-timeserie.cpp                                             \
+    -g -std=c++20 -msse4.1 -lc++ decalogue.cpp eight-utf.cpp endian-base.cpp   \
+    entry-main.cpp present-print.cpp unittests/ᛟ-test-utf8.cpp                 \
+    unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                      \
+    unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                 \
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
     cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
-    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
+    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-block.o   \
     symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o                   \
     x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c2x account-italian-1.c account-italian-2.c amend-tape.c           \
+    -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c  \
     arabic-edit.c cubist-codex.c chrono-logy.c float-short.c kiddle-table.c    \
     lock-attempt.c o-binary.c queue-invent.c round-fixed.c search-symbol.c     \
-    semantic-symbol.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c \
+    semantic-block.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c  \
     x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
@@ -37,7 +36,7 @@ import ClibTwinbeam;
     unittests/ᛟ-test-timeserie.cpp                                             \
     account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
     cubist-codex.o chrono-logy.o float-short.o kiddle-table.o lock-attempt.o   \
-    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-symbol.o  \
+    o-binary.o queue-invent.o round-fixed.o search-symbol.o semantic-block.o   \
     symbol-texts.c symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o    \
     x-partial-referen.o */
 

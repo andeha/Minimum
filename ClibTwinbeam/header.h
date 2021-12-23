@@ -144,12 +144,14 @@ EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short d
 #define true (! false)
 
 struct 𝟽bit₋text { __builtin_int_t count; signed char * keyputs; };
+/* the flag '-fsigned-char' forces plain char to be signed. */
 struct utf8₋text { __builtin_int_t bytes; char8₋t * u8s; };
 struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 
 #define KEYPUTS(x) ((signed char *)(x))
 #define UC(x) ((char32̄_t *)(U##x))
 #define U8(x) ((char8₋t *)(u8##x))
+#define UNICODES(s) ᵊ(UC(s))
 
 EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
@@ -302,18 +304,18 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 
 #define simd_init₈ vdupq_n_f16
 /* #define simd_init₈(x) { float16x8_t z = { x, 1,2,3,4,5,6,7 }; uint32_t y = vgetq_lane_f16(z,0); return y; } */
-#define __builtin_simd_add₈ __arm_vaddq_f16
-#define __builtin_simd_sub₈ __arm_vsubq_f16
-#define __builtin_simd_mul₈ __arm_vmulq_f16 /* VMUL.F16 Qd,Qn,Qm */
-#define __builtin_simd_div₈ __arm_vdivq_f16
-#define __builtin_simd_rcp₈ __arm_vinvq_f16
-#define __builtin_simd_sqrt₈ __arm_vrsqrte_f16
-#define __builtin_simd_rsqrt₈ __arm_vinvsqrtq_f16
-#define __builtin_simd_fmadd₈(a,b,c) __arm_vfmaq_f16(b,c,a) /* ⬷ a₁ + a₂*a₃. */
-#define __builtin_simd_min₈ __arm_vminq_f16
-#define __builtin_simd_max₈ __arm_vmaxq_f16
+#define __builtin_simd_add₈ __arm_vaddq_f16 /* in arm_neon.h named vaddq_f16. */
+#define __builtin_simd_sub₈ __arm_vsubq_f16 /* in arm_neon.h named vsubq_f16. */
+#define __builtin_simd_mul₈ __arm_vmulq_f16 /* VMUL.F16 Qd,Qn,Qm and in arm_neon.h named vmulq_f16. */
+#define __builtin_simd_div₈ __arm_vdivq_f16 /* not in arm_mve.h and in arm_neon.h named vdivq_f16. */
+#define __builtin_simd_rcp₈ __arm_vinvq_f16 /* --""-- and in arm_neon.h named 'vrecpeq_f16'. */
+#define __builtin_simd_sqrt₈ __arm_vrsqrte_f16 /* --""-- and in arm_neon.h named 'vsqrtq_f16'. */
+#define __builtin_simd_rsqrt₈ __arm_vinvsqrtq_f16 /* --""-- and in arm_neon.h named 'vrecpsq_f16'. */
+#define __builtin_simd_fmadd₈(a,b,c) __arm_vfmaq_f16(b,c,a) /* ⬷ a₁ + a₂*a₃ and vfmaq_f16 in arm_neon.h. */
+#define __builtin_simd_min₈ __arm_vminq_f16 /* --""-- and in arm_neon.h named 'vminnmq_f16' and 'vminq_f16'. */
+#define __builtin_simd_max₈ __arm_vmaxq_f16 /* --""-- and in arm_neon.h named 'vmaxq_f16'. */
 #define simd_scalar₈(x) __arm_vgetq_lane_f16(x,0)
-/* ⬷ +mve and +mve.fp. */
+/* ⬷ +mve and +mve.fp and arm_mve.h and __ARM_FEATURE_MVE=2. */
 
 EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
@@ -468,42 +470,31 @@ EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟
  __builtin_uint_t * words);
 EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
-struct structa {
-  __builtin_int_t cached₋number, tile₋count, bytes₋per₋tile, unused₋bytes;
-  void * treelist, *cached₋tile;
-}; /* ⬷ a․𝘬․a Tape. */
-
-typedef struct structa Structa;
-typedef void * (^Leaf₋alloc)(short bytes);
-EXT₋C int structa₋init(Structa * 🅢, __builtin_int_t bytes₋per₋tile);
-EXT₋C int structa₋lengthen(Structa * 🅢, __builtin_int_t ﹟, void * 
- fixedKbframes[], Leaf₋alloc founded);
-EXT₋C uint8_t * structa₋relative₋alt₋zero(Structa * 🅢, __builtin_int_t 
- byte₋offset);
-EXT₋C int structa₋copy₋append(Structa * 🅢, __builtin_int_t bytes, 
- uint8_t * material, void (^inflate)(__builtin_int_t ﹟, int * cancel));
-EXT₋C __builtin_int_t structa₋bytes(Structa * 🅢);
-/* auto leaf₋alloc = ^(int bytes) { return malloc(bytes); };
- let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
- as @convention(block) (__builtin_uint_t) -> Void */
-
 typedef __builtin_uint_t structa₋middle₋index;
 
 struct structa {
   structa₋middle₋index * index;
-  __builtin_int_t count, middleindex₋count, filled₋slots₋in₋last₋middleindex, filled₋slots₋in₋last₋tile;
-  unsigned bytes₋per₋item, bytes₋pertil₋ bytes₋per₋middleindex;
-}; /* ⬷ a․𝘬․a Tape. */
+  __builtin_int_t count, middleindex₋count, 
+   filled₋slots₋in₋last₋middleindex, 
+   filled₋bytes₋in₋last₋tile;
+  unsigned bytes₋per₋item, bytes₋per₋tile, pointers₋per₋middleindex;
+}; /* ⬷ a․𝘬․a Tape and not '__builtin_int_t cached₋number; void *cached₋tile'. */
 
-EXT₋C int init₋structa(unsigned bytes₋per₋item. unsigned bytes₋per₋tile, struct structa * 🅰);
+EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned bytes₋per₋tile, struct structa * 🅰);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
-EXT₋C int structa₋copy₋append(int count, void * bytesequence₋objects, struct structa * 🅐);
-EXT₋C void deinit₋structa(struct structa * 🅰);
+EXT₋C int copy₋append₋items(__builtin_int_t bytes, void * bytesequence₋objects, struct structa * 🅐);
+EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅐);
+EXT₋C int deinit₋structa(struct structa * 🅰);
 /* ...also pages with table index and offset. */
 /* ...the 'overloadable attribute in C-code not yet found in Swift code. */
-/* let register₋reflect = { (mask: __builtin_uint_t) -> Void in /‍* *‌/ } as
- @convention(block) (__builtin_uint_t) -> Void */
-
+/* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
+ as @convention(block) (__builtin_uint_t) -> Void */
+/* do not forget in main.cpp alternatively main.c (i.e 'once'):
+auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
+auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
+here not:
+typedef void * (^Leaf₋alloc)(short bytes);
+auto leaf₋alloc = ^(int bytes) { return malloc(bytes); }; */
 typedef struct structa Structa;
 
 struct two₋memory {
@@ -534,28 +525,42 @@ struct two₋command₋queue { }; */
 union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 
-struct symbolpool { struct structa symbol₋storage; void ᶿ﹡ opaque; };
-EXT₋C int init₋symbolpool(struct symbolpool * 🅿, __builtin_int_t 
- tetras₋per₋tile, __builtin_int_t count, void * kbXtiles[], struct two₋memory dynmem);
-EXT₋C int optional₋uninit₋symbolpool(struct symbolpool * 🅿, struct two₋memory 
- dynmem);
-EXT₋C int inflate₋symbolpool(struct symbolpool * 🅟, __builtin_int_t count, 
- void * kbXtiles[], struct two₋memory dynmem);
-EXT₋C int copy₋append₋text(struct symbolpool * 🅟, int count, char32̄_t cs[], 
- Nonabsolute * ref, void (^inflate)(__builtin_int_t ﹟, void **kbXtiles, 
- int * cancel));
-EXT₋C int datum₋text(struct symbolpool * 🅟, int32_t tetras);
-EXT₋C union Tetra𝘖rUnicode * at(struct symbolpool * 🅟, Nonabsolute relative);
-EXT₋C int textual₋similar(struct symbolpool * 🅟, struct Unicodes uc₁, 
- Nonabsolute relative);
+EXT₋C int init₋symbolpool(struct structa * 🅿);
+EXT₋C int optional₋uninit₋symbolpool(struct structa * 🅿);
+EXT₋C int copy₋append₋symbols(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
+EXT₋C int symbolpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
+EXT₋C struct Unicodes symbolpool₋at(struct structa * 🅟, Nonabsolute relative);
+/* ⬷ note operating system releases allocated memory space and pages when program ends. */
+/* ⬷ enough space to store all Unicode symbols in an utf-8 file 
+ may be found from the file's byte length. */
+
 #if defined 𝟷𝟸𝟾₋bit₋integers
+struct symbolpool { void ᶿ﹡ opaque; };
+typedef void * (^Leaf₋alloc)(__builtin_int_t bytes);
+/* EXT₋C int textual₋similar(struct symbolpool * 🅟, struct Unicodes uc₁, 
+ Nonabsolute relative); */
 EXT₋C void ᶿ﹡ store₋impression(struct symbolpool * 🅟, __uint128_t fineprint, 
  Leaf₋alloc alloc);
 EXT₋C void ᶿ﹡ seek₋impression(struct symbolpool * 🅟, __uint128_t fineprint);
+#if defined __cplusplus
+template <typename Note> Note * jot(Unicodes token, struct symbolpool * 🅟)
+{
+  
+}
 #endif
-/* ⬷ note operating system releases allocated memory space when program ends. */
-/* ⬷ enough space to store all Unicode symbols in an utf-8 file 
- may be found from the file's byte length. */
+#endif
+
+struct poecilonyme { struct structa symbols; void ᶿ﹡ opaque; 
+  unsigned (*norm)(struct Unicode alt1, struct Unicodes alt2);
+};
+int form₋ōnymon(Unicode key, Unicode value, int shares, struct thesaurus * 🅓);
+int dissociate₋isolate(Unicode key, Unicode value);
+int evidence₋related(Unicode key, void (^right)(int count, Unicode values[], 
+ unsigned distance), struct thesaurus * 🅓);
+int thesaurus₋init(struct thesaurus * 🅳);
+int uninit₋thesaurus(struct thesaurus * 🅳);
+/* ⬷ a․𝘬․a 'company', 'association', 'thesaurus', liability₋alt₋indemnity 
+ and 'unicode₋map'. */
 
 struct ¹stack { uint8_t * words; 
  __builtin_int_t size, elem₋bytesize, pos;
