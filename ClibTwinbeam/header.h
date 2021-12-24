@@ -174,7 +174,7 @@ EXT₋C void exit(int status);
 EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
  sym, uint64_t addr, int * stop));
 
-#pragma mark precision and the 128-bits physical bound
+/* precision and the 128-bits physical bound */
 
 union Q6463 { __uint128_t bits; __int128_t frac; };
 struct sequent { union Q6463 detail; int valid; };
@@ -232,7 +232,7 @@ EXT₋C₋FROM
 struct intel₋sequent₋pair { struct sequent inner[2]; };
 typedef struct intel₋sequent₋pair simd256_t;
 
-#pragma mark pythagorean-euclidean and the half type as described in Ieee754-2008
+/* pythagorean-euclidean and the half type as described in Ieee754-2008 */
 
 /*** Ieee 754 base-2 half with double-zero (-1)ˢ(1+m*2⁻¹⁰)×2ˣ⁻¹5 ***
                                                                              
@@ -257,20 +257,16 @@ BITMASK (uint32_t /* and not 'unsigned short' */) {
 #if defined __armv8a__
 typedef __attribute__ ((neon_vector_type(4))) float float32x4_t;
 typedef __attribute__ ((neon_vector_type(8))) __fp16 float16x8_t;
+typedef __attribute__ ((neon_vector_type(2))) double float64x2_t;
+typedef float64x2_t simd_tᵦ;
 #elif defined __x86_64__
 typedef half __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __v44f;
 typedef __v8hf __m128i; typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
 typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
-#endif
-
-#if defined __x86_64__
 typedef double __attribute__ ((__vector_size__(16), __aligned__(16))) __m128d;
 typedef __m128d simd_tᵦ;
-#elif defined __armv8a__
-typedef __attribute__ ((neon_vector_type(2))) double float64x2_t;
-typedef float64x2_t simd_tᵦ;
 #endif
 
 #define IEEE754BASE2_16BIT_PZERO 0b0000000000000000
@@ -343,8 +339,8 @@ EXT₋C₋FROM
 
 EXT₋C void * Heap₋alloc(__builtin_int_t bytes);
 EXT₋C __builtin_int_t Heap₋object₋size(void * p);
-EXT₋C void Heap₋unalloc(void * p);
 EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes);
+EXT₋C void Heap₋unalloc(void * p);
 
 typedef __builtin_uint_t * WordAlignedRef; typedef uint8_t * ByteAlignedRef;
 EXT₋C int Compare8Memory(ByteAlignedRef p₁, ByteAlignedRef p₂, __builtin_uint_t bytes);
@@ -474,16 +470,18 @@ typedef __builtin_uint_t structa₋middle₋index;
 
 struct structa {
   structa₋middle₋index * index;
-  __builtin_int_t count, middleindex₋count, 
-   filled₋slots₋in₋last₋middleindex, 
-   filled₋bytes₋in₋last₋tile;
-  unsigned bytes₋per₋item, bytes₋per₋tile, pointers₋per₋middleindex;
+  __builtin_int_t item₋count, middleindex₋count, 
+   last₋middleindex₋availables, last₋tile₋availables;
+  unsigned bytes₋per₋item, bytes₋per₋tile, 
+   pointers₋per₋middleindex;
 }; /* ⬷ a․𝘬․a Tape and primary-memory so not '__builtin_int_t cached₋number; 
  void *cached₋tile'. */
 
-EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned bytes₋per₋tile, struct structa * 🅰);
+EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
+ bytes₋per₋tile, struct structa * 🅰);
+EXT₋C int copy₋append₋items(__builtin_int_t count₋not₋bytes, void * 
+ bytesequence₋objects, struct structa * 🅐);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
-EXT₋C int copy₋append₋items(__builtin_int_t bytes, void * bytesequence₋objects, struct structa * 🅐);
 EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅐);
 EXT₋C int deinit₋structa(struct structa * 🅰);
 /* ...also pages with table index and offset. */
@@ -528,7 +526,7 @@ typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt
 
 EXT₋C int init₋regularpool(struct structa * 🅿);
 EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿);
-EXT₋C int copy₋append₋to₋regular(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
+EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
 /* ⬷ note operating system releases allocated memory space and pages when program ends. */
@@ -536,17 +534,22 @@ EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute rela
  may be found from the file's byte length. */
 
 #if defined 𝟷𝟸𝟾₋bit₋integers
-struct symbolpool { void ᶿ﹡ opaque; };
+struct regularprint { void ᶿ﹡ opaque; };
 typedef void * (^Leaf₋alloc)(__builtin_int_t bytes);
-/* EXT₋C int textual₋similar(struct symbolpool * 🅟, struct Unicodes uc₁, 
+/* EXT₋C int textual₋similar(struct symbolpool * 🅡, struct Unicodes uc₁, 
  Nonabsolute relative); */
-EXT₋C void ᶿ﹡ store₋impression(struct symbolpool * 🅟, __uint128_t fineprint, 
+EXT₋C void ᶿ﹡ store₋impression(struct regularprint * 🅡, __uint128_t fineprint, 
  Leaf₋alloc alloc);
-EXT₋C void ᶿ﹡ seek₋impression(struct symbolpool * 🅟, __uint128_t fineprint);
+EXT₋C void ᶿ﹡ seek₋impression(struct regularprint * 🅡, __uint128_t fineprint);
 #if defined __cplusplus
-template <typename Note> Note * jot(Unicodes token, struct symbolpool * 🅟)
+template <typename Note> Note * jot(Unicodes regular, struct regularprint * 🅡)
 {
-  
+  __uint128_t fineprint = 0;
+  void ᶿ﹡ node = seek₋impression(🅡,fineprint);
+  if (node == ΨΛΩ) {
+    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); };  
+    void ᶿ﹡ node2 = store₋impression(🅡,fineprint,leaf₋alloc);
+  } else { return ;}
 }
 #endif
 #endif
@@ -558,7 +561,7 @@ int form₋ōnymon(struct Unicodes key, struct Unicodes value, int shares,
  struct poecilonyme * 🅓);
 int dissociate₋isolate(struct Unicodes key, struct Unicodes value);
 int evidence₋related(struct Unicodes key, void (^right)(int count, 
- struct Unicodes values[], unsigned distance), struct poecilonyme * 🅓);
+ struct Unicodes value[], unsigned distance[]), struct poecilonyme * 🅓);
 int thesaurus₋init(struct poecilonyme * 🅳);
 int uninit₋thesaurus(struct poecilonyme * 🅳);
 /* ⬷ a․𝘬․a 'company', 'association', 'thesaurus', liability₋alt₋indemnity 

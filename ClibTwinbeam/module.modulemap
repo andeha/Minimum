@@ -16,35 +16,28 @@ module ClibTwinbeam_and_ionist {
   header "codex-ionist.h"
 }
 
-module ClibTwinbeam_with_inneraccount {
-  /* use Intel_Simd use Arm_Simd */
+module ClibTwinbeam { requires macos 
+  
+  module Arm_Simd { requires /* sve2, */ neon 
+    /* config_macros __ARM_FEATURE_MVE / * =2 */
+    /* config_macros __ARM_FEATURE_SVE */
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
+    /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_mve.h" a․𝘬․a 'Helium'. */
+    /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_sve.h" */
+  }
+  
+  module Intel_Simd { requires sse41 
+    textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
+    textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/emmintrin.h"
+  }
+  
   header "header.h"
   header "account-italian.h"
-}
-
-module After_9 { requires cplusplus, macos 
-  header "header.h"
-  header "after-nine.h"
-}
-
-module Arm_Simd { requires /* sve2, */ neon, macos 
-  config_macros __ARM_FEATURE_MVE /* =2 */
- /* config_macros __ARM_FEATURE_SVE */
-  header "header.h"
-  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
-  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_mve.h"
-  /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_sve.h" */
-}
-
-module Intel_Simd { requires sse4, macos 
-  header "header.h"
-  textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
-  textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
-  header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/emmintrin.h"
-}
-
-module ClibTwinbeam { requires macos 
-  header "header.h"
+  
+  module After_9 { requires cplusplus 
+    header "after-nine.h"
+  }
 }
 
 module Types [system]
