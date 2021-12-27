@@ -1,4 +1,4 @@
-/*  􀓩 arabic-edits.c | node stores 'characters to left' and in leaf text too. */
+/*  􀫖 arabic-edits.c | node stores 'characters to left' and in leaf text too. */
 
 import ClibTwinbeam;
 

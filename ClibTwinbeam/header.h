@@ -263,7 +263,7 @@ typedef float64x2_t simd_tᵦ;
 typedef half __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __v44f;
-typedef __v8hf __m128i; typedef __m128i panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
+typedef __v8hf __m128h; typedef __m128h panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
 typedef __v8hf simd_t₈; /* ⬷ a․𝘬․a float16x8_t. */
 typedef double __attribute__ ((__vector_size__(16), __aligned__(16))) __m128d;
 typedef __m128d simd_tᵦ;
@@ -298,20 +298,35 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
 
+#if defined __armv8q__ && !defined NON₋SIMD
 #define simd_init₈ vdupq_n_f16
 /* #define simd_init₈(x) { float16x8_t z = { x, 1,2,3,4,5,6,7 }; uint32_t y = vgetq_lane_f16(z,0); return y; } */
-#define __builtin_simd_add₈ __arm_vaddq_f16 /* in arm_neon.h named vaddq_f16. */
-#define __builtin_simd_sub₈ __arm_vsubq_f16 /* in arm_neon.h named vsubq_f16. */
-#define __builtin_simd_mul₈ __arm_vmulq_f16 /* VMUL.F16 Qd,Qn,Qm and in arm_neon.h named vmulq_f16. */
-#define __builtin_simd_div₈ __arm_vdivq_f16 /* not in arm_mve.h and in arm_neon.h named vdivq_f16. */
-#define __builtin_simd_rcp₈ __arm_vinvq_f16 /* --""-- and in arm_neon.h named 'vrecpeq_f16'. */
-#define __builtin_simd_sqrt₈ __arm_vrsqrte_f16 /* --""-- and in arm_neon.h named 'vsqrtq_f16'. */
-#define __builtin_simd_rsqrt₈ __arm_vinvsqrtq_f16 /* --""-- and in arm_neon.h named 'vrecpsq_f16'. */
-#define __builtin_simd_fmadd₈(a,b,c) __arm_vfmaq_f16(b,c,a) /* ⬷ a₁ + a₂*a₃ and vfmaq_f16 in arm_neon.h. */
-#define __builtin_simd_min₈ __arm_vminq_f16 /* --""-- and in arm_neon.h named 'vminnmq_f16' and 'vminq_f16'. */
-#define __builtin_simd_max₈ __arm_vmaxq_f16 /* --""-- and in arm_neon.h named 'vmaxq_f16'. */
-#define simd_scalar₈(x) __arm_vgetq_lane_f16(x,0)
-/* ⬷ +mve and +mve.fp and arm_mve.h and __ARM_FEATURE_MVE=2. */
+#define __builtin_simd_add₈ vaddq_f16
+#define __builtin_simd_sub₈ vsubq_f16
+#define __builtin_simd_mul₈ vmulq_f16 /* VMUL.F16 Qd,Qn,Qm. */
+#define __builtin_simd_div₈ vdivq_f16
+#define __builtin_simd_rcp₈ vrecpeq_f16
+#define __builtin_simd_sqrt₈ vsqrtq_f16
+#define __builtin_simd_rsqrt₈ vrecpsq_f16
+#define __builtin_simd_fmadd₈(a,b,c) vfmaq_f16(b,c,a) /* ⬷ a₁ + a₂*a₃. */
+#define __builtin_simd_min₈ vminq_f16
+#define __builtin_simd_max₈ vmaxq_f16
+#define simd_scalar₈(x) vgetq_lane_f16(x,0)
+#elif defined __mips__ && !defined NON₋SIMD
+#elif defined __x86_64__
+#define simd_init₈ _mm_set1_ph
+#define __builtin_simd_add₈ _mm_add_ph
+#define __builtin_simd_sub₈ _mm_sub_ph
+#define __builtin_simd_mul₈ _mm_mul_ph
+#define __builtin_simd_div₈ _mm_div_ph
+#define __builtin_simd_rcp₈ _mm_rcp_ph /* VRCPPH */
+#define __builtin_simd_sqrt₈ _mm_sqrt_ph
+#define __builtin_simd_rsqrt₈ _mm_rsqrt_ph
+#define __builtin_simd_fmadd₈ _mm_fmadd_sh
+#define __builtin_simd_max₈ _mm_max_ph
+#define __builtin_simd_min₈ _mm_min_ph
+#define simd_scalar₈(x) _mm_cvtsh_h
+#endif
 
 EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
 
@@ -508,7 +523,7 @@ typedef char32̄_t * unicode₋shatter; /* and 'Heap₋object₋size' for length
 EXT₋C void unalloc₋shatter(unicode₋shatter shat);
 EXT₋C unicode₋shatter branch₋to₋shatter(struct Unicodes ucs);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
- struct two₋memory dynmem); 
+ struct two₋memory dynmem);
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
  void ᶿ﹡ wedge, struct two₋memory dynmem);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
@@ -516,7 +531,7 @@ EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx,
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
-/* ⬷ a․𝘬․a mutable₋string. */
+/* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and remmingway. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
 struct two₋command₋queue { }; */

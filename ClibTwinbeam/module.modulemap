@@ -18,26 +18,23 @@ module ClibTwinbeam_and_ionist {
 
 module ClibTwinbeam { requires macos 
   
-  module Arm_Simd { requires /* sve2, */ neon 
-    /* config_macros __ARM_FEATURE_MVE / * =2 */
-    /* config_macros __ARM_FEATURE_SVE */
+  module Arm_Simd { requires neon 
     header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
-    /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_mve.h" a․𝘬․a 'Helium'. */
-    /* header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_sve.h" */
   }
   
-  module Intel_Simd { requires sse41 
-    textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
-    textual header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
-    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/emmintrin.h"
+  module Intel_Simd { requires /* sse41, */ sse 
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
   }
   
   header "header.h"
   header "account-italian.h"
   
-  module After_9 { requires cplusplus 
-    header "after-nine.h"
-  }
+}
+
+module After_9 { requires cplusplus 
+  header "header.h"
+  header "after-nine.h"
 }
 
 module Types [system]

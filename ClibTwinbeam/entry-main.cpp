@@ -36,8 +36,8 @@ import ClibTwinbeam;
     unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
     amend-tape.o arabic-edit.o cubist-codex.o chrono-logy.o float-short.o      \
     lock-attempt.o o-binary.o queue-invent.o regular-pool.o round-fixed.o      \
-    search-symbol.o semantic-block.o symbol-texts.c symbol-texts.o             \
-    thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
+    search-symbol.o semantic-block.o symbol-texts.o thread-fork.o tiles-map.o  \
+    x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
