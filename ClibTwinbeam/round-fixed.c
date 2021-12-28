@@ -3,7 +3,7 @@
 import ClibTwinbeam;
 
 #define 𝟶ᐧ𝟶 { .detail.frac=0, 1 }
-#define 𝟷𝟶ᐧ𝟶 { .detail.frac = (__int128_t)0x00000110 | 0x00000000, 1 }
+#define 𝟷𝟶ᐧ𝟶 { .detail.frac = (__int128_t)0x00000101<<64 | 0x00000000, 1 }
 #define 𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0x00000000<<64 | 0x80000000, 1 }
 #define 𝟸ᐧ𝟶 { .detail.frac = (__int128_t)0x00000001<<64 | 0x00000000, 1 }
 #define ₋𝟷ᐧ𝟶 { .detail.frac = (__int128_t)0xFFFFFFFF<<64 | 0x80000000, 1 }
@@ -46,46 +46,23 @@ struct sequent subtract_sequent(struct sequent x₁, struct sequent x₂)
   return diff;
 }
 
-uint8_t 𝟽₋op₋bytereverse(uint8_t b) {
-  return ((b * 0x8020LU & 0x88440LU) * 0x10101LU >> 16 | 
-   (b*0x802LU & 0x22110LU));
-}
-
-uint64_t bitswap₋63(uint64_t word, int reversed)
-{
-   union 𝟼𝟺₋bits𝟼to𝟼swap { uint8_t bytes[4]; uint64_t word; } one₋word = { .word=word };
-   if (reversed) { one₋word.word <<= 1; }
-   uint8_t bytes_0 = 𝟽₋op₋bytereverse(one₋word.bytes[0]);
-   uint8_t bytes_1 = 𝟽₋op₋bytereverse(one₋word.bytes[1]);
-   uint8_t bytes_2 = 𝟽₋op₋bytereverse(one₋word.bytes[2]);
-   uint8_t bytes_3 = 𝟽₋op₋bytereverse(one₋word.bytes[3]);
-   one₋word.bytes[0] = bytes_3; one₋word.bytes[1] = bytes_2;
-   one₋word.bytes[2] = bytes_1; one₋word.bytes[3] = bytes_0;
-   one₋word.word >>= 1;
-   return one₋word.word;
-} /* ⬷ primitive named DBITSWAP in Mips. */
-
-void unsigned₋multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * y, uint64_t * hi)
-{
-   __uint128_t frac₋mask = 0x7fffffff, int₋mask = (__uint128_t)0xFFFFFFFF<<64 | 
-    0x80000000, int₋x₁ = x₁ >> 63, int₋x₂ = x₂ >> 63, int₋y = int₋x₂ * int₋x₁, 
-   frac₋x₁ = frac₋mask & x₁, frac₋x₂ = frac₋mask & x₂;
-   frac₋x₁ = bitswap₋63((uint64_t)frac₋x₁,0);
-   frac₋x₂ = bitswap₋63((uint64_t)frac₋x₂,0);
-   __uint128_t frac₋y = frac₋x₁ * frac₋x₂;
-   bitswap₋63((uint64_t)frac₋y,1);
-} /* __uint256_t sum₋times₋2¹²⁶ = x₁ * x₂; */
-
 struct sequent multiply_sequent(struct sequent x₁, struct sequent x₂)
-{ int lneg=0, rneg=0; __uint128_t inner; uint64_t upper; struct sequent y;
-   if (x₁.detail.frac < 0) { lneg = 1; x₁.detail.frac = -x₁.detail.frac; }
-   if (x₂.detail.frac < 0) { rneg = 1; x₂.detail.frac = -x₂.detail.frac; }
-   unsigned₋multiply(x₁.detail.bits,x₂.detail.bits,&inner,&upper);
-   if (lneg ^ rneg) { inner = -inner; }
-   y.detail.bits = inner;
-   y.valid = 1;
-  return y;
-}
+{ short unsigned shift=0;
+   __int128_t X₁=x₁.detail.frac, X₂=x₂.detail.frac, mask=0b1, ACC=0;
+   int hi,lo=0; struct sequent y; y.valid=1;
+again:
+   if (shift == 127) { y.detail.frac=ACC; return y; }
+   hi = (int)((mask&X₁)>>shift);
+   if (hi ^ lo) {
+     if (hi) { ACC -= X₂<<shift; } else { ACC += X₂<<shift; }
+     /* ⬷ a․𝘬․a 'ACC -= multiple*x2' and 'ACC += multiple*x2'. 
+      where multiple=2^shift. */
+   }
+   lo=hi; mask<<=1; shift+=1;
+   goto again;
+} /* ⬷ a․𝘬․a 'Booth'. in the C language, the >> is arithmetic 
+ shift when argument is a signed integer, here we use right 
+ shift where logical and arithmetic shift is identical. */
 
 struct sequent divide_sequent₋reciproc(struct sequent x₁, struct sequent x₂, 
  int integer₋division) { struct sequent x₀=x₁, 
@@ -179,7 +156,7 @@ again:
   if (Newton(f,f₋prim,&x₀,ping)) { return accumulative₋zero(); }
 */
 
-void print₋positive₋integer₋sequent(__int128_t 𝕏, void (^out)(char 𝟬to𝟵))
+void print₋natural₋sequent(__int128_t 𝕏, void (^out)(char 𝟬to𝟵))
 { __builtin_uint_t ℕ = 𝕏>>62;
    Base𝕟(ℕ,10,0,out);
 }
@@ -195,7 +172,7 @@ void print₋sequent(struct sequent 𝕏,
    if (!𝕏.valid) { nonvalid(); return; }
    if (s == zero.detail.frac) { zero₋alt₋nonused(); return; }
    if (s < zero.detail.frac) { neg=1; s=-s; }
-   print₋positive₋integer₋sequent(s, ^(char 𝟶to𝟿) { *(is + i) = 𝟶to𝟿; ++i; });
+   print₋natural₋sequent(s, ^(char 𝟶to𝟿) { *(is + i) = 𝟶to𝟿; ++i; });
    /* print_char(".") alt. print_char(","); */
    s = 10*(s % unity.detail.frac) + 5; delta=10;
    do {
