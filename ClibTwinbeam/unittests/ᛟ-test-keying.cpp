@@ -1,4 +1,4 @@
-/*  ᛟ-test-keying.cpp | texts and editor. */
+/*  test-keying.cpp | texts and editor. */
 
 import ClibTwinbeam;
 
@@ -12,9 +12,9 @@ UNITTEST(Rope₋keyput₋1)
    if (rope₋append₋text(&opaque1,shat1,dynmem)) { ENSURE(false, "append-1 failed"); }
    if (rope₋append₋text(&opaque2,shat2,dynmem)) { ENSURE(false, "append-2 failed"); }
    if (rope₋insert(&opaque1,5,&opaque2,dynmem)) { ENSURE(false, "insert failed"); }
-   if (rope₋delete(&opaque1,11,2,dynmem)) { ENSURE(false, "delete failed"); }
    __builtin_int_t count = rope₋length(opaque1);
    char c = rope₋index(opaque1,7);
+   if (rope₋delete(&opaque1,11,2,dynmem)) { ENSURE(false, "delete failed"); }
    unalloc₋rope(opaque1,dynmem);
    unalloc₋rope(opaque2,dynmem);
 }

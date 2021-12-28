@@ -1,15 +1,15 @@
-/*  ᛟ-test-utf8.cpp | unicodes/alphabete — roman, arabic and non-cyrillic. */
+/*  test-utf8.cpp | unicodes/alphabete — roman, arabic and non-cyrillic. */
 
 import ClibTwinbeam;
 
-UNITTEST(Utf8ToUnicode₋1)
+UNITTEST(utf8ToUnicode₋1)
 {
   char8₋t ξ[] = { 0xe2, 0x99, 0xab }; __builtin_int_t bytes=3;
   char32̄_t beamed₋eigth₋uc = Utf8ToUnicode(ξ,bytes);
   ENSURE(beamed₋eigth₋uc == 0x266b, "utf8 to unicode failed")
 }
 
-UNITTEST(UnicodeToUtf8)
+UNITTEST(unicodeToUtf8)
 { char32̄_t Ξ = U'😐';
   typedef void (^Encoding)(char8₋t * u8s, short bytes);
   Encoding sometime₋valid = ^(char8₋t * u8s, short bytes) {
@@ -32,7 +32,7 @@ again:
    goto again;
 }
 
-UNITTEST(Decoded₋print)
+UNITTEST(decoded₋print)
 {
 #if defined __cplusplus
    const char32̄_t * text = (char32̄_t *)U"lorem ipsum";

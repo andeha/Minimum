@@ -9,7 +9,7 @@ UNITTEST(structa₋append)
    if (init₋structa(bytes₋per₋item,bytes₋per₋tile,&tape))
    { ENSURE(false,"error in init₋structa."); }
    uint16_t material[] = { 1, 2, 3, 4, 5, 6, 7 };
-   if (tape.copy₋append₋items(7,material)) { ENSURE(false,"error in copy₋append."); }
+   if (copy₋append₋items(7,material,&tape)) { ENSURE(false,"error in copy₋append."); }
    for (int i=0; i<7; ++i) {
      uint16_t elem = *(uint16_t *)structa₋at(i,&tape);
    }
@@ -21,7 +21,7 @@ UNITTEST(regular₋append)
    struct structa /* tape₋ */ regulars; int uninit₋error=0;
    if (init₋regularpool(&regulars)) { ENSURE(false,"error in init₋symbolpool."); }
    Unicodes capture = UNICODES("beekeeper"); Nonabsolute reference;
-   if (copy₋append₋to₋regular(&regulars,capture.tetras,capture.unicodes))
+   if (copy₋append₋onto₋regular(&regulars,capture.tetras,capture.unicodes))
    { ENSURE(false,"error append₋to₋regular."); }
    int32_t tetras=capture.tetras;
    if (regularpool₋datum₋text(&regulars,tetras,&reference)) 

@@ -1,11 +1,6 @@
-/*  ᛟ-test-timeserie.cpp | inner code in bank. (DOES₋NOT₋REQUIRE₋LIBC⁺⁺.) */
+/*  test-timeserie.cpp | inner code in bank. (DOES₋NOT₋REQUIRE₋LIBC⁺⁺.) */
 
 import ClibTwinbeam;
-#if defined __armv8a__
-import Arm_Simd;
-#else
-import Intel_Simd;
-#endif
 
 union historypod two₋real₋addition(union historypod x₁, union historypod x₂)
 {
@@ -19,7 +14,7 @@ typedef struct timeserie₋entry Entry;
 void Present(Entry row)
 { int format=1; 
    double starboard=row.entry.two₋real[1], port=row.entry.two₋real[0];
-   print("⬚ ",﹟s7(row.reference.count,(const char *)row.reference.keyputs));
+   print("⬚ ",﹟s7(row.reference.count,(const /* signed */ char *)row.reference.keyputs));
    print("⬚,⬚", ﹟F(port,format), ﹟F(starboard,format));
    print(" ⬚\n",﹟S(row.key.tetras,row.key.unicodes));
 }

@@ -1,4 +1,4 @@
-/*  ᛟ-test-half.cpp | ieee754-2008 16-bit floating points. */
+/*  test-half.cpp | ieee754-2008 16-bit floating points. */
 
 import ClibTwinbeam;
 import Stdio;
