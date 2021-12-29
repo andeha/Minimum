@@ -75,8 +75,8 @@ build $objs/account-italian-1.o: c ClibTwinbeam/account-italian-1.c
 build $objs/account-italian-2.o: c ClibTwinbeam/account-italian-2.c
 build $objs/amend-tape.o: c ClibTwinbeam/amend-tape.c
 build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
-build $objs/bacon-cipher.c: c ClibTwinbeam/bacon-cipher.c
 build $objs/chrono-logy.o: c ClibTwinbeam/chrono-logy.c
+build $objs/chipher-rhode.o: c ClibTwinbeam/cipher-rhode.c
 build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
 build $objs/decalogue.o: cc ClibTwinbeam/decalogue.cpp
 build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
@@ -97,7 +97,7 @@ build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build libClibTwinbeam: library $objs/account-italian-1.o                     $
  $objs/account-italian-2.o $objs/amend-tape.o $objs/arabic-edit.o            $
- $objs/bacon-cipher.c $objs/chrono-logy.o $objs/cubist-codex.o               $
+ $objs/chrono-logy.o $objs/chipher-rhode.o $objs/cubist-codex.o              $
  $objs/decalogue.o $objs/eight-utf.o $objs/endian-base.o $objs/float-short.o $
  $objs/lock-attempt.o $objs/o-binary.o $objs/present-print.o                 $
  $objs/queue-invent.o $objs/regular-pool.o $objs/round-fixed.o               $
