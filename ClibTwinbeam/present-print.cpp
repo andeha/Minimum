@@ -29,11 +29,11 @@ EXT₋C Argᴾ ﹟I(__int128_t I) { return Argᴾ { { .I=I }, 12 }; }
 EXT₋C Argᴾ ﹟regs(__builtin_uint_t mask) { return Argᴾ { { .x=mask }, 13 }; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
 
-EXT₋C Argᴾ ﹟λ(Argᴾ₋output scalar, void * context) { return Argᴾ { { .λ={ scalar, context } }, 10 }; }
+EXT₋C Argᴾ ﹟λ₋p(Argᴾ₋output₋p scalar, void * context) { return Argᴾ { .λ₋p={ scalar, context }, .kind=10 }; }
 
 EXT₋C Argᴾ ﹟chapter(Unicodes ingress, Plate * anfang)
 {
-  return Argᴾ { { .chapter={ anfang, ingress } }, 88 };
+  return Argᴾ { .chapter={ anfang, ingress }, .kind=88 };
 } /* ⬷ see --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
 
 void Register₋reflect(__builtin_uint_t /* mask */) { }
@@ -126,8 +126,8 @@ again:
       case 12: 𝟷𝟸𝟾₋out𝕫(a.value.I); break;
 #endif
       case 13: Register₋reflect(a.value.x); break;                              \
-      case 88: unicode₋stream(a.value.chapter.ingress.tetras,                   \
-       a.value.chapter.ingress.unicodes); break;                                \
+      case 88: unicode₋stream(a.chapter.ingress.tetras,                         \
+       a.chapter.ingress.unicodes); break;                                      \
       default: /* if (a.kind >= 0) imprint[a.kind](a); else */                  \
         unicode₋symbol(U'?'); break; }
     }

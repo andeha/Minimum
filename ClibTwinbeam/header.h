@@ -51,6 +51,8 @@ typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant', 'icke-lös' and 'em
 #define QUOTE(str) #str
 #define ΨΛΩ ((void *)0)
 #define ᶿ﹡ *
+/* #define ■ 1
+#define □ 0 */
 
 #if defined  __mips__ || defined __armv6__ || defined espressif
 #define BUILTIN₋INT₋MAX 2147483647
@@ -174,38 +176,34 @@ EXT₋C void exit(int status);
 EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
  sym, uint64_t addr, int * stop));
 
-/* precision and the 128-bits physical bound */
+/*  the 128-bits precision arithmetics. */
 
-union Q6463 { __uint128_t bits; __int128_t frac; };
-struct sequent { union Q6463 detail; int valid; };
+union Q6364 { __uint128_t bits; __int128_t frac; };
+struct sequent { union Q6364 detail; int valid; };
+typedef struct sequent Sequenta;
 typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 /* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
 /* enum CastToSequentOpinion { accept, rejecting, negate, complete, annul }; */
-typedef struct sequent Sequenta;
 EXT₋C₂
 void int₋to₋sequent(int64_t ℤ, Sequenta * ℝ);
 void rounded₋fraction(int count₋upto𝟼𝟺, short 𝟶to𝟿s[], 
- Sequenta * ℝ); /* ⬷ a․𝘬․a digits_to_sequent and 
- 'decimaltxt₋2⁻ⁱ₋round'. See TeX 102 §. */
-void print₋sequent(Sequenta 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
- integers, struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), 
- void (^nonvalid)()); /* ⬷ TeX 103 §. */
+ Sequenta * ℝ); /* ⬷ See TeX 102 §. */
 Sequenta add_sequent(Sequenta x₁, Sequenta x₂);
 Sequenta subtract_sequent(Sequenta x₁, Sequenta x₂);
-void multiply(__uint128_t x₁, __uint128_t x₂, __uint128_t * std, 
- uint64_t * int₋hi, uint64_t * hi₋prec);
 Sequenta multiply_sequent(Sequenta x₁, Sequenta x₂);
-Sequenta reciproc_sequent(Sequenta yb);
-Sequenta divide_sequent₂(Sequenta x₁, Sequenta x₂, int integer₋division);
+Sequenta divide_sequent(Sequenta x₁, Sequenta x₂, int integer₋division);
+Sequenta absolute_sequent(Sequenta x);
+Sequenta negate_sequent(Sequenta x);
+Sequenta floor_sequent(Sequenta x);
+Sequenta modulo_sequent(Sequenta x₁, Sequenta x₂);
 Sequenta product₋abelian(); /* ⬷ a․𝘬․a '1'. */
 Sequenta accumulative₋zero(); /* ⬷ a․𝘬․a '0'. */
 Sequenta piano₋ten(); /* ⬷ a․𝘬․a '10'. */
 Sequenta negative₋infinity(); /* ⬷ a․𝘬․a -Inf. */
-Sequenta operator_minus(Sequenta x);
-Sequenta absolute_sequent(Sequenta x);
-Sequenta sequent₋floor(Sequenta x);
-Sequenta sequent₋modulo(Sequenta x₁, Sequenta x₂);
+void print₋sequent(Sequenta 𝕏, void (^digits)(int neg, struct 𝟽bit₋text 
+ integers, struct 𝟽bit₋text fracts), void (^zero₋alt₋nonused)(), 
+ void (^nonvalid)()); /* ⬷ TeX 103 §. */
 int Newton(computational f, computational f₋prim, Sequenta * x₀, 
  void (^ping)(enum Newtoncontrol * ctrl));
 Sequenta 𝟷𝟸𝟹𝟺₋atan(Sequenta y, Sequenta x);
@@ -219,10 +217,10 @@ EXT₋C₋FROM
 #define __builtin_fixpoint_add add_sequent
 #define __builtin_fixpoint_sub subtract_sequent
 #define __builtin_fixpoint_mul multiply_sequent
-#define __builtin_fixpoint_div divide_sequent₂
-#define __builtin_fixpoint_rcp reciproc_sequent
-#define __builtin_fixpoint_negate operator_minus
-/* #define __builtin_fixpoint_modulo sequent₋modulo */
+#define __builtin_fixpoint_div divide_sequent
+#define __builtin_fixpoint_negate negate_sequent
+#define __builtin_fixpoint_modulo modulo_sequent
+#define __builtin_fixpoint_floor floor_sequent
 /* #define __builtin_fixpoint_sqrt
 #define __builtin_fixpoint_rsqrt
 #define __builtin_fixpoint_fmadd(a,b,c)
@@ -420,10 +418,10 @@ __builtin_int_t Frame(__builtin_uint_t size, __builtin_uint_t framesize)
 { return (__builtin_int_t)((size + framesize - 1) & ~(framesize - 1)); }
 /* ⬷ may be evaluated at compile-time a․𝘬․a 'constexpr'. */
 
-typedef void (^Argᴾ₋output)(struct Unicodes set, void * context); /* ⬷ C and C++. */
-typedef void (*Argᴾ₋output₂)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
-struct Lambda { Argᴾ₋output scalar; void * context; };
-struct Lambda₋2 { Argᴾ₋output₂ scalar; void * context; };
+typedef void (*Argᴾ₋output₋p)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
+typedef void (^Argᴾ₋output₋b)(struct Unicodes set, void * context); /* ⬷ C and C++. */
+struct Lambda₋b { Argᴾ₋output₋b scalar; void * context; };
+struct Lambda₋p { Argᴾ₋output₋p scalar; void * context; };
 struct Chapter { struct Plate * anfang; struct Unicodes ingress; };
 /* typedef void (^Argᴾ₋Unicode)(bool anfang, char32_t * prvNxt𝖤𝖮𝖳𝘖𝘳𝟶𝚡𝟶𝟶𝟶𝟶, 
  void * context);
@@ -439,11 +437,11 @@ typedef struct Arg₋𝓟 {
   __uint128_t U; __int128_t I;
 #endif
   uint64_t hi₋and₋lo₋128bits[2];
-  struct Lambda₋2 λ₂;
-  struct Lambda λ;
-  struct Chapter chapter;
  } value;
  int kind;
+ struct Lambda₋b λ₋b;
+ struct Lambda₋p λ₋p;
+ struct Chapter chapter;
 } Argᴾ;
 
 EXT₋C Argᴾ ﹟d(__builtin_int_t d);
@@ -462,7 +460,8 @@ EXT₋C Argᴾ ﹟C(char32̄_t C);
 EXT₋C Argᴾ ﹟U(__uint128_t U);
 EXT₋C Argᴾ ﹟I(__int128_t I);
 #endif
-EXT₋C Argᴾ ﹟λ(Argᴾ₋output scalar, void * context);
+EXT₋C Argᴾ ﹟λ₋p(Argᴾ₋output₋p scalar, void * context);
+/* EXT₋C Argᴾ ﹟λ₋b(Argᴾ₋output₋b scalar, void * context); */
 EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang);
 /* ⬷ PRO|29|17. See also PRO|3|30. */
 EXT₋C Argᴾ ﹟F(double f, int format);
@@ -681,7 +680,7 @@ enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove }
 union historypod {
   __uint128_t machineunsigned;
   simd_tᵦ two₋real;
-  union Q6463 fixed;
+  union Q6364 fixed;
 };
 
 EXT₋C int timeserie₋init(version₋ts * revision, version₋ts earliest, 

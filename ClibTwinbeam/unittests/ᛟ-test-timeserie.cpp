@@ -19,9 +19,9 @@ void Present(Entry row)
    print(" ⬚\n",﹟S(row.key.tetras,row.key.unicodes));
 }
 
-Argᴾ₋output double₋double = ^(struct Unicodes set, void * context) { 
-   union historypod * entry = (union historypod *)context;
-};
+void double₋double(struct Unicodes set, void * context) { 
+  union historypod * entry = (union historypod *)context;
+}
 
 typedef struct timeserie Timeserie;
 
@@ -52,7 +52,7 @@ UNITTEST(timeserie₋1)
    state₋before(3,keys,ordin, ^(int count, Entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) { void * ctxt = (void *)&(row[i].entry);
         if (permanent[i]) { print("⬚: ⬚\n", ﹟S(row[i].key.tetras,row[i].key.unicodes), 
-         ﹟λ(double₋double,ctxt)); }
+         ﹟λ₋p(double₋double,ctxt)); }
       }
      },&serie1,two₋real₋addition);
    
@@ -61,7 +61,7 @@ UNITTEST(timeserie₋1)
    state₋after(3,keys,ordin, ^(int count, Entry row[], int permanent[]) {
       for (int i=0; i<count; ++i) { void * ctxt = (void *)&(row[i].entry);
         if (permanent[i]) { print("⬚: ⬚\n", ﹟S(row[i].key.tetras,row[i].key.unicodes), 
-         ﹟λ(double₋double,ctxt)); }
+         ﹟λ₋p(double₋double,ctxt)); }
       }
     },&serie1,two₋real₋addition);
    
