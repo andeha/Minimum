@@ -1,4 +1,4 @@
-/*  symbol-text.c | . */
+/*  symbol-text.c | bytes, chars and 32-bit words. */
 
 import ClibTwinbeam;
 

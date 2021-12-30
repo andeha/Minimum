@@ -33,33 +33,20 @@ err:
    return ΨΛΩ;
 } /* ⬷ see --<🥽 Cordal.cpp> when constant and --<🥽 Memclone.cpp>{Copy} when branch. */
 
-int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
+int Twinbeam₋mmap(char8₋t * canonicalUtf8RegularOrLinkpath, 
   __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
   __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
-  void * material)
+  uint8_t ** material)
 {
-   void * outcome = mapfileʳᵚ(canonicalUtf8RegularOrLinkpath, 
+   void * outcome = mapfileʳᵚ((const char *)canonicalUtf8RegularOrLinkpath, 
     bytesOffset,pages𝘖rZero,bytesAugment,bytesActual);
-   if (outcome) { material=outcome; return 1; } else { return 0; }
+   if (outcome) { *material=(uint8_t *)outcome; return 1; } else { return 0; }
 }
 
-EXT₋C void * Heap₋alloc(__builtin_int_t bytes) { return malloc(bytes); }
+/* probe translation-look-buffer, virtual₋to₋physical */
 
-EXT₋C __builtin_int_t Heap₋object₋size(void * p) { return malloc_size(p); }
-
-EXT₋C void Heap₋unalloc(void * p) { free(p); }
-
-EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes) { return realloc(p,to₋bytes); }
-
-/* EXT₋C void * Heap₋realloc₂(void * p, __builtin_int_t to₋bytes)
-{
-  size_t old_bytes = malloc_size(p);
-  uint8_t * new_words = (uint8_t *)malloc(to₋bytes);
-  Copy8Memory((ByteAlignedRef)new_words, (ByteAlignedRef)p, old_bytes);
-  Heap₋unalloc(p);
-  return new_words;
-} */
-
-EXT₋C void * Heap₋valloc(__builtin_int_t bytes) { return valloc(bytes); }
+/* typedef __builtin_uint_t virtual₋address;
+struct tlb₋entry { };
+struct tlb₋page { }; */
 
 

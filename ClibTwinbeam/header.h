@@ -540,7 +540,7 @@ typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt
 
 EXT₋C int init₋regularpool(struct structa * 🅿);
 EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿);
-EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, __builtin_int_t tetras, char32̄_t cs[]);
+EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[]);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
 /* ⬷ note operating system releases allocated memory space and pages when program ends. */
@@ -651,10 +651,10 @@ typedef int pid_t;
 EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * 
  command₋u8s, int * fd_p2c, int * fd_c2p /*, const char * NULLterminatedEnv */);
 
-EXT₋C int Twinbeam₋mmap(const char * canonicalUtf8RegularOrLinkpath, 
+EXT₋C int Twinbeam₋mmap(char8₋t * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
- void * material);
+ uint8_t ** material);
 
 EXT₋C void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *);

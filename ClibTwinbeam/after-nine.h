@@ -1,4 +1,4 @@
-/*  after-9.h | 'expressive timeserie' and 'bleeding on trees'. */
+/*  after-nine.h | 'expressive timeserie' and 'bleeding on trees'. */
 
 /* #define EXPERIMENT₋BRIEFED */
 

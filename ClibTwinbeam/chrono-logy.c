@@ -14,6 +14,8 @@ unionᵢ ntp₋stomp { uint64_t bits; structᵢ relative₋time mil; };
 
 typedef int64_t q631; /* ⬷ a․𝘬․a sixty₋three₋bits₋and₋one₋half. */
 
+/* Gregorian October 15, 1582 and the Julian October 5 1581 day */
+
 #define 𝟼𝟾𝟻𝟼𝟿 137138
 #define 𝟷𝟺𝟼𝟶𝟿𝟽 292194
 #define 𝟺 8

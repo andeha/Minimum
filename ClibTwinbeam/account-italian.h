@@ -1,4 +1,4 @@
-/*  account-italian.h | non-contractuals. (UNREQUIRED₋REQUIRED₋AFTER₋COMPILATION.) */
+/*  account-italian.h | non-contractuals. (REQUIRED₋AFTER₋COMPILATION.) */
 
 struct timeserie₋temporal₋row { struct Unicodes key; union historypod entry; 
  version₋ts from,to; };

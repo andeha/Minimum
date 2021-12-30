@@ -512,12 +512,12 @@ main(
 )
 {
    lexer bag; const char * binary = argv[0];
-   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(binary)); }
+   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(binary)); return 1; }
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
-   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 1; }
+   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 2; }
    if (bag.symbols == 0) { return 2; }
    debugbuild(&bag,&current); short bytes₋per₋elem = 16;
-   if (init₋stack(&🥞,bytes₋per₋elem)) { return 2; }
+   if (init₋stack(&🥞,bytes₋per₋elem)) { return 3; }
    lookahead = next₋token(&bag,&current);
    parse₋assign(&bag); lookahead = next₋token(&bag,&current);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");

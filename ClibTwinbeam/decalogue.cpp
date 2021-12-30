@@ -3,6 +3,25 @@
 import ClibTwinbeam;
 import Mapfile;
 
+EXT₋C void * Heap₋alloc(__builtin_int_t bytes) { return malloc(bytes); }
+
+EXT₋C __builtin_int_t Heap₋object₋size(void * p) { return malloc_size(p); }
+
+EXT₋C void Heap₋unalloc(void * p) { free(p); }
+
+EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes) { return realloc(p,to₋bytes); }
+
+/* EXT₋C void * Heap₋realloc₂(void * p, __builtin_int_t to₋bytes)
+{
+  size_t old_bytes = malloc_size(p);
+  uint8_t * new_words = (uint8_t *)malloc(to₋bytes);
+  Copy8Memory((ByteAlignedRef)new_words, (ByteAlignedRef)p, old_bytes);
+  Heap₋unalloc(p);
+  return new_words;
+} */
+
+EXT₋C void * Heap₋valloc(__builtin_int_t bytes) { return valloc(bytes); }
+
 FOCAL
 int
 Acquire𝟷ᵈ(__builtin_int_t ﹟, /* ⬷ a․𝘬․a '#shatters', '﹟skeletons' and '﹟turnstiles'. */
