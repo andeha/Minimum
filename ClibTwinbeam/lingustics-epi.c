@@ -511,8 +511,8 @@ main(
   const char * argv[]
 )
 {
-   lexer bag; const char * binary = argv[0];
-   if (argc != 2) { print("usage: ⬚ file \n", ﹟s(binary)); return 1; }
+   lexer bag; char8₋t * binary = (char8₋t *)argv[0];
+   if (argc != 2) { print("usage: ⬚ file \n", ﹟s8(binary)); return 1; }
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
    if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 2; }
    if (bag.symbols == 0) { return 2; }

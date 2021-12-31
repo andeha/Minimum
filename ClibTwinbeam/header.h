@@ -712,6 +712,11 @@ EXT₋C void Present₋timeserie₋overview(unsigned columns, struct timeserie *
 EXT₋C void Present₋timeserie₋transacts(struct timeserie * 🅙, int incl₋tables, 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
+int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes, 
+ struct structa * pool, struct structa * words);
+int steganography₋hide(Nonabsolute word, Nonabsolute * code);
+int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
+
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
 #define simd_initᵦ __builtin_msa_cast_to_vector_double

@@ -54,7 +54,7 @@ module Unistd [system]
 
 module CString [system]
 { requires macos
-  header "/Library/Develoepr/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h"
+  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h"
 }
 
 module Stdlib [system]

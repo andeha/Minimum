@@ -21,6 +21,11 @@ import CString;
 auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
 auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }; */
 
+char8₋t words₋akademi₋ordlista[] = { /* #embed "../../Apps/macOS/material/svenska-ord.txt" */ };
+char8₋t wording₋beskow[] = { /* #embed "../../Apps/macOS/material/Beskow.txt" */ };
+__builtin_int_t Saol₋bytes() { return 2 + sizeof(words₋akademi₋ordlista)/sizeof(*words₋akademi₋ordlista); }
+__builtin_int_t Beskow₋bytes() { return 2 + sizeof(wording₋beskow)/sizeof(*wording₋beskow); }
+
 Structa code₋key₋pool, text₋word₋pool; /* two regularpools. */
 Structa message₋words; /* vector<Nonabsolute> */
 Structa code₋key₋words; /* vector<Nonabsolute> */
@@ -30,7 +35,7 @@ main(
   int argc, 
   const char * argv[]
 )
-{ char8₋t * binary=(char8₋t *)argv[0]; int reverse=0; 
+{ char8₋t * binary=(char8₋t *)argv[0]; int reverse=0;
    if (argc != 3) { print("usage: ⬚ [encrypt|decrypt] 'text file' \n", ﹟s8(binary)); return 1; }
    if (strcmp(argv[1],"decrypt") == 0) { reverse=1; }
    char8₋t * canonicalUtf8RegularOrLinkpath = (char8₋t *)argv[1];
@@ -42,16 +47,19 @@ main(
    if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words)) { return 6; }
    __builtin_int_t beskow₋bytes = Beskow₋bytes();
    if (read₋utf8₋exposition(beskow₋bytes,wording₋beskow,&code₋key₋pool,&code₋key₋words)) { return 7; }
-   if (read₋utf8₋exposition(utf8₋bytes,utf8₋material,&text₋word₋pool,&message₋words) { return 8; }
-   __builtin_int_t message₋word₋count = structa₋bytes(&message₋words)/sizeof(Nonabsolute);
+   if (read₋utf8₋exposition(utf8₋bytes,utf8₋textmaterial,&text₋word₋pool,&message₋words)) { return 8; }
+   __builtin_int_t message₋word₋count = structa₋bytes(&message₋words)/sizeof(Nonabsolute), i=0;
+   Nonabsolute mess, bijection; struct Unicodes text;
 again:
    if (i >= message₋word₋count) { goto unagain; }
    if (reverse) {
-     if (steganography₋reveal(Nonabsolute code, Nonabsolute * word)) { return 11; }
+     if (steganography₋reveal(mess,&bijection)) { return 11; }
    }
    else {
-     if (steganography₋hide(Nonabsolute word, Nonabsolute * code)) { return 12; }
+     if (steganography₋hide(mess,&bijection)) { return 12; }
    }
+   text = regularpool₋at(struct structa * 🅟,bijection);
+   print("⬚ ", ﹟S(text.tetras,text,unicodes));
    goto again;
 unagain:
    if (optional₋uninit₋regularpool(&text₋word₋pool)) { return 9; }

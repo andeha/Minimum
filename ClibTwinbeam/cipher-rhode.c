@@ -2,13 +2,6 @@
 
 import ClibTwinbeam;
 
-const char8₋t wording₋beskow[] = { /* #embed "Beskow.txt" */ };
-
-__builtin_int_t Beskow₋bytes()
-{
-   return 2 + sizeof(wording₋beskow)/sizeof(*wording₋beskow);
-}
-
 inexorable int token₋separator(char32̄_t uc) { return uc == ' ' || 
  uc == '\t' || uc == '\xa' || uc == '\xd'; }
 
@@ -18,7 +11,7 @@ int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes,
    int32_t tetras=0; char32̄_t cs[1024]; __builtin_int_t i=0,j=0, bytes;
 again:
    if (i >= byte₋count) { return -1; }
-   leadOr8bit = i + utf8₋bytes;
+   leadOr8Bit = i + utf8₋bytes;
    bytes = 1 + Utf8Followers(*leadOr8Bit);
    uc = Utf8ToUnicode(leadOr8Bit,bytes);
    if (token₋separator(uc)) {
