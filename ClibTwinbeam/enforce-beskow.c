@@ -53,13 +53,14 @@ main(
 again:
    if (i >= message₋word₋count) { goto unagain; }
    if (reverse) {
-     if (steganography₋reveal(mess,&bijection)) { return 11; }
+     if (steganography₋reveal(mess,&bijection)) { return 13; }
+     text = regularpool₋at(&message₋words,bijection);
    }
    else {
-     if (steganography₋hide(mess,&bijection)) { return 12; }
+     if (steganography₋hide(mess,&bijection)) { return 14; }
+     text = regularpool₋at(&code₋key₋words,bijection);
    }
-   text = regularpool₋at(struct structa * 🅟,bijection);
-   print("⬚ ", ﹟S(text.tetras,text,unicodes));
+   print("⬚ ", ﹟S(text.tetras,text.unicodes));
    goto again;
 unagain:
    if (optional₋uninit₋regularpool(&text₋word₋pool)) { return 9; }
