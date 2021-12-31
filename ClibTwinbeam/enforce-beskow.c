@@ -9,7 +9,7 @@ import CString;
      -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap   \
      -g -std=c2x -lc++ enforce-beskow.c ../Releases/libClibTwinbeam.a
    
-   ./x86_stegagraph ./testimony.txt
+   ./x86_stegagraph encrypt ./express/testimony.txt
    
  */
 
@@ -21,14 +21,11 @@ import CString;
 auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
 auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }; */
 
-char8₋t words₋akademi₋ordlista[] = { /* #embed "../../Apps/macOS/material/svenska-ord.txt" */ };
 char8₋t wording₋beskow[] = { /* #embed "../../Apps/macOS/material/Beskow.txt" */ };
-__builtin_int_t Saol₋bytes() { return 2 + sizeof(words₋akademi₋ordlista)/sizeof(*words₋akademi₋ordlista); }
 __builtin_int_t Beskow₋bytes() { return 2 + sizeof(wording₋beskow)/sizeof(*wording₋beskow); }
 
-Structa code₋key₋pool, text₋word₋pool; /* two regularpools. */
-Structa message₋words; /* vector<Nonabsolute> */
-Structa code₋key₋words; /* vector<Nonabsolute> */
+Structa code₋key₋pool, text₋word₋pool, message₋words, code₋key₋words;
+/* ⬷ two regularpools and three vector<Nonabsolute>. */
 
 int
 main(
@@ -42,31 +39,31 @@ main(
    __builtin_int_t utf8₋bytes; uint8_t * utf8₋textmaterial;
    if (Twinbeam₋mmap(canonicalUtf8RegularOrLinkpath,0,0,0,&utf8₋bytes,&utf8₋textmaterial)) { return 2; }
    if (utf8₋textmaterial == ΨΛΩ) { return 3; }
-   if (init₋regularpool(&code₋key₋pool) && init₋regularpool(&text₋word₋pool)) { return 4; }
-   if (structa₋init(sizeof(Nonabsolute),4096,&message₋words)) { return 5; }
-   if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words)) { return 6; }
-   __builtin_int_t beskow₋bytes = Beskow₋bytes();
-   if (read₋utf8₋exposition(beskow₋bytes,wording₋beskow,&code₋key₋pool,&code₋key₋words)) { return 7; }
-   if (read₋utf8₋exposition(utf8₋bytes,utf8₋textmaterial,&text₋word₋pool,&message₋words)) { return 8; }
+   if (init₋regularpool(&code₋key₋pool) && init₋regularpool(&text₋word₋pool)) { return 5; }
+   if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words)) { return 7; }
+   if (structa₋init(sizeof(Nonabsolute),4096,&message₋words)) { return 8; }
+   __builtin_int_t beskow₋bytes = Beskow₋bytes(), saol₋bytes = Saol₋bytes();
+   if (read₋utf8₋exposition(beskow₋bytes,wording₋beskow,&code₋key₋pool,&code₋key₋words)) { return 10; }
+   if (read₋utf8₋exposition(utf8₋bytes,utf8₋textmaterial,&text₋word₋pool,&message₋words)) { return 11; }
    __builtin_int_t message₋word₋count = structa₋bytes(&message₋words)/sizeof(Nonabsolute), i=0;
    Nonabsolute mess, bijection; struct Unicodes text;
 again:
    if (i >= message₋word₋count) { goto unagain; }
    if (reverse) {
-     if (steganography₋reveal(mess,&bijection)) { return 13; }
+     if (steganography₋reveal(mess,&bijection)) { return 16; }
      text = regularpool₋at(&message₋words,bijection);
    }
    else {
-     if (steganography₋hide(mess,&bijection)) { return 14; }
+     if (steganography₋hide(mess,&bijection)) { return 17; }
      text = regularpool₋at(&code₋key₋words,bijection);
    }
    print("⬚ ", ﹟S(text.tetras,text.unicodes));
    goto again;
 unagain:
-   if (optional₋uninit₋regularpool(&text₋word₋pool)) { return 9; }
-   if (deinit₋structa(&message₋words)) { return 10; }
-   if (optional₋uninit₋regularpool(&code₋key₋pool)) { return 11; }
-   if (deinit₋structa(&code₋key₋words)) { return 12; }
+   if (optional₋uninit₋regularpool(&text₋word₋pool)) { return 12; }
+   if (deinit₋structa(&message₋words)) { return 13; }
+   if (optional₋uninit₋regularpool(&code₋key₋pool)) { return 14; }
+   if (deinit₋structa(&code₋key₋words)) { return 15; }
    return 0;
 }
 
