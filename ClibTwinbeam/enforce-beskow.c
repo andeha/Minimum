@@ -42,7 +42,7 @@ main(
    if (init₋regularpool(&code₋key₋pool) && init₋regularpool(&text₋word₋pool)) { return 5; }
    if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words)) { return 7; }
    if (structa₋init(sizeof(Nonabsolute),4096,&message₋words)) { return 8; }
-   __builtin_int_t beskow₋bytes = Beskow₋bytes(), saol₋bytes = Saol₋bytes();
+   __builtin_int_t beskow₋bytes = Beskow₋bytes();
    if (read₋utf8₋exposition(beskow₋bytes,wording₋beskow,&code₋key₋pool,&code₋key₋words)) { return 10; }
    if (read₋utf8₋exposition(utf8₋bytes,utf8₋textmaterial,&text₋word₋pool,&message₋words)) { return 11; }
    __builtin_int_t message₋word₋count = structa₋bytes(&message₋words)/sizeof(Nonabsolute), i=0;
