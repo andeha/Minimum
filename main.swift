@@ -5,16 +5,16 @@ import AppKit
 @available(macOS 10.15, *)
 class Appdelegate: NSObject, NSApplicationDelegate {
    let controller = Windowcontroller()
-   let fork₋controller = Forkscontroller()
-   lazy var appname = ProcessInfo.processInfo.processName
+   /* let fork₋controller = Forkscontroller() */
    let delegate = default₋Windowdelegate()
    
    func applicationWillFinishLaunching(_ notification: Notification) {
      if let window = controller.window { window.delegate = delegate }
      print("▞ Minimum loading...please stand-by. ▚")
-     /* NSInteger major, minor, bugfix; GetSystemVersion(major,minor,bugfix)
-     print("for macos version \(major).\(minor).\(bugfix)", terminator: "") */
-     /* print("a․𝘬․a \(SHA1GIT)") */
+     let os = ProcessInfo().operatingSystemVersion
+     var sha1git: UnsafeMutablePointer<CChar>
+     GitFingerprint(sha1git)
+     print("\(sha1git) on macos version \(os.majorVersion).\(os.minorVersion).\(os.patchVersion)")
    }
    
    func applicationDidFinishLaunching(_ notification: Notification) {
@@ -23,7 +23,7 @@ class Appdelegate: NSObject, NSApplicationDelegate {
       name: ProcessInfo.thermalStateDidChangeNotification, object: nil)
      include₋menu()
      controller.showWindow(self)
-     fork₋controller.showWindow(self)
+     /* fork₋controller.showWindow(self) */
      NSApp.setActivationPolicy(.regular)
      NSApp.activate(ignoringOtherApps: true)
    }
@@ -56,6 +56,7 @@ extension Appdelegate {
      let about₋minimum = #selector(NSApplication.orderFrontStandardAboutPanel(_:))
      let preferences = #selector(self.preferences(_:))
      let hide₋other = #selector(NSApplication.hideOtherApplications(_:))
+     var appname = ProcessInfo.processInfo.processName
      appmenu.submenu?.items = [
        NSMenuItem(title: "About Minimum", action: about₋minimum, keyEquivalent: ""), 
        NSMenuItem.separator(), 
@@ -120,7 +121,6 @@ extension Appdelegate {
 
 extension Notification.Name {
   static let searchitem₋found = Notification.Name("􀊬-found")
-  static let preferences₋changed = Notification.Name("􀣔-preferences") /* todo: improve 􀯛. */
 }
 
 let app = NSApplication.shared

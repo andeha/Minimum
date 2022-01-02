@@ -3,24 +3,25 @@
 import ClibTwinbeam;
 
 /* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
-    -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c++20 -msse4.1 -lc++ decalogue.cpp eight-utf.cpp endian-base.cpp   \
-    entry-main.cpp present-print.cpp unittests/ᛟ-test-utf8.cpp                 \
-    unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                      \
-    unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                 \
-    account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
-    chrono-logy.o cipher-rhode.o cubist-codex.o float-short.o lock-attempt.o   \
-    o-binary.o queue-invent.o regular-pool.o round-fixed.o search-symbol.o     \
-    semantic-block.o symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o  \
-    x-partial-referen.o */
+  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
+  -g -std=c++20 -msse4.1 -lc++ entry-main.cpp unittests/ᛟ-test-utf8.cpp        \
+   unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                       \
+   unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                  \
+   account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o          \
+   built-altern.o chrono-logy.o cipher-rhode.o codex-ionist.o cubist-codex.o   \
+   eight-utf.o endian-base.o float-short.o lock-attempt.o o-binary.o           \
+   present-print.o queue-invent.o regular-pool.o round-fixed.o search-symbol.o \
+   semantic-block.o symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o   \
+   x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
-    -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c  \
-    arabic-edit.c chrono-logy.c cipher-rhode.c cubist-codex.c float-short.c    \
-    lock-attempt.c o-binary.c queue-invent.c regular-pool.c round-fixed.c      \
-    search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c  \
-    x-error-stack.c x-partial-referen.c */
+  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
+  -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c    \
+   arabic-edit.c built-altern.c chrono-logy.c cipher-rhode.c codex-ionist.c    \
+   cubist-codex.c eight-utf.c endian-base.c float-short.c lock-attempt.c       \
+   o-binary.c present-print.c queue-invent.c regular-pool.c round-fixed.c      \
+   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c   \
+   x-error-stack.c x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
    $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
@@ -28,27 +29,28 @@ import ClibTwinbeam;
    lipo -archs confidence */
 
 /* clang -o arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
-    -D__armv8a__ -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap \
-    -g -std=c++20 -lc++ -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc \
-    decalogue.cpp eight-utf.cpp endian-base.cpp entry-main.cpp                 \
-    present-print.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp      \
-    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
-    unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
-    amend-tape.o arabic-edit.o chrono-logy.o cipher-rhode.o cubist-codex.o     \
-    float-short.o lock-attempt.o o-binary.o queue-invent.o regular-pool.o      \
-    round-fixed.o search-symbol.o semantic-block.o symbol-texts.o              \
-    thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
+  -D__armv8a__ -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap \
+  -g -std=c++20 -lc++ -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc \
+   entry-main.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp         \
+   unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
+   unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
+   amend-tape.o arabic-edit.o built-altern.o chrono-logy.o cipher-rhode.o     \
+   codex-ionist.o cubist-codex.o eight-utf.o endian-base.o float-short.o      \
+   lock-attempt.o o-binary.o present-print.o queue-invent.o regular-pool.o    \
+   round-fixed.o search-symbol.o semantic-block.o symbol-texts.o              \
+   thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
 
-/* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__       \
-    -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap       \
-    -g -std=c2x -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc  \
-    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
-    chrono-logy.c cipher-rhode.c cubist-codex.c float-short.c lock-attempt.c   \
-    o-binary.c queue-invent.c regular-pool.c round-fixed.c search-symbol.c     \
-    semantic-block.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c  \
-    x-partial-referen.c */
+/* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__      \
+  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
+  -g -std=c2x -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc   \
+   account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
+   built-altern.c chrono-logy.c cipher-rhode.c codex-ionist.c cubist-codex.c  \
+   eight-utf.c endian-base.c float-short.c lock-attempt.c o-binary.c          \
+   present-print.c queue-invent.c regular-pool.c round-fixed.c                \
+   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c  \
+   x-error-stack.c x-partial-referen.c */
 
-#define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"       \
+#define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"      \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
 #define BUILDINFO_BRAND "⚖️  sublimates experimentally"
 #define PROGRESS_START_YEAR QUOTE(2021)
@@ -56,11 +58,10 @@ import ClibTwinbeam;
 
 inexorable void printGreetings()
 {
-   print("▞ twinbeam exercised...please stand-by. ▚\n"); 
+   print("▞ twinbeam exercised...please stand-by. ▚\n");
    print("test harness for clibTwinbeam.a, release "
-     "⬚\n⬚\n\n", ﹟s7(SHA1GIT), ﹟s7(BUILDINFO_COPYRIGHT_MESSAGE));
-   /* ⬷ Epson MX-80 166 and 169. */
-}
+    "⬚\n⬚\n\n", ﹟s7(SHA1GIT), ﹟s7(BUILDINFO_COPYRIGHT_MESSAGE));
+} /* ⬷ Epson MX-80 codes 166 and 169. */
 
 inexorable
 void
@@ -96,7 +97,7 @@ RunUnittests(
 {
    __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 count = 0;
    extern void Symbols(const char * utf8exepath /*, int * is₋debug */, 
-    void (^callback)(const char *, uint64_t, int *));
+    void (^callback)(const char *, uint64_t, int *)); /* defined in --<o-binary.c>. */
    Symbols(execfilePath, /* is₋debug, */ ^(const char * sym, uint64_t addr, int * stop) {
      if (addr && IsPrefixOrEqual((char *)sym, (char *)"_Unittest_")) {
        print("\nRunning ⬚ from 0x⬚\n\n", ﹟s7(sym), ﹟x((__builtin_uint_t)addr));

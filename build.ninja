@@ -21,8 +21,7 @@ macoscflags = $macoscflags_commandline
 sha1git = `git log -1 '--pretty=format:%h'`
 cflags = $cpp-optflags -DSHA1GIT=\"$sha1git\" $macoscflags
 macos-compiler-c = xcrun clang $gencdflags $moduleflags
-macos-compiler-swift = xcrun swiftc 
-# -DSHA1GIT=\"$sha1git\" 
+macos-compiler-swift = xcrun swiftc
 #  swiftc -module-name <value> -enable-experimental-cxx-interop
 librarian-mac = xcrun ar
 
@@ -75,16 +74,17 @@ build $objs/account-italian-1.o: c ClibTwinbeam/account-italian-1.c
 build $objs/account-italian-2.o: c ClibTwinbeam/account-italian-2.c
 build $objs/amend-tape.o: c ClibTwinbeam/amend-tape.c
 build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
+build $objs/built-altern.o: c ClibTwinbeam/built-altern.c
 build $objs/chrono-logy.o: c ClibTwinbeam/chrono-logy.c
 build $objs/chipher-rhode.o: c ClibTwinbeam/cipher-rhode.c
 build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
-build $objs/decalogue.o: cc ClibTwinbeam/decalogue.cpp
-build $objs/eight-utf.o: cc ClibTwinbeam/eight-utf.cpp
-build $objs/endian-base.o: cc ClibTwinbeam/endian-base.cpp
+build $objs/eight-utf.o: c ClibTwinbeam/eight-utf.c
+build $objs/endian-base.o: c ClibTwinbeam/endian-base.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
+build $objs/ionist-codex.o: c ClibTwinbeam/ionist-codex.c
 build $objs/lock-attempt.o: c ClibTwinbeam/lock-attempt.c
 build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
-build $objs/present-print.o: cc ClibTwinbeam/present-print.cpp
+build $objs/present-print.o: c ClibTwinbeam/present-print.c
 build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
 build $objs/regular-pool.o: c ClibTwinbeam/regular-pool.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
@@ -97,8 +97,9 @@ build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build libClibTwinbeam: library $objs/account-italian-1.o                     $
  $objs/account-italian-2.o $objs/amend-tape.o $objs/arabic-edit.o            $
- $objs/chrono-logy.o $objs/chipher-rhode.o $objs/cubist-codex.o              $
- $objs/decalogue.o $objs/eight-utf.o $objs/endian-base.o $objs/float-short.o $
+ $objs/built-altern.o $objs/chrono-logy.o $objs/chipher-rhode.o              $
+ $objs/cubist-codex.o $objs/decalogue.o $objs/eight-utf.o                    $
+ $objs/endian-base.o $objs/float-short.o $objs/ionist-codex.o                $
  $objs/lock-attempt.o $objs/o-binary.o $objs/present-print.o                 $
  $objs/queue-invent.o $objs/regular-pool.o $objs/round-fixed.o               $
  $objs/search-symbol.o $objs/semantic-block.o $objs/symbol-texts.o           $

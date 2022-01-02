@@ -1,4 +1,4 @@
-/* 􀠕􀯐 endian-base.cpp | forward-only alternatively planning. */
+/*  endian-base.c | forward-only alternatively planning. */
 
 import ClibTwinbeam;
 
@@ -23,7 +23,8 @@ Base𝕟(
   void (^out)(char 𝟶to𝟿)
 ) a⃝
 {
-   auto 𝟶to𝖥 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
+   typedef void (^Out)(unsigned short r, void (^out)(char));
+   Out 𝟶to𝖥 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
      out('0' + r) : out('a' - 10 + r); };
    
    unsigned short cycle[128] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -56,7 +57,8 @@ Base𝕟( /* TeX §64, §65 and §67. */
   void (^output)(char 𝟬to𝟵)
 ) a⃝
 {
-   auto 𝟬to𝗙 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
+   typedef void (^Out)(unsigned short r, void (^out)(char));
+   Out 𝟬to𝗙 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
      out('0' + r) : out('a' - 10 + r); };
    
    unsigned short cycle[64] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 

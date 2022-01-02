@@ -1,4 +1,4 @@
-/* 􀅰 utf-eight.cpp | convoj-encoded letters. */
+/* 􀅰 utf-eight.c | variable-length-encoded letters. */
 
 import ClibTwinbeam;
 
@@ -50,10 +50,10 @@ UnicodeToUtf8(
   void (^sometime₋valid)(char8₋t *u8s, short bytes)
 )
 {
-    unsigned char 🥈 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 
+    unsigned char firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 
       0xF8, 0xFC };
     
-    char32̄_t 🥈 byteMask=0xBF, byteMark=0x80;
+    char32̄_t byteMask=0xBF, byteMark=0x80;
     
     short bytesToWrite=0;
     

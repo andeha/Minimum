@@ -409,15 +409,6 @@ __builtin_int_t 🥈 Wordbytes=sizeof(__builtin_uint_t);
 __builtin_int_t constexpr Syspagesize() { return 4096; }
 #endif
 
-#if defined __cplusplus
-constexpr
-#else
-inline
-#endif
-__builtin_int_t Frame(__builtin_uint_t size, __builtin_uint_t framesize)
-{ return (__builtin_int_t)((size + framesize - 1) & ~(framesize - 1)); }
-/* ⬷ may be evaluated at compile-time a․𝘬․a 'constexpr'. */
-
 typedef void (*Argᴾ₋output₋p)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
 typedef void (^Argᴾ₋output₋b)(struct Unicodes set, void * context); /* ⬷ C and C++. */
 struct Lambda₋b { Argᴾ₋output₋b scalar; void * context; };
@@ -601,11 +592,11 @@ typedef uint64_t chronology₋instant;
 typedef uint32_t chronology₋UQ32;
 typedef int32_t chronology₋Q31;
 struct chronology₋relative { int32_t seconds; chronology₋Q31 frac; };
-struct chronology₋date { int32_t y,M,d; }; /* 1-12 and 1-31 */
+struct chronology₋date { int32_t y,M,d; }; /* 1-12 and 1-31. */
 struct chronology₋time { int32_t h,m,s; chronology₋UQ32 partial; };
-EXT₋C struct chronology₋date chronology₋date(chronology₋instant instant);
-EXT₋C struct chronology₋relative chronology₋since₋midnight₁(chronology₋instant ts);
-EXT₋C struct chronology₋time chronology₋since₋midnight₂(chronology₋instant ts);
+EXT₋C struct chronology₋date chronology₋date(chronology₋instant i);
+EXT₋C struct chronology₋relative chronology₋since₋midnight₁(chronology₋instant i);
+EXT₋C struct chronology₋time chronology₋since₋midnight₂(chronology₋instant i);
 EXT₋C chronology₋instant chronology₋timestamp(int32_t parts[6], chronology₋UQ32 frac);
 EXT₋C chronology₋instant add₋seconds(chronology₋instant relative, uint32_t 
  seconds, chronology₋UQ32 frac);
@@ -716,6 +707,8 @@ int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes,
  struct structa * pool, struct structa * words);
 int steganography₋hide(Nonabsolute word, Nonabsolute * code);
 int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
+
+EXT₋C void Gitfingerprint(const char ** text);
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
