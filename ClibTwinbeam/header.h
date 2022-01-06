@@ -487,18 +487,16 @@ EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned
 EXT₋C int copy₋append₋items(__builtin_int_t count₋not₋bytes, void * 
  bytesequence₋objects, struct structa * 🅐);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
-EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅐);
+EXT₋C __builtin_int_t structa₋count(struct structa * 🅐);
 EXT₋C int deinit₋structa(struct structa * 🅰);
 /* ...also pages with table index and offset. */
 /* ...the 'overloadable attribute in C-code not yet found in Swift code. */
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-/* do not forget in main.cpp alternatively main.c (i.e 'once'):
-auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
+/* do not forget in main.cpp alternatively main.c (𝘪․𝘦 'once'): 
 auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-here not:
-typedef void * (^Leaf₋alloc)(short bytes);
-auto leaf₋alloc = ^(int bytes) { return malloc(bytes); }; */
+auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
+auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }; */
 typedef struct structa Structa;
 
 struct two₋memory {
