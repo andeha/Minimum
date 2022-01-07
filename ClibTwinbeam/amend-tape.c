@@ -40,8 +40,7 @@ EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐)
   return offset + tile;
 }
 
-inexorable int requires₋optionally₋adjust(
-  __builtin_int_t requires₋bytes₋additional, 
+inexorable int optionally₋inflate(__builtin_int_t required₋additional₋bytes, 
   struct structa * 🅐)
 {
  /*  int no₋alloc₋required = requires₋bytes₋additional <= 🅐->last₋tile₋availables;
@@ -65,7 +64,7 @@ inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
 EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytesequence₋objects, 
  struct structa * 🅐)
 {
-  if (requires₋optionally₋adjust(count*🅐->bytes₋per₋item,🅐)) { return -1; }
+  if (optionally₋inflate(count*🅐->bytes₋per₋item,🅐)) { return -1; }
   for (__builtin_int_t i=0; i<count; i += 1) {
     void * start = (i*🅐->bytes₋per₋item) + (uint8_t *)(bytesequence₋objects);
     if (copy₋append₋one₋object(start,🅐)) { return -2; }
@@ -73,12 +72,12 @@ EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytesequence₋o
   return 0;
 }
 
-EXT₋C __builtin_int_t structa₋bytes(struct structa * 🅐)
+EXT₋C __builtin_int_t structa₋count(struct structa * 🅐)
 {
    __builtin_int_t full₋tiles = 🅐->middleindex₋count * 🅐->pointers₋per₋middleindex;
    __builtin_int_t tile₋count = full₋tiles - 🅐->last₋middleindex₋availables;
    __builtin_int_t full₋bytes = 🅐->bytes₋per₋tile * tile₋count;
-   return full₋bytes - 🅐->last₋tile₋availables;
+   return 1 + (full₋bytes - 🅐->last₋tile₋availables) / 🅐->bytes₋per₋item;
 }
 
 EXT₋C int deinit₋structa(struct structa * 🅰)
@@ -92,11 +91,11 @@ EXT₋C int deinit₋structa(struct structa * 🅰)
     }
     for (__builtin_int_t j=0; j<middle₋pointer₋count; j += 1) {
       uint8_t * tile = *(j + middle₋index₋start);
-      Fall⒪⒲(tile);
+      Fallow(tile);
     }
-    Fall⒪⒲(middle₋index₋start);
+    Fallow(middle₋index₋start);
   }
-  Fall⒪⒲(🅰->index); 🅰->index=ΨΛΩ;
+  Fallow(🅰->index); 🅰->index=ΨΛΩ;
   return 0;
 }
 
