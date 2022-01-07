@@ -332,8 +332,9 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
-EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fall⒪⒲)(void *);
+EXT₋C void * (^Alloc)(__builtin_int_t); EXT₋C void (^Fallow)(void *);
 EXT₋C void * (^Realloc)(void * p, __builtin_int_t to₋bytes);
+EXT₋C __builtin_int_t (^Didalloc)(void * p);
 
 /* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
 struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
@@ -493,10 +494,6 @@ EXT₋C int deinit₋structa(struct structa * 🅰);
 /* ...the 'overloadable attribute in C-code not yet found in Swift code. */
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-/* do not forget in main.cpp alternatively main.c (𝘪․𝘦 'once'): 
-auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
-auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }; */
 typedef struct structa Structa;
 
 struct two₋memory {
