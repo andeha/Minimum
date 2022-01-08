@@ -114,10 +114,10 @@ RunUnittests(
    return count;
 }
 
-auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-auto Fallow = ^(void * p) { Heap₋unalloc(p); };
-auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); };
-auto Didalloc = ^(void * p) { return Heap₋object₋size(p); };
+EXT₋C void * Alloc(__builtin_int_t bytes) { return Heap₋alloc(bytes); }
+EXT₋C void Fallow(void * p) { Heap₋unalloc(p); }
+EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }
+EXT₋C __builtin_int_t Didalloc(void * p) { return Heap₋object₋size(p); }
 
 int
 main(
