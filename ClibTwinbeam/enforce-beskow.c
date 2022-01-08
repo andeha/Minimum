@@ -17,15 +17,16 @@ import CString;
  *  main entry.
  */
 
-/* auto Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-auto Fall⒪⒲ = ^(void * p) { Heap₋unalloc(p); };
-auto Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }; */
-
 char8₋t wording₋beskow[] = { /* #embed "../../Apps/macOS/material/Beskow.txt" */ };
 __builtin_int_t Beskow₋bytes() { return 2 + sizeof(wording₋beskow)/sizeof(*wording₋beskow); }
 
 Structa code₋key₋pool, text₋word₋pool, message₋words, code₋key₋words;
 /* ⬷ two regularpools and three vector<Nonabsolute>. */
+
+EXT₋C void * Alloc(__builtin_int_t bytes) { return Heap₋alloc(bytes); }
+EXT₋C void Fallow(void * p) { Heap₋unalloc(p); }
+EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }
+EXT₋C __builtin_int_t Didalloc(void * p) { return Heap₋object₋size(p); }
 
 int
 main(
