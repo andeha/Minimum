@@ -332,9 +332,15 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
-EXT₋C void * Alloc(__builtin_int_t); EXT₋C void Fallow(void *);
-EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes);
-EXT₋C __builtin_int_t Didalloc(void * p);
+EXT₋C void * (^Alloc)(__builtin_int_t); 
+EXT₋C void (^Fallow)(void *);
+EXT₋C void * (^Realloc)(void * p, __builtin_int_t to₋bytes);
+EXT₋C __builtin_int_t (^Didalloc)(void * p);
+
+typedef void * (^ALLOC)(__builtin_int_t);
+typedef void (^FALLOW)(void *);
+typedef void * (^REALLOC)(void *, __builtin_int_t);
+typedef __builtin_int_t (^DIDALLOC)(void *);
 
 /* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
 struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
