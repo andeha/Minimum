@@ -3,7 +3,7 @@
 import ClibTwinbeam;
 
 EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
- bytes₋per₋tile, struct structa * 🅰)
+ bytes₋per₋tile, struct structa * 🅰, ALLOC alloc)
 {
   🅰->bytes₋per₋item = bytes₋per₋item;
   🅰->bytes₋per₋tile = bytes₋per₋tile;
@@ -12,9 +12,10 @@ EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned
   🅰->last₋middleindex₋availables = 
    🅰->pointers₋per₋middleindex;
   🅰->last₋tile₋availables=bytes₋per₋tile;
-  void * index = Alloc(4096*sizeof(__builtin_uint_t));
+  void * index = alloc(4096*sizeof(__builtin_uint_t));
   if (index) { return -1; }
   🅰->index=index;
+  /* optionally₋inflate() */
   return 0;
 } /* ⬷ stored objects must be smaller than 'bytes₋per₋tile'. */
 
@@ -41,16 +42,28 @@ EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐)
 }
 
 inexorable int optionally₋inflate(__builtin_int_t required₋additional₋bytes, 
-  struct structa * 🅐)
+  struct structa * 🅐, ALLOC alloc)
 {
- /*  int no₋alloc₋required = requires₋bytes₋additional <= 🅐->last₋tile₋availables;
-   if (no₋alloc₋required) { return 0; }
-   __builtin_int_t bytes₋on₋additional₋tiles = required₋bytes₋additional - 🅐->last₋tile₋available;
-   __builtin_int_t additional₋tiles = bytes₋on₋additional₋tiles/🅐->bytes₋per₋tile;
-   if (additional₋tiles <= 🅐->) { }
-   __builtin_int_t requires₋additional₋middle₋indexes = additional₋tiles
-   __builtin_int_t additional₋middle₋indexes = */
-   return -1;
+   typedef void (^Inflate)(); typedef __builtin_int_t (^Additional)();
+   Inflate tile₋inflate = ^{ uint8_t * newtile = (uint8_t *)alloc(🅐->bytes₋per₋tile); };
+   Inflate middleidx₋inflate = ^{
+     __builtin_int_t middleindex₋bytes = 🅐->pointers₋per₋middleindex * sizeof(uint8_t *);
+     void * new₋middle₋index = alloc(middleindex₋bytes);
+   };
+   
+   __builtin_int_t additional₋padding = 100;
+   
+   Additional tiles = ^{ return required₋additional₋bytes/🅐->bytes₋per₋tile; };
+   Additional middle₋indexes = ^{ return additional₋padding; };
+   
+   if (required₋additional₋bytes <= 🅐->last₋tile₋availables) {
+     🅐->last₋tile₋availables -= required₋additional₋bytes;
+   } else {
+     __builtin_int_t additional₋tiles = tiles();
+     __builtin_int_t additional₋middle₋indexes = middle₋indexes();
+   }
+   
+   return 0;
 }
 
 inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
@@ -62,9 +75,9 @@ inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
 }
 
 EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytesequence₋objects, 
- struct structa * 🅐)
+ struct structa * 🅐, ALLOC alloc)
 {
-  if (optionally₋inflate(count*🅐->bytes₋per₋item,🅐)) { return -1; }
+  if (optionally₋inflate(count*🅐->bytes₋per₋item,🅐,alloc)) { return -1; }
   for (__builtin_int_t i=0; i<count; i += 1) {
     void * start = (i*🅐->bytes₋per₋item) + (uint8_t *)(bytesequence₋objects);
     if (copy₋append₋one₋object(start,🅐)) { return -2; }
@@ -80,7 +93,7 @@ EXT₋C __builtin_int_t structa₋count(struct structa * 🅐)
    return 1 + (full₋bytes - 🅐->last₋tile₋availables) / 🅐->bytes₋per₋item;
 }
 
-EXT₋C int deinit₋structa(struct structa * 🅰)
+EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow)
 {
   if (🅰->index == ΨΛΩ) { return -1; }
   for (__builtin_int_t i=0; i<🅰->middleindex₋count; i += 1) {
@@ -91,11 +104,11 @@ EXT₋C int deinit₋structa(struct structa * 🅰)
     }
     for (__builtin_int_t j=0; j<middle₋pointer₋count; j += 1) {
       uint8_t * tile = *(j + middle₋index₋start);
-      Fallow(tile);
+      fallow(tile);
     }
-    Fallow(middle₋index₋start);
+    fallow(middle₋index₋start);
   }
-  Fallow(🅰->index); 🅰->index=ΨΛΩ;
+  fallow(🅰->index); 🅰->index=ΨΛΩ;
   return 0;
 }
 

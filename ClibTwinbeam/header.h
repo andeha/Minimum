@@ -332,7 +332,7 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
-EXT₋C void * (^Alloc)(__builtin_int_t); 
+EXT₋C void * (^Alloc)(__builtin_int_t);
 EXT₋C void (^Fallow)(void *);
 EXT₋C void * (^Realloc)(void * p, __builtin_int_t to₋bytes);
 EXT₋C __builtin_int_t (^Didalloc)(void * p);
@@ -490,14 +490,13 @@ struct structa {
  void *cached₋tile'. */
 
 EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
- bytes₋per₋tile, struct structa * 🅰);
+ bytes₋per₋tile, struct structa * 🅰, ALLOC alloc);
 EXT₋C int copy₋append₋items(__builtin_int_t count₋not₋bytes, void * 
- bytesequence₋objects, struct structa * 🅐);
+ bytesequence₋objects, struct structa * 🅐, ALLOC alloc);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
 EXT₋C __builtin_int_t structa₋count(struct structa * 🅐);
-EXT₋C int deinit₋structa(struct structa * 🅰);
-/* ...also pages with table index and offset. */
-/* ...the 'overloadable attribute in C-code not yet found in Swift code. */
+EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
+/* ...the 'overloadable attribute in C-code is not yet found in Swift code. */
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
 typedef struct structa Structa;
@@ -530,9 +529,9 @@ struct two₋command₋queue { }; */
 union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
 
-EXT₋C int init₋regularpool(struct structa * 🅿);
-EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿);
-EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[]);
+EXT₋C int init₋regularpool(struct structa * 🅿, ALLOC alloc);
+EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿, FALLOW fallow);
+EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[], ALLOC alloc);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
 /* ⬷ note operating system releases allocated memory space and pages when program ends. */

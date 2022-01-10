@@ -17,7 +17,7 @@ again:
    if (token₋separator(uc)) {
      if (cs[j-1] != '-') {
       for (short x=0; x<j; x+=1) {
-       if (copy₋append₋onto₋regular(pool,tetras,cs)) { return -2; }
+       if (copy₋append₋onto₋regular(pool,tetras,cs,Alloc)) { return -2; }
       }
       Nonabsolute ref; if (regularpool₋datum₋text(pool,tetras,&ref)) { return -3; }
      }

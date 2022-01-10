@@ -39,4 +39,5 @@ int append₋pending₋changes(struct pending₋change entry, struct structa * c
 
 /* structures are normally returned by arranging for the caller to pass the
  address of a memory area as a hidden first argument. The function then 
- stores the return value into that memory area. */ 
+ stores the return value into that memory area. */
+

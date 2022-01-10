@@ -1,4 +1,4 @@
-/*  􀫖 arabic-edits.c | node stores 'characters to left' and in leaf text too. */
+/*  arabic-edits.c | node stores 'characters to left' and in leaf text too. */
 
 import ClibTwinbeam;
 
@@ -12,7 +12,7 @@ unicode₋shatter branch₋to₋shatter(struct Unicodes ucs)
 
 void unalloc₋shatter(unicode₋shatter shatter)
 {
-   Fall⒪⒲(shatter);
+   Fallow(shatter);
 }
 
 inexorable int is₋leaf₋node(void ᶿ﹡ opaque)

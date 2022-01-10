@@ -1,9 +1,9 @@
-/* 􀬓 o-binary.c | sections, segments and 'tape recorder'. */
+/*  o-binary.c | sections, segments and 'tape recorder'. */
 
 import ClibTwinbeam;
 import Mach_O_binary;
 
-int is_fat(uint32_t magic) { return magic == FAT_MAGIC || magic == FAT_CIGAM; }
+int is_fat(uint32_t magic) { return magic == FAT_CIGAM; }
 
 void
 Symbols(
@@ -12,23 +12,24 @@ Symbols(
 { __builtin_int_t bytesActual;
    extern void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath,
    __builtin_int_t, __builtin_int_t , __builtin_int_t,__builtin_int_t *);
-    uint8_t * obj = (uint8_t *)mapfileʳᵚ(utf8exepath, 0, 0, 0, &bytesActual);
+    uint8_t * obj = (uint8_t *)mapfileʳᵚ(utf8exepath,0,0,0,&bytesActual);
     uint8_t * obj_p = obj;
     uint32_t magic = *(uint32_t *)obj;
     if (is_fat(magic)) {
       struct fat_header * fheader = (struct fat_header *)obj_p;
       obj_p += sizeof(struct fat_header);
-      uint32_t acount = __builtin_bswap32(fheader->nfat_arch);
+#define SWAP32(x) __builtin_bswap32(x)
+      uint32_t acount = SWAP32(fheader->nfat_arch);
       print("is-fat containing ⬚ archs.\n", ﹟d((__builtin_int_t)acount));
       for (int i=0; i<acount; ++i) {
         struct fat_arch * arch = (struct fat_arch *)obj_p;
-        uint32_t cputype = __builtin_bswap32(arch->cputype);
+        obj_p += sizeof(struct fat_arch);
+        uint32_t cputype = SWAP32(arch->cputype);
         if (cputype == CPU_TYPE_X86_64) { print("CPU_TYPE_X86_64\n"); 
-         uint32_t offset = __builtin_bswap32(arch->offset); obj_p = offset + obj;
+         uint32_t offset = SWAP32(arch->offset); obj_p = offset + obj;
          print("offset is ⬚\n", ﹟x((__builtin_uint_t)offset));
          goto found; }
         if (arch->cputype == CPU_TYPE_ARM64) { print("CPU_TYPE_ARM64\n"); }
-        obj_p += sizeof(struct fat_arch);
       }
 found:
       ;
@@ -48,7 +49,7 @@ found:
         struct nlist_64 * ns = (struct nlist_64 *)(obj + symtab->symoff);
         char * strtable = (char *)(obj + symtab->stroff);
         for (int i=0; i<symtab->nsyms; ++i) {
-           struct nlist_64 *entry = ns + i;
+           struct nlist_64 * entry = ns + i;
            uint32_t idx = entry->n_un.n_strx;
            if ((entry->n_type & N_TYPE) == N_SECT) { each₋symbol(strtable + idx, 
              entry->n_value, &outer₋stop); }
