@@ -1,4 +1,4 @@
-/* 􀈪 altern-builtin.cpp | facts examining the cross. (DO-NOT-PUBLISH) */
+/*  built-altern.cpp | builtin and manually tuned. */
 
 import ClibTwinbeam;
 import Mapfile;

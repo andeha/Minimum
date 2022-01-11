@@ -1,4 +1,4 @@
-/* 􀤑 pythagoryn.c | half precision - 16-bit - with conversions routines. */
+/*  float-short.c | half precision - 16-bit - with conversions routines. */
 
 import ClibTwinbeam;
 
@@ -9,21 +9,17 @@ __attribute__ ((target("f16c")))
 half₋to₋float(half /* unsigned short */ 𝟷𝟼₋bits)
 {
 #if defined __armv8a__
-  float16x8_t a = { 𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
-  float32x4_t b = __builtin_arm_mve_vcvtbq_f32_f16(a);
+  float16x4_t a = { 𝟷𝟼₋bits, 0, 0, 0 };
+  float32x4_t b = vcvt_f32_f16(a);
   return b[0];
 #elif defined __x86_64__
   __v8hf v = { 𝟷𝟼₋bits, 0, 0, 0, 0, 0, 0, 0 };
   __v44f non₋double = (__v44f)__builtin_ia32_vcvtph2ps(v);
-  return non₋double[0];
-#else
-  return 0.0;
+  return non₋double[0]; /* defined as _cvtsh_ss in 'f16cintrin.h'. */
 #endif
 }
 
-double
-/* __attribute__ ((target("f16c"))) */
-To₋doubleprecision(/* unsigned short */ half 𝟷𝟼₋bits)
+double To₋doubleprecision(/* unsigned short */ half 𝟷𝟼₋bits)
 {
   return (double)half₋to₋float(𝟷𝟼₋bits);
 }

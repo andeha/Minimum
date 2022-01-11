@@ -478,16 +478,13 @@ EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟
  __builtin_uint_t * words);
 EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
-typedef __builtin_uint_t structa₋middle₋index;
+struct middle₋index { uint8_t * tilerefs[8192]; };
 
 struct structa {
-  structa₋middle₋index * index;
-  __builtin_int_t item₋count, middleindex₋count, 
-   last₋middleindex₋availables, last₋tile₋availables;
-  unsigned bytes₋per₋item, bytes₋per₋tile, 
-   pointers₋per₋middleindex;
-}; /* ⬷ a․𝘬․a Tape and primary-memory so not '__builtin_int_t cached₋number; 
- void *cached₋tile'. */
+  struct middle₋index * middles[4096];
+  __builtin_int_t item₋count, tile₋count;
+  unsigned bytes₋per₋item, bytes₋per₋tile;
+}; /* ⬷ a․𝘬․a Tape. */
 
 EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
  bytes₋per₋tile, struct structa * 🅰, ALLOC alloc);
@@ -552,24 +549,24 @@ template <typename Note> Note * jot(Unicodes regular, struct regularprint * 🅡
   __uint128_t fineprint = 0;
   void ᶿ﹡ node = seek₋impression(🅡,fineprint);
   if (node == ΨΛΩ) {
-    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); };  
+    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); }; 
     void ᶿ﹡ node2 = store₋impression(🅡,fineprint,leaf₋alloc);
-  } else { return ;}
+  } else { return ; }
 }
 #endif
 #endif
 
-struct poecilonyme { struct structa symbols; void ᶿ﹡ opaque; 
+struct thesaurus { struct structa symbols; void ᶿ﹡ opaque; 
   unsigned (*norm)(struct Unicodes alt₁, struct Unicodes alt₂);
 };
 int form₋ōnymon(struct Unicodes key, struct Unicodes value, int shares, 
- struct poecilonyme * 🅓);
+ struct thesaurus * 🅓);
 int dissociate₋isolate(struct Unicodes key, struct Unicodes value);
 int evidence₋related(struct Unicodes key, void (^right)(int count, 
- struct Unicodes value[], unsigned distance[]), struct poecilonyme * 🅓);
-int thesaurus₋init(struct poecilonyme * 🅳);
-int uninit₋thesaurus(struct poecilonyme * 🅳);
-/* ⬷ a․𝘬․a 'company', 'association', 'thesaurus', liability₋alt₋indemnity 
+ struct Unicodes value[], unsigned distance[]), struct thesaurus * 🅓);
+int association₋init(struct thesaurus * 🅳);
+int uninit₋association(struct thesaurus * 🅳);
+/* ⬷ a․𝘬․a 'company', 'association', liability₋alt₋indemnity 
  and 'unicode₋map'. */
 
 struct ¹stack { uint8_t * words; 
