@@ -518,7 +518,7 @@ EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx,
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
-/* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and remmingway. */
+/* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
 struct two₋command₋queue { }; */
@@ -549,7 +549,7 @@ template <typename Note> Note * jot(Unicodes regular, struct regularprint * 🅡
   __uint128_t fineprint = 0;
   void ᶿ﹡ node = seek₋impression(🅡,fineprint);
   if (node == ΨΛΩ) {
-    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); }; 
+    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); };
     void ᶿ﹡ node2 = store₋impression(🅡,fineprint,leaf₋alloc);
   } else { return ; }
 }
@@ -568,6 +568,18 @@ int association₋init(struct thesaurus * 🅳);
 int uninit₋association(struct thesaurus * 🅳);
 /* ⬷ a․𝘬․a 'company', 'association', liability₋alt₋indemnity 
  and 'unicode₋map'. */
+
+struct remmingway {
+  struct structa keypresses₋unicodes;
+  struct structa nonabsolutes;
+  void ᶿ﹡ opaque₋rope;
+}; /* a.k.a getdelim and getline. */
+
+int init₋remm(struct remmingway * 🅡);
+int append₋characters(struct Unicodes text, struct remmingway * 🅡);
+int delete₋character(struct remmingway * 🅡);
+int insert₋character(struct remmingway * 🅡);
+int uninit₋remm(struct remmingway * 🅡);
 
 struct ¹stack { uint8_t * words; 
  __builtin_int_t size, elem₋bytesize, pos;
@@ -706,6 +718,9 @@ int steganography₋hide(Nonabsolute word, Nonabsolute * code);
 int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
 
 EXT₋C void Gitfingerprint(const char ** text);
+
+typedef int (*Keydown₋Incident)(struct Unicodes text);
+EXT₋C int Register₋Keydown(Keydown₋Incident occurred);
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);
