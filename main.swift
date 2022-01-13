@@ -1,131 +1,37 @@
-/*  􀙤􀻒 main.swift | 'commence-initiate detail-orientation'. */
+/*  main.swift | for Minimum. */
 
 import AppKit
+import ClibTwinbeam_and_cCubist;
 
 @available(macOS 10.15, *)
 class Appdelegate: NSObject, NSApplicationDelegate {
    let controller = Windowcontroller()
-   /* let fork₋controller = Forkscontroller() */
    let delegate = default₋Windowdelegate()
    
    func applicationWillFinishLaunching(_ notification: Notification) {
      if let window = controller.window { window.delegate = delegate }
      print("▞ Minimum loading...please stand-by. ▚")
      let os = ProcessInfo().operatingSystemVersion
-     var sha1git: UnsafeMutablePointer<CChar>
-     GitFingerprint(sha1git)
-     print("\(sha1git) on macos version \(os.majorVersion).\(os.minorVersion).\(os.patchVersion)")
+     var sha1git: UnsafePointer<CChar>?
+     Gitidentity(&sha1git)
+     let fingerprint = String(cString: sha1git!)
+     let major=os.majorVersion, minor=os.minorVersion, patch=os.patchVersion
+     print("Revision \(fingerprint) on macos version \(major).\(minor).\(patch)")
    }
    
    func applicationDidFinishLaunching(_ notification: Notification) {
-     NotificationCenter.default.addObserver(self, 
-      selector: #selector(thermalStateChanged(notification:)), 
-      name: ProcessInfo.thermalStateDidChangeNotification, object: nil)
-     include₋menu()
      controller.showWindow(self)
-     /* fork₋controller.showWindow(self) */
      NSApp.setActivationPolicy(.regular)
      NSApp.activate(ignoringOtherApps: true)
    }
    
-   @objc func preferences(_ sender: Any?) { print("preferences") }
-   
-   @objc func thermalStateChanged(notification: NSNotification) {
-     let state = ProcessInfo.processInfo.thermalState
-     if state == ProcessInfo.ThermalState.fair {
-       debugPrint("Thermals are fair. Consider taking proactive measures to prevent higher thermals.")
-     } else if state == ProcessInfo.ThermalState.serious {
-       debugPrint("Thermals are highly elevated. Help the system by taking corrective action.")
-     } else if state == ProcessInfo.ThermalState.critical {
-       debugPrint("Thermals are seriously elevated. Help the system by taking immediate corrective action.")
-     } else {
-       debugPrint("Thermals are okay. Go about your business.")
-     }
-   }
-   
-   func applicationWillTerminate(_ notification: Notification) { print("to-terminate") }
-   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { return true }
-   /* func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply { return .terminateLater }
-   func reply(toApplicationShouldTerminate shouldTerminate: Bool) { print("toApplicationShouldTerminate") } */
 }
 
-extension Appdelegate {
-   func include₋menu() { print("Building menu") /* ⬷ understand /ma-n⸺v-ä-l-jer⸺f-r-å-n⸺e-n⸺me-n-y/. */
-     let appmenu = NSMenuItem()
-     appmenu.submenu = NSMenu()
-     let about₋minimum = #selector(NSApplication.orderFrontStandardAboutPanel(_:))
-     let preferences = #selector(self.preferences(_:))
-     let hide₋other = #selector(NSApplication.hideOtherApplications(_:))
-     var appname = ProcessInfo.processInfo.processName
-     appmenu.submenu?.items = [
-       NSMenuItem(title: "About Minimum", action: about₋minimum, keyEquivalent: ""), 
-       NSMenuItem.separator(), 
-       NSMenuItem(title: "Preferences...", action: preferences, keyEquivalent: ","), 
-       NSMenuItem.separator(), 
-       NSMenuItem(title: "Hide \(appname)", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"), 
-       NSMenuItem(title: "Hide Others", target: NSApplication.shared, action: hide₋other, 
-        keyEquivalent: "h", modifier: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.option]), 
-       NSMenuItem.separator(), 
-       NSMenuItem(title: "Quit \(appname)", action: #selector(NSApplication.shared.terminate(_:)), 
-        keyEquivalent: "q")
-     ]
-     let forkmenu = NSMenuItem()
-     forkmenu.submenu = NSMenu(title: "Forks")
-     forkmenu.submenu?.items = [
-       NSMenuItem(title: "New", action: #selector(self.preferences(_:)), keyEquivalent: "n")
-     ]
-    
-     let editmenu = NSMenuItem()
-     editmenu.submenu = NSMenu(title: "Edit")
-     editmenu.submenu?.items = [
-       NSMenuItem(title: "Undo", target: self, action: Selector(("undo:")), keyEquivalent: "z", 
-        modifier: [NSEvent.ModifierFlags.command]), 
-       NSMenuItem(title: "Redo", target: self, action: Selector(("redo:")), keyEquivalent: "z", 
-        modifier: [NSEvent.ModifierFlags.command, NSEvent.ModifierFlags.shift]), 
-       NSMenuItem.separator(), 
-       NSMenuItem(title: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x"), 
-       NSMenuItem(title: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c"), 
-       NSMenuItem(title: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v"), 
-       NSMenuItem(title: "Select All", action: Selector(("selectall:")), keyEquivalent: "a"), 
-     ]
-    
-     let viewmenu = NSMenuItem()
-     viewmenu.submenu = NSMenu(title: "View")
-     viewmenu.submenu?.items = [ /* 'add scribble' */ ]
-    
-     let winmenu = NSMenuItem()
-     winmenu.submenu = NSMenu(title: "Window")
-     winmenu.submenu?.items = [
-       NSMenuItem(title: "Minimize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: ""), 
-       NSMenuItem(title: "Zoom", action: #selector(NSWindow.performZoom(_:)), keyEquivalent: ""), 
-       NSMenuItem.separator(), 
-       NSMenuItem(title: "Show All", action: #selector(NSApplication.arrangeInFront(_:)), keyEquivalent: "m"), 
-     ]
-    
-     let mainmenu = NSMenu(title: "Main Menu")
-     mainmenu.addItem(appmenu); mainmenu.addItem(forkmenu); mainmenu.addItem(editmenu) 
-     mainmenu.addItem(viewmenu); mainmenu.addItem(winmenu)
-     /* mainmenu.addItems(appmenu, forkmenu, editmenu, viewmenu, winmenu) */
-     NSApplication.shared.mainMenu = mainmenu /* ⬷ NSResponder object. */
-   }
-  
-   @objc func validateMenuItem(_ menuItem: NSMenuItem) -> Bool { print("validate menu for delegate") 
-     if menuItem.action == #selector(NSApplication.orderFrontStandardAboutPanel(_:)) { return true }
-     if menuItem.action == #selector(self.preferences(_:)) { return true }
-     if menuItem.action == #selector(NSApplication.hide(_:)) { return true }
-     if menuItem.action == #selector(NSApplication.hideOtherApplications(_:)) { return true }
-     if menuItem.action == #selector(NSApplication.shared.terminate(_:)) { return true }
-     return false
-   }
-}
-
-extension Notification.Name {
-  static let searchitem₋found = Notification.Name("􀊬-found")
+class default₋Windowdelegate: NSObject, NSWindowDelegate {
 }
 
 let app = NSApplication.shared
 let delegate = Appdelegate()
 app.delegate = delegate
 app.run()
-
 

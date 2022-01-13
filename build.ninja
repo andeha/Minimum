@@ -14,15 +14,13 @@ gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
 moduleflags = -fmodules-ts -fimplicit-modules                                $
  -fmodule-map-file=./ClibTwinbeam/module.modulemap
 commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
-tmacr-version = 
-# -mmacosx-version-min=11.5
+tmacr-version = -mmacosx-version-min=12.0.0
 macoscflags_commandline = -isysroot $commandline-sdkpath $tmacr-version
 macoscflags = $macoscflags_commandline
 sha1git = `git log -1 '--pretty=format:%h'`
 cflags = $cpp-optflags -DSHA1GIT=\"$sha1git\" $macoscflags
 macos-compiler-c = xcrun clang $gencdflags $moduleflags
 macos-compiler-swift = xcrun swiftc
-#  swiftc -module-name <value> -enable-experimental-cxx-interop
 librarian-mac = xcrun ar
 
 rule cc
@@ -51,11 +49,11 @@ rule objc
   deps = gcc
 
 rule primary-compile-macswift
-  command = $macos-compiler-swift $swift-flags -o $out $in                   $
-   ./Releases/libClibTwinbeam.a
+  command = $macos-compiler-swift $swift-flags -o $out $in
 
 rule assemble-macapp
   command = rm -rf Minimum.app                                             ; $
+   rm -rf $objs/revision-print.o                                           ; $
    mkdir $appname.app                                                      ; $
    mkdir $appname.app/Contents                                             ; $
    mkdir $appname.app/Contents/MacOS                                       ; $
@@ -64,11 +62,6 @@ rule assemble-macapp
    cp macos-content/PkgInfo $appname.app/Contents/                         ; $
    cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
    mv Minimum $appname.app/Contents/MacOS/$appname
-
-rule library
-  command = $librarian-mac rcs Releases/$out\_$sha1git.a $in               ; $
-  ln -f Releases/$out\_$sha1git.a Releases/$out.a                          ; $
-  printf $sha1git
 
 build $objs/account-italian-1.o: c ClibTwinbeam/account-italian-1.c
 build $objs/account-italian-2.o: c ClibTwinbeam/account-italian-2.c
@@ -81,12 +74,13 @@ build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
 build $objs/eight-utf.o: c ClibTwinbeam/eight-utf.c
 build $objs/endian-base.o: c ClibTwinbeam/endian-base.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
-build $objs/ionist-codex.o: c ClibTwinbeam/ionist-codex.c
+build $objs/codex-ionist.o: c ClibTwinbeam/codex-ionist.c
 build $objs/lock-attempt.o: c ClibTwinbeam/lock-attempt.c
 build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
 build $objs/present-print.o: c ClibTwinbeam/present-print.c
 build $objs/queue-invent.o: c ClibTwinbeam/queue-invent.c
 build $objs/regular-pool.o: c ClibTwinbeam/regular-pool.c
+build $objs/revision-print.o: c ClibTwinbeam/revision-print.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-symbol.o: c ClibTwinbeam/search-symbol.c
 build $objs/semantic-block.o: c ClibTwinbeam/semantic-block.c
@@ -95,19 +89,8 @@ build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
 build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
-build libClibTwinbeam: library $objs/account-italian-1.o                     $
- $objs/account-italian-2.o $objs/amend-tape.o $objs/arabic-edit.o            $
- $objs/built-altern.o $objs/chrono-logy.o $objs/chipher-rhode.o              $
- $objs/cubist-codex.o $objs/decalogue.o $objs/eight-utf.o                    $
- $objs/endian-base.o $objs/float-short.o $objs/ionist-codex.o                $
- $objs/lock-attempt.o $objs/o-binary.o $objs/present-print.o                 $
- $objs/queue-invent.o $objs/regular-pool.o $objs/round-fixed.o               $
- $objs/search-symbol.o $objs/semantic-block.o $objs/symbol-texts.o           $
- $objs/thread-fork.o $objs/tiles-map.o $objs/x-error-stack.o                 $
- $objs/x-partial-referen.o
-build $appname: primary-compile-macswift histories.swift enriching.swift     $
- main.swift Data+Base16.swift
+build $appname: primary-compile-macswift main.swift histories.swift          $
+ enriching.swift $objs/revision-print.o
 build Minimum.app: assemble-macapp $appname
-default libClibTwinbeam Minimum.app
-
+default Minimum.app
 
