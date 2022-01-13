@@ -90,7 +90,7 @@ build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
 build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build $appname: primary-compile-macswift main.swift histories.swift          $
- enriching.swift $objs/revision-print.o
+ enriching.swift $objs/revision-print.o $objs/eight-utf.o
 build Minimum.app: assemble-macapp $appname
 default Minimum.app
 

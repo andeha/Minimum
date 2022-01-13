@@ -5,7 +5,7 @@ import AppKit
 class Interaction { var process: Process?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ 'fifo' and 'pipe' is similar. */
   var output: ((Data) -> Void)?
-  let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4) /* a.k.a Reference. */
+  let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
   
   func UnicodeToUtf8(_ uc: UInt32, maxfour bytes: inout Int) {
     /* let s = String(format: "%02x ", uc); print("converting \(s)") */
