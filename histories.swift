@@ -1,14 +1,47 @@
-/* histories.swift | log. */
+/*  histories.swift | the Minimum log. */
 
 import AppKit
 import ClibTwinbeam_and_cCubist;
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
 class Rendition {
+   
+   static let zinkwhite = NSColor(calibratedWhite: 0.99, alpha: 1.0)
+   static let systemfont = NSFont.systemFont(ofSize: 30.0), 
+    textfont = NSFont(name: "SF Mono", size: 11)!
+   
+   var default₋textattrs: [NSAttributedString.Key: Any] {
+     get {
+       let ink = Rendition.zinkwhite.cgColor
+       return [.font: Rendition.textfont, .foregroundColor: ink]
+     }
+   }
+   
    var utf8₋bytes = Array<UInt8>()
    var unicodes = Array<UInt32>()
    var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
    var y₋offset = 0.0
+   
+   func line₋height(font: NSFont) -> CGFloat {
+     let fontLineHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
+     return fontLineHeight
+   }
+   
+   func text₋height(font: NSFont) -> CGFloat
+   {
+     return CGFloat(linebreaks.count + 1)*line₋height(font: font)
+   }
+   
+   func edit₋height(font: NSFont) -> CGFloat
+   {
+     return line₋height(font: font)
+   }
+   
+   func document₋height(font: NSFont) -> CGFloat
+   {
+     return text₋height(font: font) + edit₋height(font: font)
+   }
+   
 }
 
 class Minimumwindow: NSWindow {
@@ -58,9 +91,12 @@ class Minimumview: NSView {
        let frame₋update = NSRect(x: 0, y: 0, width: self.frame.width, 
         height: self.frame.height)
        print("setNeedsDisplay \(frame₋update)")
-       self.setNeedsDisplay(frame₋update)
+       self.needsDisplay = true
      }
      /* init₋for₋dropping(NSFilenamesPboardType) */
+    /* self.rotate(byDegrees: 10.0)
+    self.translateOrigin(to: NSPoint(x: 100.0, y: 100.0))
+    self.scaleUnitSquare(to: NSSize(width: 1.0, height: 1.0)) */
    }
    
    required init?(coder: NSCoder) {
@@ -81,8 +117,34 @@ class Minimumview: NSView {
    
    func setNeedsDisplay(_ uc₋count: Int, _ break₋count: Int) {
      print("setNeedsDisplay \(uc₋count), \(break₋count)")
+     print("setNeedsDisplay \(self.frame)")
+     //self.setNeedsDisplay(self.bounds)
    }
    
+}
+
+extension Minimumview { /* ⬷ text drawing. */
+   
+   override func draw(_ dirty: CGRect) {
+     print("draw-rect: \(dirty) self.frame now is \(self.frame)")
+     guard let context = NSGraphicsContext.current?.cgContext else { return }
+     self.controller.rendition.unicodes.withUnsafeBytes {
+       let raw = UnsafeMutableRawPointer(mutating: $0.baseAddress!)
+       let count = self.controller.rendition.unicodes.count
+       let text = String(bytesNoCopy: raw, length: 4*count, encoding: 
+         .utf32LittleEndian, freeWhenDone: false)
+       let default₋textattrs = self.controller.rendition.default₋textattrs
+       let attributed = NSAttributedString(string: text!, attributes: default₋textattrs)
+       let y₋offset = self.controller.rendition.y₋offset
+       var rect = self.frame.offsetBy(dx: 0, dy: y₋offset)
+       rect.origin.y = rect.origin.y - 1000 + rect.size.height
+       rect.size.height = 1000
+       Typeset(attributed, frame: rect, context: context)
+     }
+     /* let first₋unicode=0, last₋unicode=0
+     self.viewcontroller.rendition.forEach.linebreaks { elem in } */
+     super.draw(dirty)
+   }
 }
 
 class Viewcontroller: NSViewController {
@@ -99,13 +161,12 @@ class Viewcontroller: NSViewController {
      /* visualeffect.translatesAutoresizingMaskIntoConstraints = false */
      visualeffect.blendingMode = .behindWindow
      visualeffect.state = .active
-     /* visualeffect.maskImage = NSImage(data: Data(contentsOf: url)) /​* ⬷ '130px-Cross-Pattee-Heraldry.png'. */
      self.view = visualeffect
      let material = Minimumview(frame: frame)
      /* material.acceptsTouchEvents = true */
      material.allowedTouchTypes = [.indirect] /* ⬷ ipad = .direct */
      self.view.addSubview(material)
-     let views = ["material" : minimumview]
+     let views = [ "material" : minimumview ]
      self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[material]|", options: [], metrics: nil, views: views))
      self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[material]|", options: [], metrics: nil, views: views))
      material.translatesAutoresizingMaskIntoConstraints = false
@@ -126,12 +187,25 @@ class Viewcontroller: NSViewController {
    var rendition: Rendition {
      get { self.representedObject as! Rendition }
      set { self.representedObject = newValue 
-      minimumview.setNeedsDisplay(minimumview.frame) }
+      minimumview.needsDisplay = true }
    }
    
    var minimumview: Minimumview { get { self.view.subviews[0] as! Minimumview } }
    
    override var acceptsFirstResponder: Bool { true }
+   
+   func vertical₋scroll(_ plus₋minus₋1: CGFloat)
+   {
+     let document₋height = rendition.document₋height(font: Rendition.textfont)
+     let view₋height = self.view.subviews[0].bounds.height
+     if (document₋height <= view₋height) { return }
+     rendition.y₋offset += view₋height*plus₋minus₋1
+     if (rendition.y₋offset < 0) { rendition.y₋offset = 0 }
+     if (document₋height - rendition.y₋offset < view₋height) {
+       rendition.y₋offset = document₋height - view₋height }
+     print("\(document₋height) and \(view₋height) and \(rendition.y₋offset)")
+     minimumview.needsDisplay = true
+   }
    
    var beginning₋touches = Dictionary<String,NSPoint>()
    var moved₋touches = Dictionary<String,NSPoint>()
@@ -162,10 +236,11 @@ class Viewcontroller: NSViewController {
        let distance₂ = moved₋touches[second]!.y - beginning₋touches[second]!.y
        let magnitude = (distance₁ + distance₂) / 2
        print("two-finger swipe \(magnitude)")
+       vertical₋scroll(magnitude)
        /* top to botton prints magnitude from 0 to approximately -0.97. */
        let rect: CGRect = minimumview.frame
        let physical₋size = ovals[𝟶].deviceSize
-       minimumview.setNeedsDisplay(rect)
+       minimumview.needsDisplay = true
      }
    }
   
@@ -264,16 +339,20 @@ class Windowcontroller: NSWindowController {
            }
          }
        }
-       self.minimumview.setNeedsDisplay(uc₋count,break₋count)
+       DispatchQueue.main.async { self.minimumview.needsDisplay = true }
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
    }
 }
 
 extension Windowcontroller { /* ⬷ keyboard input. */
-   func keyput(_ unicode: UInt32) {
-     print("writing \(unicode) to child")
-     shell.slow₋write₋to₋child(unicode)
+   func keyput(_ uc: UInt32) {
+     print("writing \(uc) to child")
+     shell.slow₋write₋to₋child(uc)
+     self.rendition.unicodes.append(uc)
+     let uc₋count = self.rendition.unicodes.count
+     let break₋count = self.rendition.linebreaks.count
+     self.minimumview.needsDisplay = true
    }
    override func keyDown(with event: NSEvent) {
      if let characters = event.characters {

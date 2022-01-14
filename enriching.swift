@@ -1,6 +1,16 @@
-/*  enriching.swift | miscellaneous. */
+/*  enriching.swift | miscellaneous helpers for Minimum. */
 
 import AppKit
+
+func Typeset(_ attributed: NSAttributedString, frame: NSRect, context: CGContext) -> Void
+{
+  let framesetter = CTFramesetterCreateWithAttributedString(attributed)
+  let symbols = CFRangeMake(0,attributed.length)
+  let box = frame.insetBy(dx: 3, dy: 3).offsetBy(dx: 1.5, dy: 1.5)
+  let path = CGPath(rect: box.insetBy(dx: 1, dy: 1), transform: nil)
+  let textframe = CTFramesetterCreateFrame(framesetter,symbols,path,nil)
+  CTFrameDraw(textframe,context)
+}
 
 class Interaction { var process: Process?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ 'fifo' and 'pipe' is similar. */
