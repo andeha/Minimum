@@ -81,13 +81,13 @@ inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
   return 0;
 }
 
-EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytesequence₋objects, 
+EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytes₋objects, 
  struct structa * 🅐, ALLOC alloc)
 {
   if (optionally₋inflate(count*🅐->bytes₋per₋item,🅐,alloc)) { return -1; }
   for (__builtin_int_t i=0; i<count; i += 1) {
     __builtin_int_t byte₋offset = i*🅐->bytes₋per₋item;
-    void * start = byte₋offset + (uint8_t *)bytesequence₋objects;
+    void * start = byte₋offset + (uint8_t *)bytes₋objects;
     if (copy₋append₋one₋object(start,🅐)) { return -2; }
   }
   return 0;

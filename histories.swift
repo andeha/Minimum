@@ -19,7 +19,14 @@ class Rendition {
    
    var utf8₋bytes = Array<UInt8>()
    var unicodes = Array<UInt32>()
-   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations. */
+   var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations₋in₋unicodes. */
+   var stateshift = Array<Int>() /* ⬷ \U2FED alt. \U2FEB locations₋in₋unicodes. */
+   struct section {
+     var first₋unicode, last₋unicode, first₋line, last₋line: Int
+     var state: Minimumview.State
+   }
+   var sections = Array<section>()
+   
    var y₋offset = 0.0
    
    func line₋height(font: NSFont) -> CGFloat {
@@ -30,7 +37,7 @@ class Rendition {
    func text₋height(font: NSFont) -> CGFloat
    {
      return CGFloat(linebreaks.count + 1)*line₋height(font: font)
-   }
+   } /* in bands of 'print' and 'draw'. */
    
    func edit₋height(font: NSFont) -> CGFloat
    {
@@ -73,7 +80,7 @@ class Minimumwindow: NSWindow {
    }
    
    override func performKeyEquivalent(with event: NSEvent) -> Bool {
-     print("performKeyEquivalent")
+     /* print("performKeyEquivalent") */
      return super.performKeyEquivalent(with: event)
    }
    
@@ -93,7 +100,6 @@ class Minimumview: NSView {
        print("setNeedsDisplay \(frame₋update)")
        self.needsDisplay = true
      }
-     /* init₋for₋dropping(NSFilenamesPboardType) */
     /* self.rotate(byDegrees: 10.0)
     self.translateOrigin(to: NSPoint(x: 100.0, y: 100.0))
     self.scaleUnitSquare(to: NSSize(width: 1.0, height: 1.0)) */
@@ -104,6 +110,8 @@ class Minimumview: NSView {
    }
    
    override var isOpaque: Bool { false }
+
+   enum State { case print, draw, down₋83 }
    
    var controller: Viewcontroller {
      get { self.window!.contentViewController as! Viewcontroller }
@@ -116,9 +124,8 @@ class Minimumview: NSView {
    }
    
    func setNeedsDisplay(_ uc₋count: Int, _ break₋count: Int) {
-     print("setNeedsDisplay \(uc₋count), \(break₋count)")
-     print("setNeedsDisplay \(self.frame)")
-     //self.setNeedsDisplay(self.bounds)
+     print("setNeedsDisplay \(uc₋count), \(break₋count) and \(self.frame)")
+     self.needsDisplay = true
    }
    
 }
@@ -126,7 +133,7 @@ class Minimumview: NSView {
 extension Minimumview { /* ⬷ text drawing. */
    
    override func draw(_ dirty: CGRect) {
-     print("draw-rect: \(dirty) self.frame now is \(self.frame)")
+     print("draw-rect: \(dirty) while self.frame is \(self.frame) and offset \(self.controller.rendition.y₋offset)")
      guard let context = NSGraphicsContext.current?.cgContext else { return }
      self.controller.rendition.unicodes.withUnsafeBytes {
        let raw = UnsafeMutableRawPointer(mutating: $0.baseAddress!)
@@ -137,9 +144,22 @@ extension Minimumview { /* ⬷ text drawing. */
        let attributed = NSAttributedString(string: text!, attributes: default₋textattrs)
        let y₋offset = self.controller.rendition.y₋offset
        var rect = self.frame.offsetBy(dx: 0, dy: y₋offset)
-       rect.origin.y = rect.origin.y - 1000 + rect.size.height
-       rect.size.height = 1000
+       let height = self.controller.rendition.document₋height(font: Rendition.textfont)
+       rect.origin.y = rect.origin.y - height + rect.size.height
+       rect.size.height = height
        Typeset(attributed, frame: rect, context: context)
+       let umbra = CGColor(genericCMYKCyan: 0.34, magenta: 0.92, yellow: 0.8, black: 0.49, alpha: 1.0)
+       context.setStrokeColor(umbra)
+       context.setLineWidth(5.0) /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
+       context.beginPath()
+       context.move(to: CGPoint(x: 100, y: 100))
+       context.addCurve(to: CGPoint(x: 150, y: 150), control1: CGPoint(x: 200, y: 200), control2: CGPoint(x: 174, y: 175))
+       context.closePath()
+       context.strokePath()
+       let anfang = NSBezierPath(anfang: "A", font: Rendition.systemfont, 
+        origin: NSPoint(x: 20, y: 20))
+       Rendition.zinkwhite.set()
+       anfang.stroke()
      }
      /* let first₋unicode=0, last₋unicode=0
      self.viewcontroller.rendition.forEach.linebreaks { elem in } */
@@ -203,7 +223,6 @@ class Viewcontroller: NSViewController {
      if (rendition.y₋offset < 0) { rendition.y₋offset = 0 }
      if (document₋height - rendition.y₋offset < view₋height) {
        rendition.y₋offset = document₋height - view₋height }
-     print("\(document₋height) and \(view₋height) and \(rendition.y₋offset)")
      minimumview.needsDisplay = true
    }
    
@@ -235,12 +254,11 @@ class Viewcontroller: NSViewController {
        let distance₁ = moved₋touches[first]!.y - beginning₋touches[first]!.y
        let distance₂ = moved₋touches[second]!.y - beginning₋touches[second]!.y
        let magnitude = (distance₁ + distance₂) / 2
-       print("two-finger swipe \(magnitude)")
+       /* print("two-finger swipe \(magnitude)") */
        vertical₋scroll(magnitude)
        /* top to botton prints magnitude from 0 to approximately -0.97. */
-       let rect: CGRect = minimumview.frame
-       let physical₋size = ovals[𝟶].deviceSize
-       minimumview.needsDisplay = true
+       /* let rect: CGRect = minimumview.frame
+       let physical₋size = ovals[𝟶].deviceSize */
      }
    }
   
@@ -256,8 +274,8 @@ class Viewcontroller: NSViewController {
   
    override func pressureChange(with event: NSEvent) {
      /* let instant: TimeInterval = event.timestamp */
-     let pressure = event.pressure
-     print("pressure \(pressure)")
+     /* let pressure = event.pressure
+     print("pressure \(pressure)") */
    }
    
    override func touchesCancelled(with event: NSEvent) { print("touchesCancelled") }
@@ -305,6 +323,11 @@ class Windowcontroller: NSWindowController {
    
    var utf8₋bytes₋idx: Int = 0;
    let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
+   var previous₋state = Minimumview.State.print
+   var opaque = UnsafeMutablePointer<Any>.allocate(capacity: 1)
+   var twomem = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: Heap₋unalloc, 
+    node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, text₋bytesize: Heap₋object₋size)
+   /* maxfour.deallocate(); opaque.deallocate() */
    
    override func windowDidLoad() { print("windowDidLoad") 
      self.viewctrl.representedObject = Rendition()
@@ -332,14 +355,42 @@ class Windowcontroller: NSWindowController {
            }
            let uc = Utf8ToUnicode(self.maxfour, Int64(followers) + 1)
            self.rendition.unicodes.append(uc)
-           print("added \(uc)")
+           /* print("added \(uc)") at-least one unicode in self.rendition.unicodes. */
+           let unicode₋idx = self.rendition.unicodes.count - 1
            if (uc == 0x0a) {
-             self.rendition.linebreaks.append(self.rendition.unicodes.count - 1)
-             print("and added linebreak")
+             self.rendition.linebreaks.append(unicode₋idx)
+             /* print("and added linebreak") */
+           } else if (uc == 0x2FEF || uc == 0x2FEB || uc == 0x2FED) {
+             self.rendition.stateshift.append(unicode₋idx)
+             /* print("and added stateshift") */
+             var first₋uc=0, last₋uc=unicode₋idx, first₋line=1, last₋line=1
+             if self.rendition.linebreaks.count >= 1 {
+               let last₋linebreak₋idx = self.rendition.linebreaks.count - 1
+               let last₋unicode₋idx = self.rendition.linebreaks[last₋linebreak₋idx]
+               last₋line = last₋linebreak₋idx + 1
+               last₋uc = last₋unicode₋idx
+             }
+             if self.rendition.linebreaks.count >= 2 {
+               let first₋linebreak₋idx = self.rendition.linebreaks.count - 2
+               let first₋unicode₋idx = self.rendition.linebreaks[first₋linebreak₋idx]
+               first₋line = first₋linebreak₋idx + 1
+               first₋uc = first₋unicode₋idx
+             }
+             let section₋closed = Rendition.section(first₋unicode: first₋uc, 
+              last₋unicode: last₋uc, first₋line: first₋line, 
+              last₋line: last₋line, state: self.previous₋state)
+             self.rendition.sections.append(section₋closed)
+             if uc == 0x2FEF {
+               self.previous₋state = Minimumview.State.draw
+             } else if uc == 0x2FEB {
+               self.previous₋state = Minimumview.State.print
+             } else if uc == 0x2FED {
+               self.previous₋state = Minimumview.State.down₋83
+             }
            }
          }
        }
-       DispatchQueue.main.async { self.minimumview.needsDisplay = true }
+       DispatchQueue.main.async { self.minimumview.setNeedsDisplay(uc₋count,break₋count) }
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
    }
@@ -348,11 +399,14 @@ class Windowcontroller: NSWindowController {
 extension Windowcontroller { /* ⬷ keyboard input. */
    func keyput(_ uc: UInt32) {
      print("writing \(uc) to child")
-     shell.slow₋write₋to₋child(uc)
-     self.rendition.unicodes.append(uc)
      let uc₋count = self.rendition.unicodes.count
      let break₋count = self.rendition.linebreaks.count
-     self.minimumview.needsDisplay = true
+     /* let cell: UnsafeMutableRawPointer = Heap₋alloc(4)
+     let text: unicode₋shatter = cell
+     if rope₋append₋text(self.opaque,text,self.twomem) != 0 { return } */
+     shell.slow₋write₋to₋child(uc)
+     self.rendition.unicodes.append(uc)
+     self.minimumview.setNeedsDisplay(uc₋count,break₋count)
    }
    override func keyDown(with event: NSEvent) {
      if let characters = event.characters {

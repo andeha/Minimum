@@ -399,21 +399,26 @@ EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...) a⃝;
 EXT₋C int print(const char * utf8format, ...) a⃝;
+EXT₋C int markdown₋83(const char * utf8format, ...);
+EXT₋C int draw₋vector(int px, const char * utf8format, ...); /* includes image. */
+/* default state is 'print' to toggle 'draw', 'markdown' and 
+ 'print' use the unicodes U+2FEF (e2 bf af), U+2FED (e2 bf ad), 
+ U+2FEB (e2 bf ab). */
 
 #ifndef __cplusplus
 typedef int bool;
 #define Wordbytes (sizeof(__builtin_uint_t))
 static inline __builtin_int_t Syspagesize() { return 4096; }
 #else
-#define WHEN_COMPILING constexpr static
+/* #define WHEN_COMPILING constexpr static
 #define 🥈ᵢ WHEN_COMPILING __attribute__ ((internal_linkage))
-#define 🥈 WHEN_COMPILING /* ⬷ must be assigned to a 'const' and no inline assembler. */
+#define 🥈 WHEN_COMPILING /‌* ⬷ must be assigned to a 'const' and no inline assembler. *‌/
 #define NOT_EVERYTIME const static
 #define 🥇 NOT_EVERYTIME
 template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
-template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". */
+template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /‌* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". *‌/
 __builtin_int_t 🥈 Wordbytes=sizeof(__builtin_uint_t);
-__builtin_int_t constexpr Syspagesize() { return 4096; }
+__builtin_int_t constexpr Syspagesize() { return 4096; } */
 #endif
 
 typedef void (*Argᴾ₋output₋p)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
@@ -717,7 +722,7 @@ int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes,
 int steganography₋hide(Nonabsolute word, Nonabsolute * code);
 int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
 
-EXT₋C void Gitfingerprint(const char ** text);
+EXT₋C void Gitidentity(const char ** text);
 
 typedef int (*Keydown₋Incident)(struct Unicodes text);
 EXT₋C int Register₋Keydown(Keydown₋Incident occurred);

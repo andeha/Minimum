@@ -9,19 +9,20 @@ import ClibTwinbeam;
    unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                  \
    account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o          \
    built-altern.o chrono-logy.o cipher-rhode.o codex-ionist.o cubist-codex.o   \
-   eight-utf.o endian-base.o float-short.o lock-attempt.o o-binary.o           \
-   present-print.o queue-invent.o regular-pool.o round-fixed.o search-symbol.o \
-   semantic-block.o symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o   \
-   x-partial-referen.o */
+   down-format.o draw-format.o eight-utf.o endian-base.o float-short.o         \
+   lock-attempt.o o-binary.o present-print.o queue-invent.o regular-pool.o     \
+   round-fixed.o search-symbol.o semantic-block.o symbol-texts.o thread-fork.o \
+   tiles-map.o x-error-stack.o x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
   -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c    \
    arabic-edit.c built-altern.c chrono-logy.c cipher-rhode.c codex-ionist.c    \
-   cubist-codex.c eight-utf.c endian-base.c float-short.c lock-attempt.c       \
-   o-binary.c present-print.c queue-invent.c regular-pool.c round-fixed.c      \
-   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c   \
-   x-error-stack.c x-partial-referen.c */
+   cubist-codex.c down-format.c draw-format.c eight-utf.c endian-base.c        \
+   float-short.c lock-attempt.c o-binary.c present-print.c queue-invent.c      \
+   regular-pool.c round-fixed.c search-symbol.c semantic-block.c               \
+   symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c                    \
+   x-partial-referen.c */
 
 /* $(CC) main.c -o arm_app -target arm64-apple-macos11
    $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
@@ -35,20 +36,21 @@ import ClibTwinbeam;
    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
    unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
    amend-tape.o arabic-edit.o built-altern.o chrono-logy.o cipher-rhode.o     \
-   codex-ionist.o cubist-codex.o eight-utf.o endian-base.o float-short.o      \
-   lock-attempt.o o-binary.o present-print.o queue-invent.o regular-pool.o    \
-   round-fixed.o search-symbol.o semantic-block.o symbol-texts.o              \
-   thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o */
+   codex-ionist.o cubist-codex.o down-format.o draw-format.o eight-utf.o      \
+   endian-base.o float-short.o lock-attempt.o o-binary.o present-print.o      \
+   queue-invent.o regular-pool.o round-fixed.o search-symbol.o                \
+   semantic-block.o symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o  \
+   x-partial-referen.o */
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__      \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
   -g -std=c2x -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc   \
    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
    built-altern.c chrono-logy.c cipher-rhode.c codex-ionist.c cubist-codex.c  \
-   eight-utf.c endian-base.c float-short.c lock-attempt.c o-binary.c          \
-   present-print.c queue-invent.c regular-pool.c round-fixed.c                \
-   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c  \
-   x-error-stack.c x-partial-referen.c */
+   down-format.c draw-forma.c eight-utf.c endian-base.c float-short.c         \
+   lock-attempt.c o-binary.c present-print.c queue-invent.c regular-pool.c    \
+   round-fixed.c search-symbol.c semantic-block.c symbol-texts.c              \
+   thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c */
 
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"      \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
@@ -72,6 +74,7 @@ runUnitTest(
 )
 {
    typedef void (*Testcase)(); void (*testcase)() = (Testcase)addr;
+   /* mprotect((void*)base, size, PROT_READ | PROT_EXEC); */
    uint64_t startInstant = cycles(); testcase();
    uint64_t dt = cycles() - startInstant;
    completion(symbol,dt);

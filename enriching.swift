@@ -12,6 +12,48 @@ func Typeset(_ attributed: NSAttributedString, frame: NSRect, context: CGContext
   CTFrameDraw(textframe,context)
 }
 
+extension NSBezierPath {
+  
+  convenience init(anfang: String, font: NSFont, origin point: NSPoint)
+  {
+    self.init()
+    let textStorage = NSTextStorage(string: anfang)
+    let layoutManager = NSLayoutManager()
+    textStorage.addLayoutManager(layoutManager)
+    let glyphRange = layoutManager.glyphRange(forCharacterRange: NSMakeRange(0, 
+     anfang.count), actualCharacterRange: nil)
+    move(to: point)
+    for i in glyphRange.location..<glyphRange.location + glyphRange.length {
+      let g = layoutManager.glyph(at: i, isValidIndex: nil)
+      self.append(withCGGlyph: CGGlyph(g), in: font)
+    }
+  } /* ⬷ for bear from 'anfang: Character'. */
+  
+  var cgPath: CGPath
+  {
+    let path = CGMutablePath()
+    var points = [CGPoint](repeating: .zero, count: 3)
+    
+    for i in 0 ..< self.elementCount {
+      let type = self.element(at: i, associatedPoints: &points)
+      switch type {
+      case .moveTo:
+        path.move(to: points[0])
+      case .lineTo:
+        path.addLine(to: points[0])
+      case .curveTo:
+        path.addCurve(to: points[2], control1: points[0], control2: points[1])
+      case .closePath:
+        path.closeSubpath()
+      @unknown default: print("cgpath: unknown default")
+      }
+    }
+    
+    return path
+  }
+  
+}
+
 class Interaction { var process: Process?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ 'fifo' and 'pipe' is similar. */
   var output: ((Data) -> Void)?
