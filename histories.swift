@@ -26,12 +26,18 @@ class Rendition {
      var state: Minimumview.State
    }
    var sections = Array<section>()
+   var text₋sections = Array<String>()
    
    var y₋offset = 0.0
    
    func line₋height(font: NSFont) -> CGFloat {
      let fontLineHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
      return fontLineHeight
+   }
+   
+   func near₋visible₋region(y₋offset: CGFloat)
+   {
+      
    }
    
    func text₋height(font: NSFont) -> CGFloat
@@ -120,6 +126,11 @@ class Minimumview: NSView {
    
    override func setFrameSize(_ newSize: NSSize) {
      print("setFrameSize to \(newSize)")
+     if newSize.height > self.frame.height {
+       let diff = newSize.height - self.frame.height
+       controller.rendition.y₋offset -= diff
+       if controller.rendition.y₋offset < 0 { controller.rendition.y₋offset = 0.0 }
+     }
      super.setFrameSize(newSize)
    }
    
@@ -184,7 +195,7 @@ class Viewcontroller: NSViewController {
      self.view = visualeffect
      let material = Minimumview(frame: frame)
      /* material.acceptsTouchEvents = true */
-     material.allowedTouchTypes = [.indirect] /* ⬷ ipad = .direct */
+     material.allowedTouchTypes = [ .indirect ] /* ⬷ ipad = .direct */
      self.view.addSubview(material)
      let views = [ "material" : minimumview ]
      self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[material]|", options: [], metrics: nil, views: views))
@@ -380,6 +391,14 @@ class Windowcontroller: NSWindowController {
               last₋unicode: last₋uc, first₋line: first₋line, 
               last₋line: last₋line, state: self.previous₋state)
              self.rendition.sections.append(section₋closed)
+             self.rendition.unicodes.withUnsafeBytes {
+               let raw = first₋uc + $0.baseAddress!
+               let mutableraw = UnsafeMutableRawPointer(mutating: raw)
+               let length = last₋uc - first₋uc
+               let text = String(bytesNoCopy: mutableraw, length: length, 
+                encoding: .utf32LittleEndian, freeWhenDone: false)
+               self.rendition.text₋sections.append(text!)
+             }
              if uc == 0x2FEF {
                self.previous₋state = Minimumview.State.draw
              } else if uc == 0x2FEB {
@@ -413,7 +432,11 @@ extension Windowcontroller { /* ⬷ keyboard input. */
        for symbol: Character in characters {
          for possibly₋canonic in symbol.unicodeScalars {
            var uc: UInt32 = possibly₋canonic.value
-           if uc == 0xd { uc = 0xa }
+           if uc == 0xd { uc = 0xa } 
+           let shift₋pressed = self.minimumwindow.shift
+           if shift₋pressed && uc == 0xa { } /* ⬷ shift+return alternatively linebreak alternatively '\' to write next line. */
+           else if !shift₋pressed && uc == 0xa { /* send to child. */}
+           else { }
            keyput(uc)
          }
        }
