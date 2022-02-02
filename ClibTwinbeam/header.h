@@ -401,6 +401,7 @@ EXT₋C int print(void (^out)(char8₋t * u8s, __builtin_int_t bytes),
 EXT₋C int print(const char * utf8format, ...) a⃝;
 EXT₋C int markdown₋83(const char * utf8format, ...);
 EXT₋C int draw₋vector(int px, const char * utf8format, ...); /* includes image. */
+EXT₋C int interact₋regional(unsigned retrospect₋rows, int (*decree)(int64_t param));
 /* default state is 'print' to toggle 'draw', 'markdown' and 
  'print' use the unicodes U+2FEF (e2 bf af), U+2FED (e2 bf ad), 
  U+2FEB (e2 bf ab). */
@@ -580,7 +581,7 @@ struct remmingway {
   void ᶿ﹡ opaque₋rope;
 }; /* a.k.a getdelim and getline. */
 
-int init₋remm(struct remmingway * 🅡);
+int init₋typewriter(struct remmingway * 🅡);
 int append₋characters(struct Unicodes text, struct remmingway * 🅡);
 int delete₋character(struct remmingway * 🅡);
 int insert₋character(struct remmingway * 🅡);
