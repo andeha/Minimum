@@ -27,6 +27,7 @@ class Rendition {
    }
    var sections = Array<section>()
    var text₋sections = Array<String>()
+   var images = Array<CGImage>()
    
    var y₋offset = 0.0
    
@@ -34,6 +35,29 @@ class Rendition {
      let fontLineHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
      return fontLineHeight
    }
+   
+   // func line₋width(line: CTLine) -> CGFloat {
+   //   var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
+   //   let width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
+   //   return width
+   // }
+   
+   // func draw₋line(attr: NSAttributedString, context: CGContext) {
+   //   let line = CTLineCreateWithAttributedString(attr)
+   //   CTLineDraw(line,context)
+   // }
+   
+   // func draw₋multiple₋lines(attr: NSAttributedString, context: CGContext) {
+   //   let typesetter = CTTypesetterCreateWithAttributedString(attr)
+   //   let breakIndex = CTTypesetterSuggestLineBreakWithOffset(typesetter, 0, 140, 0.0)
+   //   /* let clusterIndex = CTTypesetterSuggestClusterBreakWithOffset(typesetter, 0, 140, 0.0) */
+   //   let line1 = CTTypesetterCreateLine(typesetter, CFRange(location: 0, length: breakIndex))
+   //   let line2 = CTTypesetterCreateLine(typesetter, CFRange(location: breakIndex, length: attr.length - breakIndex))
+   //   context.textPosition = .init(x: 0, y: 150)
+   //   CTLineDraw(line1, context)
+   //   context.textPosition = .init(x: 0, y: 100)
+   //   CTLineDraw(line2, context)
+   // }
    
    func near₋visible₋region(y₋offset: CGFloat)
    {
@@ -55,6 +79,20 @@ class Rendition {
      return text₋height(font: font) + edit₋height(font: font)
    }
    
+   func render₋image(width: Int, height: Int, text: String) -> CGImage?
+   {
+     let drawing = { (ctxt: NSGraphicsContext) -> Void in 
+       let umbra = CGColor(genericCMYKCyan: 0.34, magenta: 0.92, yellow: 0.8, black: 0.49, alpha: 1.0)
+       ctxt.setStrokeColor(umbra)
+       ctxt.setLineWidth(5.0) /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
+       ctxt.beginPath()
+       ctxt.move(to: CGPoint(x: 100, y: 100))
+       ctxt.addCurve(to: CGPoint(x: 150, y: 150), control1: CGPoint(x: 200, y: 200), control2: CGPoint(x: 174, y: 175))
+       ctxt.closePath()
+       ctxt.strokePath()
+     }
+     return Renderimage(width: width,height: height, process: drawing)
+   }
 }
 
 class Minimumwindow: NSWindow {
@@ -130,7 +168,7 @@ class Minimumview: NSView {
        let diff = newSize.height - self.frame.height
        controller.rendition.y₋offset -= diff
        if controller.rendition.y₋offset < 0 { controller.rendition.y₋offset = 0.0 }
-     }
+     } /* ⬷ scroll-past-end normally one extra line after field-edit. */
      super.setFrameSize(newSize)
    }
    
@@ -159,14 +197,6 @@ extension Minimumview { /* ⬷ text drawing. */
        rect.origin.y = rect.origin.y - height + rect.size.height
        rect.size.height = height
        Typeset(attributed, frame: rect, context: context)
-       let umbra = CGColor(genericCMYKCyan: 0.34, magenta: 0.92, yellow: 0.8, black: 0.49, alpha: 1.0)
-       context.setStrokeColor(umbra)
-       context.setLineWidth(5.0) /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
-       context.beginPath()
-       context.move(to: CGPoint(x: 100, y: 100))
-       context.addCurve(to: CGPoint(x: 150, y: 150), control1: CGPoint(x: 200, y: 200), control2: CGPoint(x: 174, y: 175))
-       context.closePath()
-       context.strokePath()
        let anfang = NSBezierPath(anfang: "A", font: Rendition.systemfont, 
         origin: NSPoint(x: 20, y: 20))
        Rendition.zinkwhite.set()

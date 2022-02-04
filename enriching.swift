@@ -54,6 +54,23 @@ extension NSBezierPath {
   
 }
 
+func Renderimage(width: Int, height: Int, process: (NSGraphicsContext) -> Void) -> CGImage?
+{
+   guard let plate = CGContext(data: nil, width: width, height: height, 
+     bitsPerComponent: 8, bytesPerRow: 0, 
+     space: CGColorSpace(name: CGColorSpace.sRGB)!, 
+     bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+   let ns₋plate = NSGraphicsContext(cgContext: plate, flipped: true)
+   guard let previous = NSGraphicsContext.current else { return nil }
+   previous.cgContext.saveGState(); NSGraphicsContext.current = ns₋plate
+   ns₋plate.cgContext.beginTransparencyLayer(auxiliaryInfo: nil)
+   do { process(ns₋plate) }
+   ns₋plate.cgContext.endTransparencyLayer()
+   /* NSGraphicsContext.current = nil */
+   previous.cgContext.restoreGState()
+   return plate.makeImage()
+}
+
 class Interaction { var process: Process?
   let p2c₋pipe=Pipe(), c2p₋pipe=Pipe() /* ⬷ 'fifo' and 'pipe' is similar. */
   var output: ((Data) -> Void)?
