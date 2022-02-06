@@ -1,6 +1,16 @@
 /*  enriching.swift | miscellaneous helpers for Minimum. */
 
 import AppKit
+import ClibTwinbeam
+
+func ReapTwinbeam() {
+  print("hello language-analysis-and-church")
+  let pid: UInt64 = 0x17
+  let val: Int32 = 0x13
+  /* let al: __uint128_t = 0x21 */
+  let y: Int32 = Details_in_C(pid,val /*, 0x10*/)
+  print("y is \(y)")
+}
 
 func Typeset(_ attributed: NSAttributedString, frame: NSRect, context: CGContext) -> Void
 {
@@ -24,7 +34,7 @@ extension NSBezierPath {
      anfang.count), actualCharacterRange: nil)
     move(to: point)
     for i in glyphRange.location..<glyphRange.location + glyphRange.length {
-      let g = layoutManager.glyph(at: i, isValidIndex: nil)
+      let g = layoutManager.cgGlyph(at: i, isValidIndex: nil)
       self.append(withCGGlyph: CGGlyph(g), in: font)
     }
   } /* ⬷ for bear from 'anfang: Character'. */
@@ -57,17 +67,17 @@ extension NSBezierPath {
 func Renderimage(width: Int, height: Int, process: (NSGraphicsContext) -> Void) -> CGImage?
 {
    guard let plate = CGContext(data: nil, width: width, height: height, 
-     bitsPerComponent: 8, bytesPerRow: 0, 
-     space: CGColorSpace(name: CGColorSpace.sRGB)!, 
-     bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+    bitsPerComponent: 8, bytesPerRow: 0, 
+    space: CGColorSpace(name: CGColorSpace.sRGB)!, 
+    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
    let ns₋plate = NSGraphicsContext(cgContext: plate, flipped: true)
-   guard let previous = NSGraphicsContext.current else { return nil }
+   /* guard let previous = NSGraphicsContext.current else { return nil }
    previous.cgContext.saveGState(); NSGraphicsContext.current = ns₋plate
-   ns₋plate.cgContext.beginTransparencyLayer(auxiliaryInfo: nil)
+   ns₋plate.cgContext.beginTransparencyLayer(auxiliaryInfo: nil) */
    do { process(ns₋plate) }
-   ns₋plate.cgContext.endTransparencyLayer()
-   /* NSGraphicsContext.current = nil */
-   previous.cgContext.restoreGState()
+   /* ns₋plate.cgContext.endTransparencyLayer()
+   NSGraphicsContext.current = nil
+   previous.cgContext.restoreGState() */
    return plate.makeImage()
 }
 
@@ -119,3 +129,4 @@ class Interaction { var process: Process?
     self.process = proc
   }
 }
+

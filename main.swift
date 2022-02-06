@@ -1,7 +1,7 @@
 /*  main.swift | for Minimum. */
 
 import AppKit
-import ClibTwinbeam_and_cCubist;
+import ClibTwinbeam;
 
 @available(macOS 10.15, *)
 class Appdelegate: NSObject, NSApplicationDelegate {

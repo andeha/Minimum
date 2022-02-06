@@ -70,7 +70,7 @@ build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
 build $objs/built-altern.o: c ClibTwinbeam/built-altern.c
 build $objs/chrono-logy.o: c ClibTwinbeam/chrono-logy.c
 build $objs/chipher-rhode.o: c ClibTwinbeam/cipher-rhode.c
-build $objs/cubist-codex.o: c ClibTwinbeam/cubist-codex.c
+build $objs/codex-system.o: c ClibTwinbeam/codex-system.c
 build $objs/down-format.o: c ClibTwinbeam/down-format.c
 build $objs/draw-format.o: c ClibTwinbeam/draw-format.c
 build $objs/eight-utf.o: c ClibTwinbeam/eight-utf.c
@@ -93,7 +93,9 @@ build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build $appname: primary-compile-macswift main.swift histories.swift          $
  enriching.swift $objs/revision-print.o $objs/eight-utf.o                    $
- $objs/built-altern.o $objs/semantic-block.o
+ $objs/built-altern.o $objs/semantic-block.o $objs/present-print.o           $
+ $objs/endian-base.o $objs/symbol-texts.o $objs/codex-system.o               $
+ $objs/thread-fork.o
 build Minimum.app: assemble-macapp $appname
 default Minimum.app
 

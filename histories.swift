@@ -1,13 +1,13 @@
 /*  histories.swift | the Minimum log. */
 
 import AppKit
-import ClibTwinbeam_and_cCubist;
+import ClibTwinbeam;
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
 class Rendition {
    
    static let zinkwhite = NSColor(calibratedWhite: 0.99, alpha: 1.0)
-   static let systemfont = NSFont.systemFont(ofSize: 30.0), 
+   static let systemfont = NSFont.systemFont(ofSize: 11.0), 
     textfont = NSFont(name: "SF Mono", size: 11)!
    
    var default₋textattrs: [NSAttributedString.Key: Any] {
@@ -21,53 +21,28 @@ class Rendition {
    var unicodes = Array<UInt32>()
    var linebreaks = Array<Int>() /* ⬷ a․𝘬․a lf₋locations₋in₋unicodes. */
    var stateshift = Array<Int>() /* ⬷ \U2FED alt. \U2FEB locations₋in₋unicodes. */
+   enum State { case monotype, charcoals, formatted }
    struct section {
      var first₋unicode, last₋unicode, first₋line, last₋line: Int
-     var state: Minimumview.State
+     var state: Rendition.State
    }
    var sections = Array<section>()
-   var text₋sections = Array<String>()
-   var images = Array<CGImage>()
-   
-   var y₋offset = 0.0
+   var charcoals = Array<CGImage>()
+   var markdowns = Array<NSAttributedString>()
+
+   var y₋offset=0.0, cursor₋position=NSPoint(x: 0, y: 0)
    
    func line₋height(font: NSFont) -> CGFloat {
      let fontLineHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
      return fontLineHeight
    }
    
-   // func line₋width(line: CTLine) -> CGFloat {
-   //   var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
-   //   let width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
-   //   return width
-   // }
-   
-   // func draw₋line(attr: NSAttributedString, context: CGContext) {
-   //   let line = CTLineCreateWithAttributedString(attr)
-   //   CTLineDraw(line,context)
-   // }
-   
-   // func draw₋multiple₋lines(attr: NSAttributedString, context: CGContext) {
-   //   let typesetter = CTTypesetterCreateWithAttributedString(attr)
-   //   let breakIndex = CTTypesetterSuggestLineBreakWithOffset(typesetter, 0, 140, 0.0)
-   //   /* let clusterIndex = CTTypesetterSuggestClusterBreakWithOffset(typesetter, 0, 140, 0.0) */
-   //   let line1 = CTTypesetterCreateLine(typesetter, CFRange(location: 0, length: breakIndex))
-   //   let line2 = CTTypesetterCreateLine(typesetter, CFRange(location: breakIndex, length: attr.length - breakIndex))
-   //   context.textPosition = .init(x: 0, y: 150)
-   //   CTLineDraw(line1, context)
-   //   context.textPosition = .init(x: 0, y: 100)
-   //   CTLineDraw(line2, context)
-   // }
-   
-   func near₋visible₋region(y₋offset: CGFloat)
-   {
-      
-   }
+   func near₋visible₋region(y₋offset: CGFloat) { }
    
    func text₋height(font: NSFont) -> CGFloat
    {
      return CGFloat(linebreaks.count + 1)*line₋height(font: font)
-   } /* in bands of 'print' and 'draw'. */
+   } /* ⬷ in bands of 'print' and 'draw'. */
    
    func edit₋height(font: NSFont) -> CGFloat
    {
@@ -79,20 +54,121 @@ class Rendition {
      return text₋height(font: font) + edit₋height(font: font)
    }
    
-   func render₋image(width: Int, height: Int, text: String) -> CGImage?
-   {
-     let drawing = { (ctxt: NSGraphicsContext) -> Void in 
-       let umbra = CGColor(genericCMYKCyan: 0.34, magenta: 0.92, yellow: 0.8, black: 0.49, alpha: 1.0)
-       ctxt.setStrokeColor(umbra)
-       ctxt.setLineWidth(5.0) /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
-       ctxt.beginPath()
-       ctxt.move(to: CGPoint(x: 100, y: 100))
-       ctxt.addCurve(to: CGPoint(x: 150, y: 150), control1: CGPoint(x: 200, y: 200), control2: CGPoint(x: 174, y: 175))
-       ctxt.closePath()
-       ctxt.strokePath()
-     }
-     return Renderimage(width: width,height: height, process: drawing)
+  /* func line₋width(line: CTLine) -> CGFloat {
+     var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
+     let width = CTLineGetTypographicBounds(line,&ascent,&descent,&leading)
+     return width
+   } */
+   
+   func draw₋multiple₋lines(attr: NSAttributedString, context: CGContext) {
+     let typesetter = CTTypesetterCreateWithAttributedString(attr)
+     let breakIndex = CTTypesetterSuggestLineBreakWithOffset(typesetter, 0, 140, 0.0)
+     /* let clusterIndex = CTTypesetterSuggestClusterBreakWithOffset(typesetter, 0, 140, 0.0) */
+     let line1 = CTTypesetterCreateLine(typesetter, CFRange(location: 0, length: breakIndex))
+     let line2 = CTTypesetterCreateLine(typesetter, CFRange(location: breakIndex, length: attr.length - breakIndex))
+     context.textPosition = .init(x: 0, y: 150)
+     CTLineDraw(line1,context)
+     context.textPosition = .init(x: 0, y: 100)
+     CTLineDraw(line2,context)
    }
+   
+ /* func draw₋line(attr: NSAttributedString, context: CGContext) {
+     let line = CTLineCreateWithAttributedString(attr)
+     CTLineDraw(line,context)
+   } */
+   
+   func append₋keyput(_ uc: UInt32)
+   {
+     self.unicodes.append(uc)
+     let bound: CGRect = CTFontGetBoundingBox(Rendition.textfont)
+     self.cursor₋position.x += bound.width
+   }
+}
+
+func Render₋art(unicodes: Array<UInt32>, first₋unicode: Int, last₋unicode: Int) -> CGImage?
+{ var width: CInt=0, height: CInt=0
+  
+  unicodes.withUnsafeBytes { /* UnsafeRawBufferPointer */
+    let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+    guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+    let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
+    let count = CInt(last₋unicode - first₋unicode)
+    let y = parse₋art₋system(count,mutable₋start.advanced(by: first₋unicode),&width,&height)
+    if y != 0 { fatalError("error in parse₋art₋system") }
+  }
+  
+  let drawing = { (ctxt: NSGraphicsContext) -> Void in 
+      
+    let linewith = { (width: CDouble) in ctxt.cgContext.setLineWidth(width) },
+      
+     selectcolor = { (c: CDouble, m: CDouble, y: CDouble, blk: CDouble, a: CDouble) in 
+      let platform = CGColor(genericCMYKCyan: c, magenta: m, yellow: y, black: blk, alpha: a)
+      ctxt.cgContext.setStrokeColor(platform) },
+      
+     begin = { ctxt.cgContext.beginPath() },
+      
+     move = { (x: CDouble, y: CDouble) in ctxt.cgContext.move(to: CGPoint(x: x, y: y)) },
+      
+     curve = { (x: UnsafeMutablePointer<CDouble>?, y: UnsafeMutablePointer<CDouble>?) in 
+      let to=CGPoint(x: x![0], y: y![0]), ctrl1=CGPoint(x: x![1], y: y![1])
+      ctxt.cgContext.addCurve(to: to, control1: ctrl1, control2: CGPoint(x: x![2], y: y![2])) },
+      
+     straight = { (x: CDouble, y: CDouble) in ctxt.cgContext.addLine(to: CGPoint(x: x, y: y)) },
+      
+     closepath = { ctxt.cgContext.closePath() },
+      
+     stroke = { ctxt.cgContext.strokePath() }
+      
+     /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
+      
+     unicodes.withUnsafeBytes { /* UnsafeRawBufferPointer */
+       let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+       guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+       let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
+       let count = CInt(last₋unicode - first₋unicode)
+       let y = draw₋art₋system(count,mutable₋start.advanced(by: first₋unicode),selectcolor,
+        linewith,begin,move,curve,straight,closepath,stroke)
+       if y != 0 { fatalError("error in draw₋art₋system") }
+     }
+  }
+  return Renderimage(width: Int(width), height: Int(height), process: drawing)
+}
+
+func Render₋format(unicodes: Array<UInt32>, first₋unicode: Int, 
+ last₋unicode: Int) -> NSAttributedString?
+{
+  guard let boldfont = NSFont(name: "SF Mono Bold", size: 11) else { return nil }
+  let formatted = NSMutableAttributedString(string: "")
+  
+  let attributes = { (text: UnsafeMutablePointer<char32̄_t>?, offset: CInt, 
+   range: CInt, attribute: CInt) -> Void in 
+    if attribute ==  1 {
+      let raw = UnsafeMutableRawPointer(mutating: text!)
+      guard let text = String(bytesNoCopy: raw, length: Int(range), 
+       encoding: .utf32LittleEndian, freeWhenDone: false) else { return }
+      let augment = NSMutableAttributedString(string: text)
+      augment.addAttribute(NSAttributedString.Key.font, value: boldfont, 
+        range: NSMakeRange(0, text.count - 1))
+      formatted.append(augment)
+    }
+  }
+  
+  unicodes.withUnsafeBytes {
+    let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+    guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+    let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
+    let count = CInt(last₋unicode - first₋unicode)
+    let y = format₋system(count,mutable₋start.advanced(by: first₋unicode),attributes)
+    if y == 0 { formatted.draw(in: CGRect(x: 0, y: 0, width: 100, height: 100)) }
+    else { fatalError("error in render-format") }
+  }
+  return formatted
+}
+
+func Start₋render₋regional(width: Int, height: Int, retrospect₋rows: UInt32)
+{
+   let y = regional₋system(retrospect₋rows)
+   print("program ended returning \(y)")
 }
 
 class Minimumwindow: NSWindow {
@@ -139,7 +215,7 @@ class Minimumview: NSView {
      self.layerContentsRedrawPolicy = NSView.LayerContentsRedrawPolicy.onSetNeedsDisplay
      let later₋future: DispatchTime = .now() + .seconds(1)
      DispatchQueue.main.asyncAfter(deadline: later₋future) {
-       let frame₋update = NSRect(x: 0, y: 0, width: self.frame.width, 
+       let frame₋update = NSRect(x: self.frame.minX, y: self.frame.minY, width: self.frame.width, 
         height: self.frame.height)
        print("setNeedsDisplay \(frame₋update)")
        self.needsDisplay = true
@@ -154,8 +230,6 @@ class Minimumview: NSView {
    }
    
    override var isOpaque: Bool { false }
-
-   enum State { case print, draw, down₋83 }
    
    var controller: Viewcontroller {
      get { self.window!.contentViewController as! Viewcontroller }
@@ -181,8 +255,17 @@ class Minimumview: NSView {
 
 extension Minimumview { /* ⬷ text drawing. */
    
-   override func draw(_ dirty: CGRect) {
+   func document₋to₋view(_ r: CGRect) -> CGRect 
+   {
+     let y₋offset = self.controller.rendition.y₋offset
+     let y = self.frame.height - (r.minY - y₋offset)
+     return CGRect(x: r.minX, y: y, width: r.width, height: r.height)
+   }
+   
+   override func draw(_ dirty: CGRect)
+   {
      print("draw-rect: \(dirty) while self.frame is \(self.frame) and offset \(self.controller.rendition.y₋offset)")
+     /* draw₋watermark() */
      guard let context = NSGraphicsContext.current?.cgContext else { return }
      self.controller.rendition.unicodes.withUnsafeBytes {
        let raw = UnsafeMutableRawPointer(mutating: $0.baseAddress!)
@@ -201,10 +284,35 @@ extension Minimumview { /* ⬷ text drawing. */
         origin: NSPoint(x: 20, y: 20))
        Rendition.zinkwhite.set()
        anfang.stroke()
+       /* let str = self.controller.rendition.markdowns[0]
+       self.controller.draw₋multiple₋lines(attr: str, context: context) */
+       /* let image: CGImage = self.controller.rendition.charcoals[0]
+       let imgrect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+       context.draw(image, in: imgrect) */
      }
-     /* let first₋unicode=0, last₋unicode=0
-     self.viewcontroller.rendition.forEach.linebreaks { elem in } */
+     self.draw₋cursor(self.controller.rendition.cursor₋position)
      super.draw(dirty)
+   }
+   
+   func draw₋watermark()
+   {
+     if let url = Bundle.main.url(forResource: "background-coa", withExtension: "png") {
+       let material = try! Data(contentsOf: url)
+       if let image = NSImage(data: material) {
+         let dst = NSRect(x: bounds.width - 68, y: 4, width: 64, height: 100)
+         image.draw(in: dst, from: NSZeroRect, operation: NSCompositingOperation.sourceOver, fraction: 0.125)
+       }
+     }
+   }
+   
+   func draw₋cursor(_ p: NSPoint)
+   {
+      guard let context = NSGraphicsContext.current?.cgContext else { return }
+      context.setLineWidth(0.25); let x₋offset=0.0, y₋offset=5.0
+      let bound: CGRect = CTFontGetBoundingBox(Rendition.textfont)
+      var rect = CGRect(x: p.x - x₋offset, y: p.y + y₋offset, width: bound.width, height: bound.height)
+      rect = document₋to₋view(rect)
+      context.stroke(rect); print("cursorrect is \(rect)")
    }
 }
 
@@ -302,7 +410,7 @@ class Viewcontroller: NSViewController {
        let physical₋size = ovals[𝟶].deviceSize */
      }
    }
-  
+   
    override func touchesEnded(with event: NSEvent) {
      /* let instant: TimeInterval = event.timestamp */
      let ovals = event.touches(matching: .ended, in: view)
@@ -312,7 +420,7 @@ class Viewcontroller: NSViewController {
        moved₋touches.removeValue(forKey: identity)
      }
    }
-  
+   
    override func pressureChange(with event: NSEvent) {
      /* let instant: TimeInterval = event.timestamp */
      /* let pressure = event.pressure
@@ -364,7 +472,7 @@ class Windowcontroller: NSWindowController {
    
    var utf8₋bytes₋idx: Int = 0;
    let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
-   var previous₋state = Minimumview.State.print
+   var previous₋state = Rendition.State.monotype
    var opaque = UnsafeMutablePointer<Any>.allocate(capacity: 1)
    var twomem = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: Heap₋unalloc, 
     node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, text₋bytesize: Heap₋object₋size)
@@ -421,20 +529,16 @@ class Windowcontroller: NSWindowController {
               last₋unicode: last₋uc, first₋line: first₋line, 
               last₋line: last₋line, state: self.previous₋state)
              self.rendition.sections.append(section₋closed)
-             self.rendition.unicodes.withUnsafeBytes {
-               let raw = first₋uc + $0.baseAddress!
-               let mutableraw = UnsafeMutableRawPointer(mutating: raw)
-               let length = last₋uc - first₋uc
-               let text = String(bytesNoCopy: mutableraw, length: length, 
-                encoding: .utf32LittleEndian, freeWhenDone: false)
-               self.rendition.text₋sections.append(text!)
-             }
              if uc == 0x2FEF {
-               self.previous₋state = Minimumview.State.draw
+               let image: CGImage? = Render₋art(unicodes: self.rendition.unicodes, first₋unicode: first₋uc, last₋unicode: last₋uc)
+               if image != nil { self.rendition.charcoals.append(image!) }
+               self.previous₋state = Rendition.State.charcoals
              } else if uc == 0x2FEB {
-               self.previous₋state = Minimumview.State.print
+               self.previous₋state = Rendition.State.monotype
              } else if uc == 0x2FED {
-               self.previous₋state = Minimumview.State.down₋83
+               let text: NSAttributedString? = Render₋format(unicodes: self.rendition.unicodes, first₋unicode: first₋uc, last₋unicode: last₋uc)
+               if text != nil { self.rendition.markdowns.append(text!) }
+               self.previous₋state = Rendition.State.formatted
              }
            }
          }
@@ -442,6 +546,8 @@ class Windowcontroller: NSWindowController {
        DispatchQueue.main.async { self.minimumview.setNeedsDisplay(uc₋count,break₋count) }
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
+     let y = rendition.line₋height(font: Rendition.textfont)
+     self.rendition.cursor₋position = NSPoint(x: 0, y: y)
    }
 }
 
@@ -454,7 +560,7 @@ extension Windowcontroller { /* ⬷ keyboard input. */
      let text: unicode₋shatter = cell
      if rope₋append₋text(self.opaque,text,self.twomem) != 0 { return } */
      shell.slow₋write₋to₋child(uc)
-     self.rendition.unicodes.append(uc)
+     self.rendition.append₋keyput(uc)
      self.minimumview.setNeedsDisplay(uc₋count,break₋count)
    }
    override func keyDown(with event: NSEvent) {

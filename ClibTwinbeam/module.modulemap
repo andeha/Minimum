@@ -6,16 +6,6 @@ module ClibTwinbeam_with_History {
   header "history.h"
 }
 
-module ClibTwinbeam_and_cCubist {
-  header "header.h"
-  header "codex-cubist.h"
-}
-
-module ClibTwinbeam_and_ionist {
-  header "header.h"
-  header "codex-ionist.h"
-}
-
 module ClibTwinbeam { requires macos 
   
   module Arm_Simd { requires neon 

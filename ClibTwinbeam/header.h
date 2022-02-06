@@ -1,6 +1,5 @@
 /*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge for Si and O₂. */
 
-
 #if !defined __cplusplus
 #define MACRO static inline INLINED
 #define unionᵢ union
@@ -16,7 +15,7 @@ typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
 typedef unsigned long long  uint64_t;
 typedef long long           int64_t;
-#if defined  __mips__ || defined __armv6__ || defined espressif
+#if defined __mips__ || defined __armv6__ || defined espressif
 typedef unsigned long       uint32_t;
 typedef long                int32_t;
 typedef uint32_t            __builtin_uint_t;
@@ -399,12 +398,27 @@ EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
  const char * utf8format, ...) a⃝;
 EXT₋C int print(const char * utf8format, ...) a⃝;
-EXT₋C int markdown₋83(const char * utf8format, ...);
-EXT₋C int draw₋vector(int px, const char * utf8format, ...); /* includes image. */
-EXT₋C int interact₋regional(unsigned retrospect₋rows, int (*decree)(int64_t param));
+EXT₋C int markdown(const char * utf8format, ...); /* ⬷ eighty-three characters wide */
+EXT₋C int charcoals(const char * utf8format, ...); /* ⬷ includes setting images. */
+EXT₋C int interact(unsigned retrospect₋rows, double framesync₋Hz, 
+ int (*decree)(int64_t param));
 /* default state is 'print' to toggle 'draw', 'markdown' and 
  'print' use the unicodes U+2FEF (e2 bf af), U+2FED (e2 bf ad), 
- U+2FEB (e2 bf ab). */
+ U+2FEB (e2 bf ab), U+2fE7 (e2 bf a7). */
+EXT₋C int parse₋art₋system(int count, char32̄_t * text, int * width, int * height);
+typedef void (^Linewidth)(double width);
+typedef void (^Color)(double c, double m, double y, double blk, double a);
+typedef void (^Begin)(); typedef void (^Move)(double x, double y);
+typedef void (^Addcurve)(double x[], double y[]);
+typedef void (^Addstraight)(double x, double y);
+typedef void (^Closepath)();
+typedef void (^Stroke)();
+EXT₋C int draw₋art₋system(int count, char32̄_t * text, Color color, Linewidth 
+ linewidth, Begin begin, Move move, Addcurve curve, Addstraight straight, 
+ Closepath closepath, Stroke stroke);
+typedef void (^Attributes)(char32̄_t * text, int offset, int range, int attribute);
+EXT₋C int format₋system(int count, char32̄_t * text, Attributes attrs);
+EXT₋C int regional₋system(unsigned retrospect₋rows);
 
 #ifndef __cplusplus
 typedef int bool;

@@ -26,8 +26,7 @@ struct pending₋change { enum timeserie₋operation op;
 int append₋version(struct timeserie₋version₋row entry, struct structa * casette);
 int append₋temporal(struct timeserie₋temporal₋row entry, struct structa * casette);
 int append₋event(struct timeserie₋event₋row entry, struct structa * casette);
-int append₋checkpoint(struct timeserie₋checkpoint₋row entry, 
- struct structa * casette);
+int append₋checkpoint(struct timeserie₋checkpoint₋row entry, struct structa * casette);
 int append₋pending₋changes(struct pending₋change entry, struct structa * casette);
 
 #define events₋at (struct timeserie₋event₋row *)structa₋at

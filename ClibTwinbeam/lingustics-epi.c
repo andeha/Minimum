@@ -41,7 +41,7 @@ import Setjmp;
   
   clang -o x86_epitom-7 -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
-    -g -std=c2x -lc++ lingustics-epi.c ../Releases/libClibTwinbeam.a
+    -g -std=c2x -lc++ lingustics-epi.c 
   
   ./x86_epitom-7 ./express/comment.txt
   
