@@ -3,6 +3,8 @@
 import AppKit
 import ClibTwinbeam
 
+typealias Machine = __builtin_int_t;
+
 func ReapTwinbeam() {
   print("hello language-analysis-and-church")
   let pid: UInt64 = 0x17

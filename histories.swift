@@ -29,8 +29,74 @@ class Rendition {
    var sections = Array<section>()
    var charcoals = Array<CGImage>()
    var markdowns = Array<NSAttributedString>()
+   
+   var y₋offset=0.0, cursor₋index: Machine=0, cursor₋position=NSZeroRect
+   
+   var artstate: UnsafeMutableRawPointer? = nil
+   var rope₋memory = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: Heap₋unalloc, 
+    node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, text₋bytesize: Heap₋object₋size)
+   
+   func default₋cursor₋size(font: NSFont) -> NSSize {
+     let X: UInt32 = 88; return cursor₋size(X, font: font)
+   }
+   func cursor₋size(_ uc: UInt32, font: NSFont) -> NSSize {
+     guard let scalar = Unicode.Scalar(uc) else { print("error in cursor-size"); return default₋cursor₋size(font: font) }
+     let text = String(scalar)
+     let attr = NSAttributedString(string: text, attributes: self.default₋textattrs)
+     let line: CTLine = CTLineCreateWithAttributedString(attr)
+     let runs: CFArray /* of CTRun */ = CTLineGetGlyphRuns(line)
+     let count = CFArrayGetCount(runs)
+     print("count is \(count)")
+     let glyphs: [CGGlyph] = Array<CGGlyph>(unsafeUninitializedCapacity: count)
+       { (pointer, cnt) in
+         print("cnt is \(cnt)")
+         guard let address = pointer.baseAddress else { return }
+         guard let elemRef: UnsafeRawPointer = CFArrayGetValueAtIndex(runs,cnt) else { return }
+         print("elemRef \(elemRef)")
+         let run = elemRef.load(as: CTRun.self)
+         print("run is \(run)")
+         CTRunGetGlyphs(run,CFRange(location: -1, length: 0),address)
+       }
+     let advances = Array<CGSize>(unsafeUninitializedCapacity: count)
+       { (pointer, count) in
+         guard let address = pointer.baseAddress else { return }
+         CTFontGetAdvancesForGlyphs(font, .default, glyphs, 
+          address, glyphs.count)
+       }
+     print("advance is \(advances[0])")
+     return advances[0]
+   }
+}
 
-   var y₋offset=0.0, cursor₋position=NSPoint(x: 0, y: 0)
+extension Rendition { /* ⬷ arabic edit and the cursor location. */
+   
+   func index₋to₋line(idx: Machine) -> Int { return 0 }
+   
+   func beginning₋of₋line₋index(line: Int) -> Machine { return 0 }
+   
+   func impressions(line: Int) -> Int { return 0 }
+   
+   func index₋at₋previous₋line(idx: Machine) -> Machine { return 0 }
+   
+   func index₋at₋next₋line(idx: Machine) -> Machine { return 0 }
+   
+   func index₋to₋document₋rect(idx: Machine) -> NSRect
+   {
+      let line = index₋to₋line(idx: idx)
+      let uc: char32̄_t = rope₋index(self.artstate,idx)
+      let size = default₋cursor₋size(font: Rendition.textfont)
+      return NSMakeRect(0,0,size.width,size.height)
+   }
+   
+   func refresh₋cursor₋position(uc₋delta: Int, index: Machine)
+   {
+      let new₋idx = index + Machine(uc₋delta)
+      let bound: CGRect = index₋to₋document₋rect(idx: new₋idx)
+      self.cursor₋position = bound
+   }
+}
+
+extension Rendition { /* ⬷ document and text size. */
    
    func line₋height(font: NSFont) -> CGFloat {
      let fontLineHeight = CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
@@ -73,16 +139,9 @@ class Rendition {
    }
    
  /* func draw₋line(attr: NSAttributedString, context: CGContext) {
-     let line = CTLineCreateWithAttributedString(attr)
+     let line: CTLine = CTLineCreateWithAttributedString(attr)
      CTLineDraw(line,context)
    } */
-   
-   func append₋keyput(_ uc: UInt32)
-   {
-     self.unicodes.append(uc)
-     let bound: CGRect = CTFontGetBoundingBox(Rendition.textfont)
-     self.cursor₋position.x += bound.width
-   }
 }
 
 func Render₋art(unicodes: Array<UInt32>, first₋unicode: Int, last₋unicode: Int) -> CGImage?
@@ -296,7 +355,7 @@ extension Minimumview { /* ⬷ text drawing. */
    
    func draw₋watermark()
    {
-     if let url = Bundle.main.url(forResource: "background-coa", withExtension: "png") {
+     if let url = Bundle.main.url(forResource: "watermark-coa", withExtension: "png") {
        let material = try! Data(contentsOf: url)
        if let image = NSImage(data: material) {
          let dst = NSRect(x: bounds.width - 68, y: 4, width: 64, height: 100)
@@ -305,14 +364,13 @@ extension Minimumview { /* ⬷ text drawing. */
      }
    }
    
-   func draw₋cursor(_ p: NSPoint)
+   func draw₋cursor(_ rect: NSRect)
    {
       guard let context = NSGraphicsContext.current?.cgContext else { return }
-      context.setLineWidth(0.25); let x₋offset=0.0, y₋offset=5.0
-      let bound: CGRect = CTFontGetBoundingBox(Rendition.textfont)
-      var rect = CGRect(x: p.x - x₋offset, y: p.y + y₋offset, width: bound.width, height: bound.height)
-      rect = document₋to₋view(rect)
-      context.stroke(rect); print("cursorrect is \(rect)")
+      context.setLineWidth(0.25)
+      let r = document₋to₋view(rect)
+      context.stroke(r)
+      print("cursorrect is \(r)")
    }
 }
 
@@ -470,13 +528,10 @@ class Windowcontroller: NSWindowController {
    var minimumview: Minimumview { viewctrl.view.subviews[0] as! Minimumview }
    var rendition: Rendition { viewctrl.representedObject as! Rendition }
    
+   /* utf8-parser: */
    var utf8₋bytes₋idx: Int = 0;
    let maxfour = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
    var previous₋state = Rendition.State.monotype
-   var opaque = UnsafeMutablePointer<Any>.allocate(capacity: 1)
-   var twomem = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: Heap₋unalloc, 
-    node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, text₋bytesize: Heap₋object₋size)
-   /* maxfour.deallocate(); opaque.deallocate() */
    
    override func windowDidLoad() { print("windowDidLoad") 
      self.viewctrl.representedObject = Rendition()
@@ -547,33 +602,99 @@ class Windowcontroller: NSWindowController {
      }
      shell.commence(execute: "zsh", parameters: [], path₋exe: "/bin/")
      let y = rendition.line₋height(font: Rendition.textfont)
-     self.rendition.cursor₋position = NSPoint(x: 0, y: y)
+     let cursor = self.rendition.default₋cursor₋size(font: Rendition.textfont)
+     self.rendition.cursor₋position = NSMakeRect(0,y,cursor.width,cursor.height)
    }
 }
 
 extension Windowcontroller { /* ⬷ keyboard input. */
-   func keyput(_ uc: UInt32) {
-     print("writing \(uc) to child")
-     let uc₋count = self.rendition.unicodes.count
-     let break₋count = self.rendition.linebreaks.count
-     /* let cell: UnsafeMutableRawPointer = Heap₋alloc(4)
-     let text: unicode₋shatter = cell
-     if rope₋append₋text(self.opaque,text,self.twomem) != 0 { return } */
-     shell.slow₋write₋to₋child(uc)
-     self.rendition.append₋keyput(uc)
-     self.minimumview.setNeedsDisplay(uc₋count,break₋count)
+   func character₋keyput(_ uc: UInt32) {
+     var unicode = uc
+     let unicodes = Unicodes(tetras: 1, unicodes: &unicode)
+     let text: unicode₋shatter = copy₋to₋shatter(unicodes)
+     var inner: UnsafeMutableRawPointer? = nil
+     let y₁ = rope₋append₋text(&inner,text,self.rendition.rope₋memory)
+     if y₁ != 0 { fatalError("error in rope₋append₋text") }
+     let idx: Machine = Machine(self.rendition.cursor₋index)
+     let y₂ = rope₋insert(&self.rendition.artstate,idx,inner,self.rendition.rope₋memory)
+     if y₂ != 0 { fatalError("error in rope₋insert") }
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
    }
+   func transmit(_ uc: UInt32) {
+     let count: Machine = rope₋length(self.rendition.artstate)
+     for idx in 0 ..< count {
+       let unicode: char32̄_t = rope₋index(self.rendition.artstate,idx)
+       shell.slow₋write₋to₋child(unicode)
+       print("transmitted \(unicode) to child")
+       self.rendition.unicodes.append(unicode)
+     }
+     self.rendition.unicodes.append(uc)
+     self.rendition.refresh₋cursor₋position(uc₋delta: 1, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func delete() {
+     let idx: Machine=self.rendition.cursor₋index
+     let y = rope₋delete(&self.rendition.artstate,idx,1,self.rendition.rope₋memory)
+     if y != 0 { fatalError("error in rope-delete") }
+     rendition.refresh₋cursor₋position(uc₋delta: -1, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func left₋cursor() {
+     rendition.refresh₋cursor₋position(uc₋delta: -1, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func right₋cursor() {
+     rendition.refresh₋cursor₋position(uc₋delta: 1, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func up₋cursor() {
+     let new₋idx = self.rendition.index₋at₋previous₋line(idx: self.rendition.cursor₋index)
+     let diff = Int(self.rendition.cursor₋index - new₋idx)
+     rendition.refresh₋cursor₋position(uc₋delta: diff, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func down₋cursor() {
+     let new₋idx = self.rendition.index₋at₋next₋line(idx: self.rendition.cursor₋index)
+     let diff = Int(new₋idx - self.rendition.cursor₋index)
+     rendition.refresh₋cursor₋position(uc₋delta: diff, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func linestart() {
+     let line = rendition.index₋to₋line(idx: self.rendition.cursor₋index)
+     let idx₋begin = rendition.beginning₋of₋line₋index(line: line)
+     let diff = Int(idx₋begin - self.rendition.cursor₋index)
+     rendition.refresh₋cursor₋position(uc₋delta: diff, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func lineend() {
+     let line = rendition.index₋to₋line(idx: self.rendition.cursor₋index)
+     let idx₋begin = rendition.beginning₋of₋line₋index(line: line)
+     let length = rendition.impressions(line: line)
+     let diff = Int(self.rendition.cursor₋index - idx₋begin) + length
+     rendition.refresh₋cursor₋position(uc₋delta: diff, index: self.rendition.cursor₋index)
+     self.minimumview.setNeedsDisplay(self.minimumview.frame)
+   }
+   func last₋noncomitted₋character₋is₋backslash() -> Bool { return false }
    override func keyDown(with event: NSEvent) {
      if let characters = event.characters {
        for symbol: Character in characters {
+         if symbol.unicodeScalars.count != 1 { print("multiple scalars for character") }
          for possibly₋canonic in symbol.unicodeScalars {
            var uc: UInt32 = possibly₋canonic.value
-           if uc == 0xd { uc = 0xa } 
+           print("char is \(uc)")
+           if uc == 0xd { uc = 0xa }
            let shift₋pressed = self.minimumwindow.shift
-           if shift₋pressed && uc == 0xa { } /* ⬷ shift+return alternatively linebreak alternatively '\' to write next line. */
-           else if !shift₋pressed && uc == 0xa { /* send to child. */}
-           else { }
-           keyput(uc)
+           if shift₋pressed && uc == 0xa { character₋keyput(uc) }
+           else if uc == 0xa && last₋noncomitted₋character₋is₋backslash() { character₋keyput(uc) }
+           else if !shift₋pressed && uc == 0xa { transmit(uc) }
+           else if uc == 127 { delete() }
+           else if uc == 63234 { left₋cursor() }
+           else if uc == 63235 { right₋cursor() }
+           else if uc == 63232 { up₋cursor() }
+           else if uc == 63233 { down₋cursor() }
+           else if uc == 1 { linestart() }
+           else if uc == 5 { lineend() }
+           else { character₋keyput(uc) }
          }
        }
      }

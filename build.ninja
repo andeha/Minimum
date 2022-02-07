@@ -95,7 +95,7 @@ build $appname: primary-compile-macswift main.swift histories.swift          $
  enriching.swift $objs/revision-print.o $objs/eight-utf.o                    $
  $objs/built-altern.o $objs/semantic-block.o $objs/present-print.o           $
  $objs/endian-base.o $objs/symbol-texts.o $objs/codex-system.o               $
- $objs/thread-fork.o
+ $objs/thread-fork.o $objs/arabic-edit.o $objs/x-error-stack.o
 build Minimum.app: assemble-macapp $appname
 default Minimum.app
 

@@ -528,7 +528,7 @@ struct two₋memory {
 
 typedef char32̄_t * unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
 EXT₋C void unalloc₋shatter(unicode₋shatter shat);
-EXT₋C unicode₋shatter branch₋to₋shatter(struct Unicodes ucs);
+EXT₋C unicode₋shatter copy₋to₋shatter(struct Unicodes ucs);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
  struct two₋memory dynmem);
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
