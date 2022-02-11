@@ -2,7 +2,7 @@
 
 import ClibTwinbeam;
 
-unicode₋shatter branch₋to₋shatter(struct Unicodes ucs)
+unicode₋shatter copy₋to₋shatter(struct Unicodes ucs)
 {
    __builtin_int_t bytes = ucs.tetras*4;
    void * storage = Alloc(bytes);
@@ -142,7 +142,7 @@ inexorable int rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
    if (idx > rope₋length(opaque)) { return -1; }
    struct ¹stack node₋stack;
    if (init₋stack(&node₋stack, sizeof(struct node))) { return -2; }
-   push(&node₋stack,(uint8_t *)root₋node);
+   push(&node₋stack,(uint8_t *)&root₋node);
    __builtin_int_t current₋idx=0;
    while (!empty(&node₋stack)) {
      struct node * elem = (struct node *)pop(&node₋stack);
@@ -170,8 +170,8 @@ inexorable int rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
        current₋idx += weight;
      }
      else {
-       push(&node₋stack,(uint8_t *)(elem->left));
-       push(&node₋stack,(uint8_t *)(elem->right));
+       push(&node₋stack,(uint8_t *)&(elem->left));
+       push(&node₋stack,(uint8_t *)&(elem->right));
      }
    }
    *lhs=out₋lhs; *rhs=out₋rhs;

@@ -2,7 +2,9 @@
 
 import ClibTwinbeam;
 
-int charcoals(int px, const char * utf8format, ...)
+EXT₋C long write(int fd, const void * s, long unsigned nbyte);
+
+int charcoals(const char * utf8format, ...)
 {
    int y; va_prologue(utf8format);
    typedef void (^Out)(char8₋t *, __builtin_int_t);
