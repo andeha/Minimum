@@ -41,7 +41,9 @@ import Setjmp;
   
   clang -o x86_epitom-7 -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"       \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
-    -g -std=c2x -lc++ lingustics-epi.c 
+    -g -std=c2x -lc++ lingustics-epi.c tiles-map.c present-print.c            \
+    built-altern.c symbol-texts.c eight-utf.c round-fixed.c x-error-stack.c   \
+    endian-base.c semantic-block.c
   
   ./x86_epitom-7 ./express/comment.txt
   
@@ -179,7 +181,7 @@ void Diagnos(int type, void * /* lexer₋alt₋detail */ ctx, int bye, char * te
   }
   typedef void (^Utf8)(char8₋t * u8s, __builtin_int_t bytes);
   Utf8 out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1,(const void *)u8s,bytes); };
-  print(out,"⬚:⬚:⬚—⬚ ", ﹟s(src₋path), ﹟d(lineno₋first), ﹟d(first₋column), 
+  print(out,"⬚:⬚:⬚—⬚ ", ﹟s8(src₋path), ﹟d(lineno₋first), ﹟d(first₋column), 
    ﹟d(last₋column));
   print﹟(out, text, __various);
   print(out, " (⬚ line", ﹟d(linecount));
@@ -355,8 +357,8 @@ static void match(enum token expected, lexer * context,
      if (!first₋time) { current=gal₋out₊₁; lookahead = retrospect; }
      retrospect = next₋token(context,&gal₋out₊₁);
    } else { Diagnos(1,&current,0,"error: syntax expected ⬚, got ⬚.", 
-    ﹟s(tokenname(expected)), 
-    ﹟s(tokenname(lookahead))); }
+    ﹟s7(tokenname(expected)), 
+    ﹟s7(tokenname(lookahead))); }
 }
 
 static int optional₋sometime₋match(enum token expected, enum token conditional, 
@@ -375,7 +377,7 @@ static void parse₋affidare(lexer * ctx);
 static void parse₋circum(lexer * ctx);
 
 void Ⓑ(struct token₋detail regular₋alt₋ident) { print(" ⬚ ", ﹟d(regular₋alt₋ident.kind)); 
-  print("ASSIGN to '⬚' ", ﹟S₁(regular₋alt₋ident.store.regular𝘖rIdent.symbols, 
+  print("ASSIGN to '⬚' ", ﹟S(regular₋alt₋ident.store.regular𝘖rIdent.symbols, 
    regular₋alt₋ident.store.regular𝘖rIdent.start));
 }
 void Ⓒ(enum token op) { print("BIADD/BISUB "); 
@@ -463,7 +465,7 @@ static void parse₋circum(lexer * s₋ctxt)
     }
     break;
    default: Diagnos(1,&current,0,"error: expecting IDENT, LPAREN and NUMERIC₋CONST, "
-    "got ⬚.", ﹟s(tokenname(lookahead))); break;
+    "got ⬚.", ﹟s7(tokenname(lookahead))); break;
    }
 }
 
@@ -472,7 +474,7 @@ void print₋tokens(lexer * bag, struct token₋detail * gritty)
 again:
    lookahead = next₋token(bag,gritty);
    char * text = tokenname(lookahead);
-   print("⬚ ", ﹟s(text));
+   print("⬚ ", ﹟s7(text));
    if (lookahead == END₋OF₋TRANSMISSION) { print("\n\n"); return; }
    goto again;
 }
@@ -483,7 +485,7 @@ again:
    uc = *(i + text);
    if (uc == 0x0004) { print("(ext₋count=⬚)\n", ﹟d(ext₋count)); return; }
    print("U+");
-   Base𝕟((__builtin_uint_t)uc,16,4,^(char 𝟶to𝟿) { print("⬚", ﹟c(𝟶to𝟿)); });
+   Base𝕟((__builtin_uint_t)uc,16,4,^(char 𝟶to𝟿) { print("⬚", ﹟c7(𝟶to𝟿)); });
    if (uc & 0xffff0000) { ext₋count += 1; print("⌜"); } else { print(" "); }
    i += 1; goto again;
 }
@@ -514,14 +516,14 @@ main(
    lexer bag; char8₋t * binary = (char8₋t *)argv[0];
    if (argc != 2) { print("usage: ⬚ file \n", ﹟s8(binary)); return 1; }
    char8₋t * model = (char8₋t *)argv[1]; /* u8"./test.txt" */
-   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s(model)); return 2; }
+   if (context₋init(model,&bag)) { print("incomprehensible ⬚\n", ﹟s8(model)); return 2; }
    if (bag.symbols == 0) { return 2; }
    debugbuild(&bag,&current); short bytes₋per₋elem = 16;
    if (init₋stack(&🥞,bytes₋per₋elem)) { return 3; }
    lookahead = next₋token(&bag,&current);
    parse₋assign(&bag); lookahead = next₋token(&bag,&current);
    if (lookahead == END₋OF₋TRANSMISSION) print("parsing successful.\n");
-   else print("parsing unsuccessful, found '⬚' token.\n", ﹟s(tokenname(lookahead)));
+   else print("parsing unsuccessful, found '⬚' token.\n", ﹟s7(tokenname(lookahead)));
    /* stack₋unalloc(&🥞); */
    /* set₋parse(3, { "./express/comment.txt", "./express/optimal.txt", "./express/natural.txt" }); */
    context₋deinit(&bag);

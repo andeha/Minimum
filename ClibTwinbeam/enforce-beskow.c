@@ -1,13 +1,26 @@
-/*  enforce-beskow.c | cryptic and postable material. */
+/*  enforce-beskow.c | cryptic and postable alternatively non-storable material 
+ with artistic padding. (LATER-POSSIBLY-MAYBE.) */
 
-import ClibTwinbeam; /* and because of .c not 'import After_9'. */
+import ClibTwinbeam;
 import CString;
 
 /*
    
+   Hamming and /soundex/ substitution and least commonly used when a word is not in 
+   
+   [Twinbeam]--<Apps>--<macOS>--<material>--<svenska-ord.txt>
+   
+   nor in [www-cs-faculty.stanford.edu]--<~knuth>--<programs.html>--<wordlists.tgz>
+   
+   files sorted-different.
+   
+   compile with:
+   
    clang -o x86_stegagraph -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"  \
      -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap   \
-     -g -std=c2x -lc++ enforce-beskow.c ../Releases/libClibTwinbeam.a
+     -g -std=c2x -lc++ enforce-beskow.c built-altern.c cipher-rhode.c       \
+     present-print.c amend-tape.c eight-utf.c semantic-block.c tiles-map.c  \
+     regular-pool.c endian-base.c symbol-texts.c
    
    ./x86_stegagraph encrypt ./express/testimony.txt
    
@@ -23,11 +36,6 @@ __builtin_int_t Beskow₋bytes() { return 2 + sizeof(wording₋beskow)/sizeof(*w
 Structa code₋key₋pool, text₋word₋pool, message₋words, code₋key₋words;
 /* ⬷ two regularpools and three vector<Nonabsolute>. */
 
-ALLOC Alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-FALLOW Fallow = ^(void * p) { Heap₋unalloc(p); };
-REALLOC Realloc = ^(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); };
-DIDALLOC Didalloc = ^(void * p) { return Heap₋object₋size(p); };
-
 int
 main(
   int argc, 
@@ -40,13 +48,15 @@ main(
    __builtin_int_t utf8₋bytes; uint8_t * utf8₋textmaterial;
    if (Twinbeam₋mmap(canonicalUtf8RegularOrLinkpath,0,0,0,&utf8₋bytes,&utf8₋textmaterial)) { return 2; }
    if (utf8₋textmaterial == ΨΛΩ) { return 3; }
-   if (init₋regularpool(&code₋key₋pool) && init₋regularpool(&text₋word₋pool)) { return 5; }
-   if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words)) { return 7; }
-   if (structa₋init(sizeof(Nonabsolute),4096,&message₋words)) { return 8; }
+   ALLOC alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
+   FALLOW fallow = ^(void * p) { Heap₋unalloc(p); };
+   if (init₋regularpool(&code₋key₋pool,alloc) && init₋regularpool(&text₋word₋pool,alloc)) { return 5; }
+   if (structa₋init(sizeof(Nonabsolute),4096,&code₋key₋words,alloc)) { return 7; }
+   if (structa₋init(sizeof(Nonabsolute),4096,&message₋words,alloc)) { return 8; }
    __builtin_int_t beskow₋bytes = Beskow₋bytes();
    if (read₋utf8₋exposition(beskow₋bytes,wording₋beskow,&code₋key₋pool,&code₋key₋words)) { return 10; }
    if (read₋utf8₋exposition(utf8₋bytes,utf8₋textmaterial,&text₋word₋pool,&message₋words)) { return 11; }
-   __builtin_int_t message₋word₋count = structa₋bytes(&message₋words)/sizeof(Nonabsolute), i=0;
+   __builtin_int_t message₋word₋count = structa₋count(&message₋words), i=0;
    Nonabsolute mess, bijection; struct Unicodes text;
 again:
    if (i >= message₋word₋count) { goto unagain; }
@@ -61,10 +71,10 @@ again:
    print("⬚ ", ﹟S(text.tetras,text.unicodes));
    goto again;
 unagain:
-   if (optional₋uninit₋regularpool(&text₋word₋pool)) { return 12; }
-   if (deinit₋structa(&message₋words)) { return 13; }
-   if (optional₋uninit₋regularpool(&code₋key₋pool)) { return 14; }
-   if (deinit₋structa(&code₋key₋words)) { return 15; }
+   if (optional₋uninit₋regularpool(&text₋word₋pool,fallow)) { return 12; }
+   if (deinit₋structa(&message₋words,fallow)) { return 13; }
+   if (optional₋uninit₋regularpool(&code₋key₋pool,fallow)) { return 14; }
+   if (deinit₋structa(&code₋key₋words,fallow)) { return 15; }
    return 0;
 }
 
