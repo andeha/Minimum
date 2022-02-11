@@ -10,8 +10,6 @@ import CString;
    
    [Twinbeam]--<Apps>--<macOS>--<material>--<svenska-ord.txt>
    
-   nor in [www-cs-faculty.stanford.edu]--<~knuth>--<programs.html>--<wordlists.tgz>
-   
    files sorted-different.
    
    compile with:
