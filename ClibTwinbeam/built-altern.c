@@ -1,7 +1,11 @@
-/*  built-altern.cpp | builtin and manually tuned. */
+/*  built-altern.cpp | two-sided builtin and manually tuned. */
 
 import ClibTwinbeam;
 import Mapfile;
+
+EXT₋C void * Alloc(__builtin_int_t bytes) { return Heap₋alloc(bytes); }
+EXT₋C void Fallow(void * p) { Heap₋unalloc(p); }
+EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes) { return Heap₋realloc(p,to₋bytes); }
 
 EXT₋C void * Heap₋alloc(__builtin_int_t bytes) { return malloc(bytes); }
 

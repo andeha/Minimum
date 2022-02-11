@@ -331,10 +331,9 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
-EXT₋C void * (^Alloc)(__builtin_int_t);
-EXT₋C void (^Fallow)(void *);
-EXT₋C void * (^Realloc)(void * p, __builtin_int_t to₋bytes);
-EXT₋C __builtin_int_t (^Didalloc)(void * p);
+EXT₋C void * Alloc(__builtin_int_t);
+EXT₋C void Fallow(void *);
+EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes);
 
 typedef void * (^ALLOC)(__builtin_int_t);
 typedef void (^FALLOW)(void *);
@@ -354,6 +353,7 @@ int CoalescingAcquire(unsigned expeditionary, void **𝟺kbframes, __builtin_int
 int 🄕allo⒲(unsigned expeditionary, void **𝟺kbpages, __builtin_int_t ﹟);
 /* void intel₋/mips₋mzda₋Reservoir(unsigned expeditionary, 𝟺kbframes * one₋set, 
  __builtin_int_t * pages₋in₋expedition); */
+/* ⬷ also ARC and GB-collect. */
 EXT₋C₋FROM
 
 EXT₋C void * Heap₋alloc(__builtin_int_t bytes);
@@ -402,9 +402,9 @@ EXT₋C int markdown(const char * utf8format, ...); /* ⬷ eighty-three characte
 EXT₋C int charcoals(const char * utf8format, ...); /* ⬷ includes setting images. */
 EXT₋C int interact(unsigned retrospect₋rows, double framesync₋Hz, 
  int (*decree)(int64_t param));
-/* default state is 'print' to toggle 'draw', 'markdown' and 
+/* default state is 'print'. To toggle 'charcoal', 'markdown' and 
  'print' use the unicodes U+2FEF (e2 bf af), U+2FED (e2 bf ad), 
- U+2FEB (e2 bf ab), U+2fE7 (e2 bf a7). */
+ U+2FEB (e2 bf ab). Interact is U+2fE7 (e2 bf a7). */
 EXT₋C int parse₋art₋system(int count, char32̄_t * text, int * width, int * height);
 typedef void (^Linewidth)(double width);
 typedef void (^Color)(double c, double m, double y, double blk, double a);
