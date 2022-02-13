@@ -2,17 +2,17 @@
 
 import ClibTwinbeam;
 
-unicode₋shatter copy₋to₋shatter(struct Unicodes ucs)
+unicode₋shatter persist₋as₋shatter(struct Unicodes ucs)
 {
    __builtin_int_t bytes = ucs.tetras*4;
-   void * storage = Alloc(bytes);
+   void * storage = Heap₋alloc(bytes);
    Copy8Memory(storage,(ByteAlignedRef)(ucs.unicodes),bytes);
    return (unicode₋shatter)storage;
 }
 
-void unalloc₋shatter(unicode₋shatter shatter)
+void unalloc₋shatter(unicode₋shatter text)
 {
-   Fallow(shatter);
+   Fallow(text);
 }
 
 inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
@@ -60,8 +60,8 @@ inexorable int rope₋wedge(struct node * root, struct node * leaf,
    return 0;
 }; /* ⬷ a․𝘬․a make₋branch₋alternatively₋two. */
 
-int rope₋append₋text(void ᶿ﹡* opaque₋root, unicode₋shatter text, struct two₋memory 
- dynmem)
+int rope₋append₋text(void ᶿ﹡* opaque₋root, unicode₋shatter text, struct 
+ two₋memory dynmem)
 { struct node *root₋node=(struct node *)*opaque₋root, 
     *branch₋node=(struct node *)ΨΛΩ, /* non-root and root branch. */
     *leaf₋node=(struct node *)ΨΛΩ;

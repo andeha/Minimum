@@ -152,7 +152,6 @@ struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 #define KEYPUTS(x) ((signed char *)(x))
 #define UC(x) ((char32̄_t *)(U##x))
 #define U8(x) ((char8₋t *)(u8##x))
-#define UNICODES(s) ᵊ(UC(s))
 
 EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
@@ -288,7 +287,7 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
      unsigned fraction : 7;
      unsigned exponent : 8;
      unsigned sign     : 1;
-   } bfloat16; /* ⬷ ubiquitous. ARMv8.6-A and 𝘦.𝘨 'BFCVT'. */
+   } bfloat16; /* ⬷ ubiquitous. ARMv8.6-A and 𝘦․𝘨 'BFCVT'. */
    unsigned short bits;
    half location;
 } pythagorean_double;
@@ -334,6 +333,9 @@ EXT₋C void NumberformatCatalogue₋Presentᵧ(half val,
 EXT₋C void * Alloc(__builtin_int_t);
 EXT₋C void Fallow(void *);
 EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes);
+/* you can assume a guarantee that the platform code never calls 
+ Alloc/Fallow/Realloc, but Heap-alloc et al. or ContigousAcquire, 
+ and that one set of functions is called by Alloc/Fallow/Realloc. */
 
 typedef void * (^ALLOC)(__builtin_int_t);
 typedef void (^FALLOW)(void *);
@@ -518,17 +520,29 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
  as @convention(block) (__builtin_uint_t) -> Void */
 typedef struct structa Structa;
 
+#define UNICODES(s) ᵊ(UC(s))
+
+MACRO struct Unicodes ᵊ(const char32̄_t * literal) { 
+ char32̄_t * ucs = (char32̄_t *)literal; 
+ __builtin_int_t count = TetrasUntilNull(ucs, BUILTIN₋INT₋MAX);
+ struct Unicodes y = { count, ucs };
+ return y; }
+
+typedef void * (*Text₋alloc)(__builtin_int_t bytes);
+
+#define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
+
 struct two₋memory {
-  void (*text₋dealloc)(void *);
-  void (*node₋dealloc)(void *);
-  void * (*node₋alloc)(__builtin_int_t bytes);
-  void * (*text₋alloc)(__builtin_int_t bytes);
-  __builtin_int_t (*text₋bytesize)(void *);
+  void (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋dealloc)(void *);
+  void (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 node₋dealloc)(void *);
+  void * (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 node₋alloc)(__builtin_int_t bytes);
+  Text₋alloc 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋alloc;
+  __builtin_int_t (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋bytesize)(void *);
 };
 
 typedef char32̄_t * unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
-EXT₋C void unalloc₋shatter(unicode₋shatter shat);
-EXT₋C unicode₋shatter copy₋to₋shatter(struct Unicodes ucs);
+EXT₋C void unalloc₋shatter(unicode₋shatter text);
+EXT₋C unicode₋shatter persist₋as₋shatter(struct Unicodes ucs);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
  struct two₋memory dynmem);
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
@@ -551,27 +565,27 @@ EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿, FALLOW fallow
 EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[], ALLOC alloc);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
-/* ⬷ note operating system releases allocated memory space and pages when program ends. */
-/* ⬷ enough space to store all Unicode symbols in an utf-8 file 
- may be found from the file's byte length. */
+/* ⬷ note operating system releases allocated memory space and pages when 
+ program ends. */
+/* ⬷ enough space to store all Unicode symbols in an utf-8 file may be found 
+ from the file's byte length. */
 
 #if defined 𝟷𝟸𝟾₋bit₋integers
 struct regularprint { void ᶿ﹡ opaque; };
-typedef void * (^Leaf₋alloc)(__builtin_int_t bytes);
 /* EXT₋C int textual₋similar(struct symbolpool * 🅡, struct Unicodes uc₁, 
  Nonabsolute relative); */
 EXT₋C void ᶿ﹡ store₋impression(struct regularprint * 🅡, __uint128_t fineprint, 
- Leaf₋alloc alloc);
+ ALLOC alloc);
 EXT₋C void ᶿ﹡ seek₋impression(struct regularprint * 🅡, __uint128_t fineprint);
 #if defined __cplusplus
 template <typename Note> Note * jot(Unicodes regular, struct regularprint * 🅡)
 {
-  __uint128_t fineprint = 0;
-  void ᶿ﹡ node = seek₋impression(🅡,fineprint);
+  __uint128_t fineprint=0; void ᶿ﹡ node;
+  node = seek₋impression(🅡,fineprint);
   if (node == ΨΛΩ) {
-    Leaf₋alloc leaf₋alloc = ^(__builtin_int_t bytes) { return Alloc(bytes); };
-    void ᶿ﹡ node2 = store₋impression(🅡,fineprint,leaf₋alloc);
-  } else { return ; }
+    ALLOC alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
+    void ᶿ﹡ node = store₋impression(🅡,fineprint,alloc);
+  } else { return node; }
 }
 #endif
 #endif
@@ -599,7 +613,7 @@ int init₋typewriter(struct remmingway * 🅡);
 int append₋characters(struct Unicodes text, struct remmingway * 🅡);
 int delete₋character(struct remmingway * 🅡);
 int insert₋character(struct remmingway * 🅡);
-int uninit₋remm(struct remmingway * 🅡);
+int uninit₋typewriter(struct remmingway * 🅡);
 
 struct ¹stack { uint8_t * words; 
  __builtin_int_t size, elem₋bytesize, pos;
@@ -678,19 +692,6 @@ EXT₋C int Twinbeam₋mmap(char8₋t * canonicalUtf8RegularOrLinkpath,
 
 EXT₋C void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *);
-
-typedef half Artnumerical;
-/* ⬷ and neither 'struct sequent' nor 'struct Artnumerical { half value; }' for Swift half literal. */
-
-struct A₋point { Artnumerical x,y; };
-struct Illustration { double size, place₋origo, offset₋drawing₋on; };
-EXT₋C int Draw₋Bezier(int columns, int count, struct Illustration * ctxt, struct A₋point, ...);
-/* ⬷ arbitrary number of other points. ⤐ */
-typedef void (^Visual)(struct Plate layer, bool * stop);
-EXT₋C int Set₋text(struct Unicodes symbols, struct A₋point start, int mode, Visual plates);
-EXT₋C int Define₋image(struct 𝟽bit₋text regular, char base₋22, int ansamla);
-EXT₋C int Place₋image(struct 𝟽bit₋text regular, struct A₋point p₁, struct A₋point p₂, int mode);
-typedef struct A₋point A₋size; /* ⬷ a․𝘬․a ground₋size alt․ nested₋size. */
 
 typedef __builtin_int_t version₋ts;
 struct timeserie { Structa pendings; void * currents, *uncommits; 

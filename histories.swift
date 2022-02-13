@@ -1,7 +1,7 @@
 /*  histories.swift | the Minimum log. */
 
 import AppKit
-import ClibTwinbeam;
+import ClibTwinbeam
 import Metal /* ⬷ alt․ AppKit + Metal. */
 
 class Rendition {
@@ -33,39 +33,70 @@ class Rendition {
    var y₋offset=0.0, cursor₋index: Machine=0, cursor₋position=NSZeroRect
    
    var artstate: UnsafeMutableRawPointer? = nil
-   var rope₋memory = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: Heap₋unalloc, 
-    node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, text₋bytesize: Heap₋object₋size)
+   var rope₋memory = two₋memory(text₋dealloc: Heap₋unalloc, node₋dealloc: 
+    Heap₋unalloc, node₋alloc: Heap₋alloc, text₋alloc: Heap₋alloc, 
+    text₋bytesize: Heap₋object₋size)
    
    func default₋cursor₋size(font: NSFont) -> NSSize {
      let X: UInt32 = 88; return cursor₋size(X, font: font)
    }
    func cursor₋size(_ uc: UInt32, font: NSFont) -> NSSize {
-     guard let scalar = Unicode.Scalar(uc) else { print("error in cursor-size"); return default₋cursor₋size(font: font) }
+     guard let scalar = Unicode.Scalar(uc) else {
+       print("error in cursor-size")
+       return default₋cursor₋size(font: font)
+     }
      let text = String(scalar)
      let attr = NSAttributedString(string: text, attributes: self.default₋textattrs)
      let line: CTLine = CTLineCreateWithAttributedString(attr)
-     let runs: CFArray /* of CTRun */ = CTLineGetGlyphRuns(line)
-     let count = CFArrayGetCount(runs)
-     print("count is \(count)")
+     let runs /* of CTRun */ = CTLineGetGlyphRuns(line) as [AnyObject]
+     var advances = NSSize()
+     for run in runs { let r = run as! CTRun
+       let count = CTRunGetGlyphCount(r)
+       for idx in 0 ..< count {
+         var glyph=CGGlyph()
+         CTRunGetGlyphs(r, CFRange(location: idx, length: 1), &glyph)
+         CTRunGetAdvances(r, CFRange(location: idx, length: 1), &advances)
+       }
+     }
+     advances.height = CTFontGetAscent(font) + CTFontGetDescent(font)
+     return advances
+     
+     /* let runs: CFArray / * of CTRun * / = CTLineGetGlyphRuns(line)
+     if CFArrayGetCount(runs) != 1 { print("count is not 1") }
+     guard let elemref: UnsafeRawPointer = CFArrayGetValueAtIndex(runs,0)
+     else { return NSSize(width: 10, height: 10) }
+     let run: CTRun = elemref.load(as: CTRun.self)
+     var glyph=CGGlyph(); var advance=CGSize()
+     print("1 run is \(run)")
+     CTRunGetGlyphs(run,CFRange(location: 0,length: 1),&glyph)
+     print("2")
+     // CTFontGetAdvancesForGlyphs(font,.default,[glyph],&advance,1)
+     // var glyphs: [CGGlyph] = ...
+     // var rects = Array(repeating: CGRect(), count: 1)
+     // CTFontGetBoundingRectsForGlyphs(font, .default, glyphs, &rects, glyphs.count)
+     // return NSSize(width: rects[0].width, height: rects[0].height)
      let glyphs: [CGGlyph] = Array<CGGlyph>(unsafeUninitializedCapacity: count)
        { (pointer, cnt) in
          print("cnt is \(cnt)")
          guard let address = pointer.baseAddress else { return }
-         guard let elemRef: UnsafeRawPointer = CFArrayGetValueAtIndex(runs,cnt) else { return }
-         print("elemRef \(elemRef)")
-         let run = elemRef.load(as: CTRun.self)
+         guard let elem₋ref: UnsafeRawPointer = CFArrayGetValueAtIndex(runs,cnt) else { return }
+         print("elemRef \(elem₋ref)")
+         let run = elem₋ref.load(as: CTRun.self)
          print("run is \(run)")
-         CTRunGetGlyphs(run,CFRange(location: -1, length: 0),address)
+         CTRunGetGlyphs(run,CFRange(location: cnt, length: 1),address)
        }
      let advances = Array<CGSize>(unsafeUninitializedCapacity: count)
        { (pointer, count) in
          guard let address = pointer.baseAddress else { return }
-         CTFontGetAdvancesForGlyphs(font, .default, glyphs, 
-          address, glyphs.count)
+         CTFontGetAdvancesForGlyphs(font,.default,glyphs,address,glyphs.count)
        }
-     print("advance is \(advances[0])")
-     return advances[0]
+     print("advance is \(advance)")
+     return advance */
    }
+}
+
+extension Rendition {
+  func visibles() -> [Rendition.section] { return Array<Rendition.section>() }
 }
 
 extension Rendition { /* ⬷ arabic edit and the cursor location. */
@@ -174,7 +205,7 @@ func Render₋art(unicodes: Array<UInt32>, first₋unicode: Int, last₋unicode:
       
      straight = { (x: CDouble, y: CDouble) in ctxt.cgContext.addLine(to: CGPoint(x: x, y: y)) },
       
-     closepath = { ctxt.cgContext.closePath() },
+     closepath = { ctxt.cgContext.closePath() }, /* plates two la-sick alternativt östlig tingsrätt and web and '-->'. */
       
      stroke = { ctxt.cgContext.strokePath() }
       
@@ -201,7 +232,7 @@ func Render₋format(unicodes: Array<UInt32>, first₋unicode: Int,
   
   let attributes = { (text: UnsafeMutablePointer<char32̄_t>?, offset: CInt, 
    range: CInt, attribute: CInt) -> Void in 
-    if attribute ==  1 {
+    if attribute == 1 {
       let raw = UnsafeMutableRawPointer(mutating: text!)
       guard let text = String(bytesNoCopy: raw, length: Int(range), 
        encoding: .utf32LittleEndian, freeWhenDone: false) else { return }
@@ -323,39 +354,53 @@ extension Minimumview { /* ⬷ text drawing. */
    
    override func draw(_ dirty: CGRect)
    {
-     print("draw-rect: \(dirty) while self.frame is \(self.frame) and offset \(self.controller.rendition.y₋offset)")
-     /* draw₋watermark() */
+     print("draw-rect: \(dirty) while self.frame is \(self.frame) " + 
+      "and offset \(self.controller.rendition.y₋offset)")
+     let visibles: [Rendition.section] = [ Rendition.section(first₋unicode: 0, 
+       last₋unicode: 0, first₋line: 0, last₋line: 0, state: Rendition.State.monotype) ]
+     for v in visibles { }
+     watermark()
+     monospace()
      guard let context = NSGraphicsContext.current?.cgContext else { return }
-     self.controller.rendition.unicodes.withUnsafeBytes {
-       let raw = UnsafeMutableRawPointer(mutating: $0.baseAddress!)
-       let count = self.controller.rendition.unicodes.count
-       let text = String(bytesNoCopy: raw, length: 4*count, encoding: 
-         .utf32LittleEndian, freeWhenDone: false)
-       let default₋textattrs = self.controller.rendition.default₋textattrs
-       let attributed = NSAttributedString(string: text!, attributes: default₋textattrs)
-       let y₋offset = self.controller.rendition.y₋offset
-       var rect = self.frame.offsetBy(dx: 0, dy: y₋offset)
-       let height = self.controller.rendition.document₋height(font: Rendition.textfont)
-       rect.origin.y = rect.origin.y - height + rect.size.height
-       rect.size.height = height
-       Typeset(attributed, frame: rect, context: context)
-       let anfang = NSBezierPath(anfang: "A", font: Rendition.systemfont, 
-        origin: NSPoint(x: 20, y: 20))
-       Rendition.zinkwhite.set()
-       anfang.stroke()
-       /* let str = self.controller.rendition.markdowns[0]
-       self.controller.draw₋multiple₋lines(attr: str, context: context) */
-       /* let image: CGImage = self.controller.rendition.charcoals[0]
-       let imgrect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
-       context.draw(image, in: imgrect) */
-     }
-     self.draw₋cursor(self.controller.rendition.cursor₋position)
+     let anfang = NSBezierPath(anfang: "A", font: Rendition.systemfont, 
+      origin: NSPoint(x: 20, y: 20))
+     Rendition.zinkwhite.set()
+     anfang.stroke()
+     cursor(self.controller.rendition.cursor₋position)
      super.draw(dirty)
    }
    
-   func draw₋watermark()
+   func monospace()
    {
-     if let url = Bundle.main.url(forResource: "watermark-coa", withExtension: "png") {
+      guard let context = NSGraphicsContext.current?.cgContext else { return }
+      self.controller.rendition.unicodes.withUnsafeBytes {
+        let raw = UnsafeMutableRawPointer(mutating: $0.baseAddress!)
+        let count = self.controller.rendition.unicodes.count
+        let text = String(bytesNoCopy: raw, length: 4*count, encoding: 
+         .utf32LittleEndian, freeWhenDone: false)
+        let default₋textattrs = self.controller.rendition.default₋textattrs
+        let attributed = NSAttributedString(string: text!, attributes: default₋textattrs)
+        let y₋offset = self.controller.rendition.y₋offset
+        var rect = self.frame.offsetBy(dx: 0, dy: y₋offset)
+        let height = self.controller.rendition.document₋height(font: Rendition.textfont)
+        rect.origin.y = rect.origin.y - height + rect.size.height
+        rect.size.height = height
+        Typeset(attributed, frame: rect, context: context)
+      }
+   }
+   
+   func other()
+   {
+     /* let str = self.controller.rendition.markdowns[0]
+      self.controller.draw₋multiple₋lines(attr: str, context: context) */
+     /* let image: CGImage = self.controller.rendition.charcoals[0]
+      let imgrect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+      context.draw(image, in: imgrect) */
+   }
+   
+   func watermark()
+   {
+      if let url = Bundle.main.url(forResource: "watermark-coa", withExtension: "png") {
        let material = try! Data(contentsOf: url)
        if let image = NSImage(data: material) {
          let dst = NSRect(x: bounds.width - 68, y: 4, width: 64, height: 100)
@@ -364,13 +409,13 @@ extension Minimumview { /* ⬷ text drawing. */
      }
    }
    
-   func draw₋cursor(_ rect: NSRect)
+   func cursor(_ rect: NSRect)
    {
       guard let context = NSGraphicsContext.current?.cgContext else { return }
       context.setLineWidth(0.25)
       let r = document₋to₋view(rect)
       context.stroke(r)
-      print("cursorrect is \(r)")
+      print("cursor rect: \(r)")
    }
 }
 
@@ -609,13 +654,14 @@ class Windowcontroller: NSWindowController {
 
 extension Windowcontroller { /* ⬷ keyboard input. */
    func character₋keyput(_ uc: UInt32) {
-     var unicode = uc
-     let unicodes = Unicodes(tetras: 1, unicodes: &unicode)
-     let text: unicode₋shatter = copy₋to₋shatter(unicodes)
+     let text: UnsafeMutableRawPointer = 
+      self.rendition.rope₋memory.text₋alloc(4) ?? Heap₋alloc(4)
+     var memory: UInt32 = text.load(as: UInt32.self)
+     memory=uc /* ⬷ unicode₋shatter persist-as-shatter-of-length-one() */
      var inner: UnsafeMutableRawPointer? = nil
-     let y₁ = rope₋append₋text(&inner,text,self.rendition.rope₋memory)
+     let y₁ = rope₋append₋text(&inner,&memory,self.rendition.rope₋memory)
      if y₁ != 0 { fatalError("error in rope₋append₋text") }
-     let idx: Machine = Machine(self.rendition.cursor₋index)
+     let idx = Machine(self.rendition.cursor₋index)
      let y₂ = rope₋insert(&self.rendition.artstate,idx,inner,self.rendition.rope₋memory)
      if y₂ != 0 { fatalError("error in rope₋insert") }
      self.minimumview.setNeedsDisplay(self.minimumview.frame)
