@@ -1,4 +1,4 @@
-/*  arabic-edits.c | node stores 'characters to left' and in leaf text too. */
+/*  arabic-edits.c | node stores 'characters in left' and the leaf text too. */
 
 import ClibTwinbeam;
 
@@ -62,49 +62,47 @@ inexorable int rope₋wedge(struct node * root, struct node * leaf,
     if (leaf != ΨΛΩ) { node->payload.keyvalue.key += 
      leaf->payload.keyvalue.key; }
    }
-   *branch = node;
+   *branch = node; /* new node stores character count in 'left' and 'right'. */
    return 0;
-}; /* ⬷ a․𝘬․a make₋branch₋alternatively₋two. */
+}; /* ⬷ a․𝘬․a side-effect-free-band-branch. */
 
 int rope₋append₋text(void ᶿ﹡* opaque₋root, unicode₋shatter text, struct 
  two₋memory dynmem)
-{ struct node *root₋node=(struct node *)*opaque₋root, 
-    *branch₋node=(struct node *)ΨΛΩ, /* non-root and root branch. */
-    *leaf₋node=(struct node *)ΨΛΩ;
-   leaf₋node = (struct node *)dynmem.node₋alloc(sizeof(struct node));
+{ struct node *root=(struct node *)*opaque₋root, 
+   *leaf=(struct node *)dynmem.node₋alloc(sizeof(struct node)), 
+   *branch=(struct node *)ΨΛΩ;
    int32_t weight = dynmem.text₋bytesize(text);
-   leaf₋node->payload.keyvalue.key = weight;
+   leaf->payload.keyvalue.key = weight;
+   leaf->payload.keyvalue.val = (__builtin_uint_t)text;
    /* ⬷ a․𝘬․a alloc₋node₋copy₋text₋and₋assign₋reference. */
-   leaf₋node->payload.keyvalue.val = (__builtin_uint_t)text;
-   if (*opaque₋root == ΨΛΩ) { *opaque₋root = leaf₋node; return 0; } /* ⬷ ground ends. */
-   if (is₋leaf₋node(root₋node)) {
-     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,dynmem.node₋alloc)) {
-       unalloc₋rope(leaf₋node,dynmem); return -2; }
-     *opaque₋root = branch₋node;
+   if (*opaque₋root == ΨΛΩ) { *opaque₋root=leaf; return 0; } /* ⬷ first ground case. */
+   if (is₋leaf₋node(root)) {
+     if (rope₋wedge(root,leaf,&branch,dynmem.node₋alloc)) {
+       unalloc₋rope(leaf,dynmem); unalloc₋rope(root,dynmem); return -2; }
+     *opaque₋root = branch;
    } else {
-     if (root₋node->left == ΨΛΩ) {
-       if (root₋node->right == ΨΛΩ) {
-         root₋node->left = root₋node->right;
-         root₋node->right = leaf₋node;
+     if (root->left == ΨΛΩ) {
+       if (root->right == ΨΛΩ) {
+         root->left = root->right;
+         root->right = leaf;
        }
        else {
-         root₋node->left = leaf₋node;
-         root₋node->right = ΨΛΩ;
+         root->left = leaf;
+         root->right = ΨΛΩ;
        }
-       root₋node->payload.keyvalue.val = root₋node->left->payload.keyvalue.val;
+       root->payload.keyvalue.val = root->left->payload.keyvalue.val;
        return 0;
      }
-     if (root₋node->right == ΨΛΩ) {
-       root₋node->right = leaf₋node;
-       root₋node->payload.keyvalue.val = root₋node->left->payload.keyvalue.val + 
-        root₋node->right->payload.keyvalue.val;
+     if (root->right == ΨΛΩ) {
+       root->right = leaf;
+       root->payload.keyvalue.val = root->left->payload.keyvalue.val + 
+        root->right->payload.keyvalue.val;
        return 0;
      }
-     if (rope₋wedge(root₋node,leaf₋node,&branch₋node,dynmem.node₋alloc)) {
-       unalloc₋rope(leaf₋node,dynmem);
-       return -3; }
-     *opaque₋root = branch₋node;
-   }
+     if (rope₋wedge(root,leaf,&branch,dynmem.node₋alloc)) {
+       unalloc₋rope(leaf,dynmem); unalloc₋rope(root,dynmem); return -3; }
+     *opaque₋root = branch;
+   } /* ⬷ non-ground case. */
    return 0;
 }
 
