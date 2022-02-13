@@ -552,6 +552,7 @@ EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx,
 EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
 EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
+EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
@@ -565,7 +566,7 @@ EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿, FALLOW fallow
 EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[], ALLOC alloc);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
-/* ⬷ note operating system releases allocated memory space and pages when 
+/* ⬷ operating system do release allocated memory space and pages when 
  program ends. */
 /* ⬷ enough space to store all Unicode symbols in an utf-8 file may be found 
  from the file's byte length. */

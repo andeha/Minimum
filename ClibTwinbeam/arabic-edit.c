@@ -37,6 +37,12 @@ void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem)
    }
 }
 
+void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmem)
+{
+   unalloc₋rope(opaque,dynmem);
+   *opaque=ΨΛΩ;
+}
+
 inexorable int rope₋wedge(struct node * root, struct node * leaf, 
  struct node ** branch, void * (*node₋alloc)(__builtin_int_t bytes)) {
    struct node * node = (struct node *)node₋alloc(sizeof(struct node));
