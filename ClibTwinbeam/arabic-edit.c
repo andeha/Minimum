@@ -190,30 +190,35 @@ void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
  from left to right and insert each leaf at the correct sequence 
  position. */
 
-inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t idx, 
+/* extern __builtin_int_t depth₋first₋with₋interval(noderef,__builtin_int_t,
+ __builtin_int_t, void (^segment)(unicode₋shatter)); */
+
+inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t index, 
  void ᶿ﹡* left, void ᶿ﹡* right, struct two₋memory dynmem)
-{ typedef struct node * noderef;
-   struct node *lft=(noderef)left, *rgt=(noderef)right;
+{ typedef struct node * noderef; *right=ΨΛΩ;
    if (opaque == ΨΛΩ) { return -1; }
-   if (idx > rope₋symbols(opaque)) { return -2; }
-   /* extern __builtin_int_t depth₋first₋with₋interval(noderef,__builtin_int_t,
-     __builtin_int_t, void (^segment)(unicode₋shatter));
-   __builtin_int_t max₋nonleafs = rope₋nonleafs(opaque); 
-   void * trace[max₋nonleafs]; __builtin_int_t nonleaf₋count=0; */
-   typedef int (^Inner)(noderef,__builtin_int_t,noderef);
-   Inner helper = ^(noderef node, __builtin_int_t idx, noderef previous)
-   {
+   if (index > rope₋symbols(opaque)) { return -2; }
+   __builtin_int_t max₋nonleafs=10 /* rope₋nonleafs(opaque) */;
+   noderef path[max₋nonleafs], *trace=path; 
+    __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 nonleaf₋count=0;
+   typedef int (^Inner)(noderef,__builtin_int_t);
+   Inner helper = ^(noderef node, __builtin_int_t idx)
+   { typedef void (^Push)();
+     Push push = ^{ trace[nonleaf₋count]=node; nonleaf₋count += 1; };
      __builtin_int_t weight = node->payload.keyvalue.key;
-     if (weight <= idx && node->right != ΨΛΩ) {
-       return helper(node->right,idx - weight,node);
+     if (weight <= idx && node->right != ΨΛΩ) { push(); 
+       return helper(node->right,idx - weight);
      }
-     if (node->left != ΨΛΩ) { return helper(node->left,idx,node); }
-     /* split the string and create two leafs and a parent alternatively
-      when the split point is separating nodes already, cut into two ropes. */
+     if (node->left != ΨΛΩ) { push(); return helper(node->left,idx); }
+     /* is-leaf: four cases split in the middle of a L alt. R leaf-node and 
+      split after  a L alt. R node. */
+  /* split the string and create two leafs and a parent alternatively
+    when the split point is separating nodes already, cut into two ropes. */
      unicode₋shatter text = (unicode₋shatter)node->payload.keyvalue.val;
      __builtin_int_t symbols = dynmem.text₋bytesize(text);
-     if (idx != symbols /* && previous->right == node */) {
-       int node₋size = sizeof(struct node);
+     int node₋size = sizeof(struct node);
+     𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct node *l,*r;
+     if (idx != symbols) {
        typedef void (^Textsplit)(__builtin_int_t,noderef *,__builtin_int_t);
        Textsplit in₋fresh = ^(__builtin_int_t start, noderef * child, __builtin_int_t count) {
          unicode₋shatter duptext = dynmem.text₋alloc(count);
@@ -222,29 +227,32 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t idx,
          *child=dynmem.node₋alloc(node₋size);
          (*child)->payload.keyvalue.key = count;
          (*child)->payload.keyvalue.val = (__builtin_uint_t)duptext;
+         __builtin_int_t residue = symbols - idx;
+         in₋fresh(0,&l,idx); in₋fresh(idx,&r,residue);
+         dynmem.text₋dealloc(text);
+         dynmem.node₋dealloc(node);
        }; /* ⬷ a․𝘬․a 'Duptext'. */
-        __builtin_int_t residue = symbols - idx; // abcd and 3 is 4-3=1
-       struct node *l,*r; in₋fresh(0,&l,idx); in₋fresh(idx,&r,residue);
-       dynmem.text₋dealloc(text);
-       noderef parent = dynmem.node₋alloc(node₋size);
-       parent->left=l; parent->right=r;
-       parent->payload.keyvalue.key = l->payload.keyvalue.key; /* ⬷ a․𝘬․a idx. */
-       dynmem.node₋dealloc(node);
-       /* assuming idx is found in a right leaf and not in alternatively after a left leaf. */
-       /* in non-leaf parent, remove the link to the child. */
-       /* previous.leftAltRight = ΨΛΩ; */
-       /* travel back the recorded trace and re-wire to split into two ropes. */
-       for (__builtin_int_t i=nonleaf₋count-1; i>=0; i -= 1) {
-         noderef previous = trace[i];
-         if (i>0 && trace[i-1]->left != previous) { *right=previous; break; }
-         previous->right=ΨΛΩ;
-         if (i>0) { trace[i-1]->payload.keyvalue.key -= idx; }
-       }
-       *left=opaque;
      }
+     for (__builtin_int_t i=nonleaf₋count-1; i>=0; i -= 1) {
+       struct node * previous = trace[i];
+       previous->right=ΨΛΩ; /* previous.leftAltRight = ΨΛΩ; */
+       if (i>0) { trace[i-1]->payload.keyvalue.key -= idx; }
+       if (i>0 && trace[i-1]->left != previous) { *right=previous; break; }
+     }
+     /* && previous->right == node */
+     
+     if (idx == symbols) {
+        noderef ground = dynmem.node₋alloc(node₋size);
+        ground->left=r; ground->right=r;
+        ground->payload.keyvalue.key = l->payload.keyvalue.key; /* ⬷ a․𝘬․a idx. */
+     }
+      /* assuming idx is found in a right leaf and not in alternatively after a left leaf. */
+     /* in non-leaf parent, remove the link to the child. */
+     /* travel back the recorded trace and re-wire to split into two ropes. */
+     *left=opaque;
      return 0;
    };
-   return helper((noderef)opaque,idx,ΨΛΩ);
+   return helper((noderef)opaque,index);
 } /* in parent, remove the link to the child, subtract the weight of the 
  leaf from parents' parent. Travel up the tree and remove right links. covering 
  characters to the right of index. */
