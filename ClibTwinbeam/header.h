@@ -95,7 +95,7 @@ MACRO __builtin_uint_t& 🔧(__builtin_uint_t var) { return (__builtin_uint_t&)
 typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
  deactivates the unused c++ builtin type char8_t not found in llvm-c source. */
 typedef unsigned int char32̄_t; /* ⬷ from uchar.h and do-not-use-char32_t. */
-/* A C language U"abc" is of 'const unsigned int' width and a c++ language 
+/* A C2x language U"abc" is of 'const unsigned int' width and a c++ language 
  U"abc" is 'const char32_t *'. */
 
 struct Bitfield { const char32̄_t * regular; uint32_t mask; const char32̄_t * text; };
@@ -522,7 +522,7 @@ typedef struct structa Structa;
 
 #define UNICODES(s) ᵊ(UC(s))
 
-MACRO struct Unicodes ᵊ(const char32̄_t * literal) { 
+MACRO struct Unicodes ᵊ(const char32̄_t * literal) {
  char32̄_t * ucs = (char32̄_t *)literal; 
  __builtin_int_t count = TetrasUntilNull(ucs, BUILTIN₋INT₋MAX);
  struct Unicodes y = { count, ucs };
@@ -540,7 +540,7 @@ struct two₋memory {
   __builtin_int_t (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋bytesize)(void *);
 };
 
-typedef char32̄_t * unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
+typedef char32̄_t * 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
 EXT₋C void unalloc₋shatter(unicode₋shatter text);
 EXT₋C unicode₋shatter persist₋as₋shatter(struct Unicodes ucs);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
@@ -549,10 +549,11 @@ EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx,
  void ᶿ﹡ wedge, struct two₋memory dynmem);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
  __builtin_int_t len, struct two₋memory dynmem);
-EXT₋C __builtin_int_t rope₋length(void ᶿ﹡ opaque);
+EXT₋C __builtin_int_t rope₋symbols(void ᶿ﹡ opaque);
 EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
 EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
+EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
@@ -608,7 +609,7 @@ struct remmingway {
   struct structa keypresses₋unicodes;
   struct structa nonabsolutes;
   void ᶿ﹡ opaque₋rope;
-}; /* a.k.a getdelim and getline. */
+}; /* ⬷ a․𝘬․a 'getdelim' and 'getline'. */
 
 int init₋typewriter(struct remmingway * 🅡);
 int append₋characters(struct Unicodes text, struct remmingway * 🅡);

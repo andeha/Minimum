@@ -1,4 +1,4 @@
-/*  arabic-edits.c | node stores 'characters in left' and the leaf text too. */
+/*  arabic-edits.c | leaf stores text and node stores 'characters in left'. */
 
 import ClibTwinbeam;
 
@@ -190,74 +190,71 @@ void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
  from left to right and insert each leaf at the correct sequence 
  position. */
 
-typedef int (^Rope₋split)(struct node *node, __builtin_int_t idx, struct node 
- ᶿ﹡*left, struct node ᶿ﹡*right, struct two₋memory dynmem, struct node *previous);
-
 inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t idx, 
  void ᶿ﹡* left, void ᶿ﹡* right, struct two₋memory dynmem)
-{ struct node *node=(struct node *)opaque, *lhs=(struct node *)left, 
-   *rhs=(struct node *)right;
+{ typedef struct node * noderef;
+   struct node *lft=(noderef)left, *rgt=(noderef)right;
    if (opaque == ΨΛΩ) { return -1; }
-   if (idx > rope₋count(opaque)) { return -2; }
-   Rope₋split helper = ^(struct node *node, __builtin_int_t idx, struct node 
-    ᶿ﹡*lhs, struct node ᶿ﹡*rhs, struct two₋memory dynmem, struct node * 
-    previous)
+   if (idx > rope₋symbols(opaque)) { return -2; }
+   /* extern __builtin_int_t depth₋first₋with₋interval(noderef,__builtin_int_t,
+     __builtin_int_t, void (^segment)(unicode₋shatter));
+   __builtin_int_t max₋nonleafs = rope₋nonleafs(opaque); 
+   void * trace[max₋nonleafs]; __builtin_int_t nonleaf₋count=0; */
+   typedef int (^Inner)(noderef,__builtin_int_t,noderef);
+   Inner helper = ^(noderef node, __builtin_int_t idx, noderef previous)
    {
      __builtin_int_t weight = node->payload.keyvalue.key;
+     if (weight <= idx && node->right != ΨΛΩ) {
+       return helper(node->right,idx - weight,node);
+     }
+     if (node->left != ΨΛΩ) { return helper(node->left,idx,node); }
+     /* split the string and create two leafs and a parent alternatively
+      when the split point is separating nodes already, cut into two ropes. */
+     unicode₋shatter text = (unicode₋shatter)node->payload.keyvalue.val;
+     __builtin_int_t symbols = dynmem.text₋bytesize(text);
+     if (idx != symbols /* && previous->right == node */) {
+       int node₋size = sizeof(struct node);
+       typedef void (^Textsplit)(__builtin_int_t,noderef *,__builtin_int_t);
+       Textsplit in₋fresh = ^(__builtin_int_t start, noderef * child, __builtin_int_t count) {
+         unicode₋shatter duptext = dynmem.text₋alloc(count);
+         uint8_t * original = (uint8_t *)text;
+         Copy8Memory((ByteAlignedRef)duptext,start+original,count);
+         *child=dynmem.node₋alloc(node₋size);
+         (*child)->payload.keyvalue.key = count;
+         (*child)->payload.keyvalue.val = (__builtin_uint_t)duptext;
+       }; /* ⬷ a․𝘬․a 'Duptext'. */
+        __builtin_int_t residue = symbols - idx; // abcd and 3 is 4-3=1
+       struct node *l,*r; in₋fresh(0,&l,idx); in₋fresh(idx,&r,residue);
+       dynmem.text₋dealloc(text);
+       noderef parent = dynmem.node₋alloc(node₋size);
+       parent->left=l; parent->right=r;
+       parent->payload.keyvalue.key = l->payload.keyvalue.key; /* ⬷ a․𝘬․a idx. */
+       dynmem.node₋dealloc(node);
+       /* assuming idx is found in a right leaf and not in alternatively after a left leaf. */
+       /* in non-leaf parent, remove the link to the child. */
+       /* previous.leftAltRight = ΨΛΩ; */
+       /* travel back the recorded trace and re-wire to split into two ropes. */
+       for (__builtin_int_t i=nonleaf₋count-1; i>=0; i -= 1) {
+         noderef previous = trace[i];
+         if (i>0 && trace[i-1]->left != previous) { *right=previous; break; }
+         previous->right=ΨΛΩ;
+         if (i>0) { trace[i-1]->payload.keyvalue.key -= idx; }
+       }
+       *left=opaque;
+     }
      return 0;
    };
-   return helper(node,idx,&lhs,&rhs,dynmem,ΨΛΩ);
-   __builtin_int_t weight = node->payload.keyvalue.key;
-   if (weight <= idx && node->right != ΨΛΩ) {
-     return rope₋split₋recursive(node->right,idx-weight,left,right,dynmem);
-   }
-   if (node->left != ΨΛΩ) { return rope₋split₋recursive(node->left,idx,left,right,dynmem); }
-   unicode₋shatter text = (unicode₋shatter)node->payload.keyvalue.val;
-   __builtin_int_t symbols = dynmem.text₋bytesize(text);
-   if (idx != symbols) { /* split the string, create two leafs and a parent */ 
-     __builtin_int_t residue = symbols - idx;
-     ByteAlignedRef source = (ByteAlignedRef)text;
-     int node₋size = sizeof(struct node);
-     typedef void (^Duptext)(__builtin_int_t,struct node**);
-     Duptext in₋fresh = ^(__builtin_int_t count₋start, struct node **child) {
-       unicode₋shatter duptext = dynmem.text₋alloc(count₋start);
-       Copy8Memory((ByteAlignedRef)text,source,count₋start);
-       *child=dynmem.node₋alloc(node₋size);
-       (*child)->payload.keyvalue.key = count₋start;
-       (*child)->payload.keyvalue.val = (__builtin_uint_t)duptext;
-     };
-     struct node *l,*r; in₋fresh(idx,&l); in₋fresh(residue,&r);
-     /* unicode₋shatter lxt=dynmem.text₋alloc(idx), rxt=dynmem.text₋alloc(residue); */
-     /* ByteAlignedRef src = (ByteAlignedRef)text; */
-     /* Copy8Memory((ByteAlignedRef)lxt,src,idx); */
-     /* Copy8Memory((ByteAlignedRef)rxt,src+idx,residue); */
-     dynmem.text₋dealloc(text);
-     /* int node₋size = sizeof(struct node); */
-     struct node *parent=dynmem.node₋alloc(node₋size) /*, 
-      *left=dynmem.node₋alloc(node₋size), 
-      *right=dynmem.node₋alloc(node₋size) */;
-     /* right->payload.keyvalue.val = (__builtin_uint_t)rxt;
-     right->payload.keyvalue.key = residue;
-     left->payload.keyvalue.key = idx;
-     left->payload.keyvalue.val = (__builtin_uint_t)lxt; */
-     parent->left=l; parent->right=r;
-     parent->payload.keyvalue.key = l->payload.keyvalue.key; /* ⬷ a․𝘬․a idx. */
-     /* node->parent = previous; */
-     dynmem.text₋dealloc(text);
-     dynmem.node₋dealloc(node);
-   }
-  /* in parent, remove the link to the child, subtract the weight of the
-    leaf from parents-parent. travel up the tree and remove right links.
-    covering characters to the right of 'idx'. */
-   return 0;
-}
+   return helper((noderef)opaque,idx,ΨΛΩ);
+} /* in parent, remove the link to the child, subtract the weight of the 
+ leaf from parents' parent. Travel up the tree and remove right links. covering 
+ characters to the right of index. */
 
 inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx, 
  void ᶿ﹡* lhs, void ᶿ﹡* rhs, struct two₋memory dynmem)
 {
   struct node *out₋lhs=(struct node *)ΨΛΩ, *out₋rhs=(struct node *)ΨΛΩ, 
     *root₋node=(struct node *)opaque;
-   if (idx > rope₋count(opaque)) { return -1; }
+   if (idx > rope₋symbols(opaque)) { return -1; }
    typedef void (^Ground)(unicode₋shatter, struct node *, struct two₋memory);
    Ground include = ^(unicode₋shatter text, struct node *out, struct two₋memory dynmem) {};
    struct ¹stack node₋stack;
@@ -313,7 +310,7 @@ int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge,
 int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len, 
  struct two₋memory dynmem)
 { void *left,*rhs1,*lhs2,*right;
-    __builtin_int_t count = rope₋count(*opaque);
+    __builtin_int_t count = rope₋symbols(*opaque);
    if (count < idx || count < idx + len) { return -1; }
    if (rope₋split(opaque,idx,&left,&rhs1,dynmem)) { return -2; }
    if (rope₋split(opaque,idx+len-1,&lhs2,&right,dynmem)) { return -3; }
@@ -323,7 +320,7 @@ int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len,
    return 0;
 }
 
-__builtin_int_t rope₋count(void ᶿ﹡ opaque)
+__builtin_int_t rope₋symbols(void ᶿ﹡ opaque)
 { struct node *node = (struct node *)opaque;
    __builtin_int_t weight=0;
    if (opaque == ΨΛΩ) { return 0; }

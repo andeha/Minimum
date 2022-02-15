@@ -115,7 +115,7 @@ extension Rendition { /* ⬷ arabic edit and the cursor location. */
    {
       let line = index₋to₋line(idx: idx)
       let uc: char32̄_t = rope₋index(self.artstate,idx)
-      let size = default₋cursor₋size(font: Rendition.textfont)
+      let size = cursor₋size(uc,font: Rendition.textfont)
       return NSMakeRect(0,0,size.width,size.height)
    }
    
@@ -667,15 +667,16 @@ extension Windowcontroller { /* ⬷ keyboard input. */
      self.minimumview.setNeedsDisplay(self.minimumview.frame)
    }
    func transmit(_ uc: UInt32) {
-     let count: Machine = rope₋length(self.rendition.artstate)
+     let count: Machine = rope₋symbols(self.rendition.artstate)
      for idx in 0 ..< count {
        let unicode: char32̄_t = rope₋index(self.rendition.artstate,idx)
        shell.slow₋write₋to₋child(unicode)
-       print("transmitted \(unicode) to child")
+       print("transmitted roped \(unicode) to child")
        self.rendition.unicodes.append(unicode)
      }
-     self.rendition.unicodes.append(uc)
-     self.rendition.refresh₋cursor₋position(uc₋delta: 1, index: self.rendition.cursor₋index)
+     if count != 0 { rope₋clear(&self.rendition.artstate,self.rendition.rope₋memory) }
+     self.rendition.unicodes.append(uc); shell.slow₋write₋to₋child(uc)
+     self.rendition.refresh₋cursor₋position(uc₋delta: 1 + Int(count), index: self.rendition.cursor₋index)
      self.minimumview.setNeedsDisplay(self.minimumview.frame)
    }
    func delete() {
