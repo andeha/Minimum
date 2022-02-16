@@ -131,9 +131,7 @@ inexorable int rope₋append₋rope(void ᶿ﹡* opaque, void ᶿ﹡ rhs,
    if (branch == ΨΛΩ) { return -2; }
    *opaque = branch;
    return 0;
-} /* required by delete and insert. */
-
-#define rope₋split iterative₋rope₋split
+} /* required by 'delete' and 'insert'. Possibly replaceable with 'concat₋rope'. */
 
 inexorable void * concat₋rope(void * left, void * right, struct two₋memory dynmem)
 { struct node *opaque=ΨΛΩ, *lhs=(struct node *)left, 
@@ -153,23 +151,12 @@ inexorable void * concat₋rope(void * left, void * right, struct two₋memory d
   return opaque;
 }
 
-struct forest { void * opaque; int length, min₋len; };
-/*
-  all trees in a forest is balanced trees.
-  forest[i] has a depth at most i.
-  the concatenation of a forest is equal to the tree that will be balanced.
-  length(forest[i]) >= fibonacci(i+1)
-  if length(leaf1) is in [Fn,Fn+1) then put x in slot n. this may done
-   by concaternation alternatively directly.
-  the concateration is is guaranteed to be balanced.
-  concaternate in 2, ..., n-1 and concaternate x to the right of the result.
-  0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765
- */
+structᵢ forest { void * opaque; int length, min₋len; };
 
 inexorable void * concat₋forest(struct forest * forest, 
  __builtin_int_t length, struct two₋memory dynmem)
 { void * opaque; __builtin_int_t sum=0;
-   for (__builtin_int_t i=0; sum != length; i+=1) {
+   for (__builtin_int_t i=0; sum!=length; i+=1) {
      if (forest[i].opaque) {
        opaque = concat₋rope(forest[i].opaque,opaque,dynmem);
        sum += forest[i].length;
@@ -184,8 +171,8 @@ void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
   struct forest theforest[max₋depth];
   for (__builtin_int_t i=0; i<max₋depth; i+=1) {
     theforest[i].opaque = ΨΛΩ;
-    if (i == 0) { theforest[i].min₋len = 1; }
-    else if (i == 1) { theforest[i].min₋len = 2; }
+    if (i==0) { theforest[i].min₋len=1; }
+    else if (i==1) { theforest[i].min₋len=2; }
     else {
       theforest[i].min₋len = theforest[i-1].min₋len + theforest[i-2].min₋len;
     }
@@ -194,7 +181,19 @@ void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
   *opaque = concat₋forest(theforest,max₋len,dynmem);
 } /* ⬷ balancing reduces the depth of the tree. Traverse the rope
  from left to right and insert each leaf at the correct sequence 
- position. */
+ position. Invariants are:
+  
+  ∙ all trees in a forest is balanced trees
+  ∙ forest[i] has a depth at most i
+  ∙ the concatenation of a forest is equal to the tree that will be balanced
+  ∙ length(forest[i]) >= fibonacci(i+1)
+  ∙ if length(leaf1) is in [Fn,Fn+1) then put x in slot n. this may done
+     by concaternation alternatively directly
+  ∙ the concateration is is guaranteed to be balanced
+  
+ Concaternate in 2, ..., n-1 and concaternate x to the right of the result.
+ 0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765
+ */
 
 #define MAX₋NONLEAFS 10
 
@@ -229,11 +228,11 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t inde
          *child=dynmem.node₋alloc(node₋size);
          (*child)->payload.keyvalue.key = count;
          (*child)->payload.keyvalue.val = (__builtin_uint_t)duptext;
-         __builtin_int_t residue = symbols - idx;
-         in₋fresh(0,&l,idx); in₋fresh(idx,&r,residue);
-         dynmem.text₋dealloc(text);
-         dynmem.node₋dealloc(node);
        }; /* ⬷ a․𝘬․a 'Duptext'. */
+       __builtin_int_t residue = symbols - idx;
+       in₋fresh(0,&l,idx); in₋fresh(idx,&r,residue);
+       dynmem.text₋dealloc(text);
+       dynmem.node₋dealloc(node);
      }
      for (__builtin_int_t i=nonleaf₋count-1; i>=0; i -= 1) {
        struct node * previous = trace[i];
@@ -257,10 +256,13 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t inde
    };
    return helper((noderef)opaque,index);
 } /* two recursive search-paths and one terminal case where 
- 1. [node is leaf.] ⬷ invariant-1 and
- 2. [split is in the middle of a L alternatively R leaf-node, possibly 
-      a split before/after a L alternatively R leaf-node.] ⬷ invariant-2.
- in terminal, identify type of terminal-split. split the string and 
+ invariants are
+  
+  ∙ node is leaf
+  ∙ split is in the middle of a L alternatively R leaf-node, 
+   possibly  a split before/after a L alternatively R leaf-node
+  
+ In terminal, identify type of terminal-split. split the string and 
  create two leafs and a parent alternatively when the split point is 
  separating nodes already, cut into two ropes. */
 
@@ -316,6 +318,8 @@ error₋and₋dealloc:
    return -3;
 }
 
+#define rope₋split iterative₋rope₋split
+
 int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge, 
  struct two₋memory dynmem)
 { void *left,*right;
@@ -324,7 +328,7 @@ int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge,
    if (rope₋append₋rope(&left,right,dynmem)) { return -3; }
    *opaque = left;
    return 0;
-} /* this function is propotional to the depth of the node to insert. */
+} /* ⬷ this function is propotional to the depth of the node to insert. */
 
 int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len, 
  struct two₋memory dynmem)
@@ -362,4 +366,3 @@ char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
    return *(idx+text);
 } /* ⬷ execution time is propotional to depth of tree. */
 
-/* see 'Ropes: an Alternative to Strings' by Hans-j Boehms et al. */
