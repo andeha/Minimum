@@ -15,21 +15,26 @@ void unalloc₋shatter(unicode₋shatter text)
    Fallow(text);
 }
 
+structᵢ forest { void * opaque; int length, min₋len; };
+typedef struct two₋memory Two₋memory;
+typedef struct node * noderef;
+
 inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
-{ struct node *node = (struct node *)opaque;
+{ struct node *node = (noderef)opaque;
    return node->left == ΨΛΩ && node->right == ΨΛΩ;
 }
 
 inexorable __builtin_int_t depth₋rope(void ᶿ﹡ opaque)
-{ struct node *node=(struct node *)opaque;
+{ struct node *node=(noderef)opaque;
    if (opaque == ΨΛΩ) { return 0; }
    return is₋leaf₋node(opaque) ? 0 : 
     1 + max(depth₋rope(node->left),depth₋rope(node->right));
-}
+} /* ⬷ the 'depth' of a rope is the maximum number of arcs until the leafs 
+ been covered. */
 
-inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem)
-{ struct node *node=(struct node *)opaque;
-   if (opaque == ΨΛΩ) { return 0LL; }
+inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, Two₋memory dynmem)
+{ struct node *node=(noderef)opaque;
+   if (opaque == ΨΛΩ) { return 0; }
    else {
      __builtin_int_t left₋len=0,right₋len=0;
      if (is₋leaf₋node(node)) {
@@ -39,9 +44,9 @@ inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, struct two₋memory
      }
      if (node->left) { left₋len = length₋rope(node->left,dynmem); }
      if (node->right) { right₋len = length₋rope(node->right,dynmem); }
-     return 1LL + left₋len + right₋len;
+     return 1 + left₋len + right₋len;
    }
-} /* ⬷ length is string weight + number of nodes to root. */
+} /* ⬷ the 'length' of a rope is string 'weight' + number of nodes to root. */
 
 __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
   __builtin_int_t to, void (^segment)(unicode₋shatter))
@@ -51,8 +56,8 @@ __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_in
    return 0;
 }
 
-void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem)
-{ struct node *node = (struct node *)opaque;
+void unalloc₋rope(void ᶿ﹡ opaque, Two₋memory dynmem)
+{ struct node *node = (noderef)opaque;
    if (opaque == ΨΛΩ) { return; }
    if (is₋leaf₋node(opaque)) {
     unicode₋shatter text = (unicode₋shatter)(node->payload.keyvalue.val);
@@ -66,78 +71,35 @@ void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem)
    }
 }
 
-void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmem)
+void rope₋clear(void ᶿ﹡* opaque, Two₋memory dynmem)
 {
    unalloc₋rope(opaque,dynmem);
    *opaque=ΨΛΩ;
 }
 
-inexorable int rope₋wedge(struct node * root, struct node * leaf, 
- struct node ** branch, void * (*node₋alloc)(__builtin_int_t bytes)) {
-   struct node * node = (struct node *)node₋alloc(sizeof(struct node));
-   if (node == ΨΛΩ) { return -1; }
-   if (root == ΨΛΩ) {
-    node->left = leaf;
-    node->right = ΨΛΩ;
-    node->payload.bits = 0; /* ⬷ weight. */
-    if (leaf != ΨΛΩ) { node->payload.keyvalue.key += 
-     leaf->payload.keyvalue.key; }
-   } else {
-    node->left = root;
-    node->right = leaf;
-    node->payload.bits = 0; /* ⬷ weight. */
-    if (root != ΨΛΩ) { node->payload.keyvalue.key += 
-     root->payload.keyvalue.key; }
-    if (leaf != ΨΛΩ) { node->payload.keyvalue.key += 
-     leaf->payload.keyvalue.key; }
-   }
-   *branch = node; /* new node stores character count in 'left' and 'right'. */
-   return 0;
-}; /* ⬷ a․𝘬․a side-effect-free-band-branch. */
-
-int rope₋append₋text(void ᶿ﹡* opaque₋root, unicode₋shatter text, struct 
- two₋memory dynmem)
-{ struct node *root=(struct node *)*opaque₋root, 
-   *leaf=(struct node *)dynmem.node₋alloc(sizeof(struct node)), 
-   *branch=(struct node *)ΨΛΩ;
+int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, Two₋memory dynmem)
+{ struct node *node = (noderef)opaque, *branch=ΨΛΩ, 
+   *leaf=(noderef)dynmem.node₋alloc(sizeof(struct node));
+   if (leaf == ΨΛΩ) { return -1; }
    int32_t weight = dynmem.text₋bytesize(text);
    leaf->payload.keyvalue.key = weight;
    leaf->payload.keyvalue.val = (__builtin_uint_t)text;
-   /* ⬷ a․𝘬․a alloc₋node₋copy₋text₋and₋assign₋reference. */
-   if (*opaque₋root == ΨΛΩ) { *opaque₋root=leaf; return 0; } /* ⬷ first ground case. */
-   if (is₋leaf₋node(root)) {
-     if (rope₋wedge(root,leaf,&branch,dynmem.node₋alloc)) {
-       dynmem.node₋dealloc(leaf); return -2; }
-     *opaque₋root = branch;
-   } else {
-     if (root->right == ΨΛΩ) {
-       root->right = leaf;
-       root->payload.keyvalue.val = root->left->payload.keyvalue.val + 
-        root->right->payload.keyvalue.val;
-       return 0;
-     }
-     if (rope₋wedge(root,leaf,&branch,dynmem.node₋alloc)) {
-       dynmem.node₋dealloc(leaf); return -1; }
-     *opaque₋root = branch;
-   } /* ⬷ non-ground case - three nodes deep alternatively more. */
-   return 0;
-} /* returns '-1' when building too long and '-2' when adding too large. */
-
-inexorable int rope₋append₋rope(void ᶿ﹡* opaque, void ᶿ﹡ rhs, 
- struct two₋memory dynmem)
-{ struct node *branch=ΨΛΩ, *root=(struct node *)opaque, 
-    *rhs₋node=(struct node *)rhs;
-   if (rhs == ΨΛΩ) { return 0; }
-   if (*opaque == ΨΛΩ) { return 0; }
-   if (rope₋wedge(root,rhs₋node,&branch,dynmem.node₋alloc)) { return -1; }
+   if (*opaque == ΨΛΩ) { *opaque=leaf; return 0; }
+   if (!is₋leaf₋node(opaque) && node->right == ΨΛΩ) {
+     node->right=leaf;
+     return 0;
+   }
+   /* opaque is leaf-node alternatively fully-set inner node. */
+   branch = (noderef)dynmem.node₋alloc(sizeof(struct node));
    if (branch == ΨΛΩ) { return -2; }
-   *opaque = branch;
+   branch->left = *opaque; branch->right=leaf;
+   branch->payload.keyvalue.key = branch->left->payload.keyvalue.key;
+   *opaque=branch;
    return 0;
-} /* required by 'delete' and 'insert'. Possibly replaceable with 'concat₋rope'. */
+}
 
-inexorable void * concat₋rope(void * left, void * right, struct two₋memory dynmem)
-{ struct node *opaque=ΨΛΩ, *lhs=(struct node *)left, 
-   *rhs=(struct node *)right;
+inexorable void * concat₋rope(void * left, void * right, Two₋memory dynmem)
+{ struct node *opaque=ΨΛΩ, *lhs=(noderef)left, *rhs=(noderef)right;
    __builtin_int_t txtlen, depth;
   if (left == ΨΛΩ) { return right; }
   if (right == ΨΛΩ) { return left; }
@@ -153,10 +115,17 @@ inexorable void * concat₋rope(void * left, void * right, struct two₋memory d
   return opaque;
 }
 
-structᵢ forest { void * opaque; int length, min₋len; };
+inexorable int rope₋append₋rope(void ᶿ﹡* opaque, void ᶿ﹡ right, 
+ Two₋memory dynmem)
+{
+  void *merge = concat₋rope(*opaque,right,dynmem);
+  if (merge == ΨΛΩ) { return -1; }
+  *opaque = merge;
+  return 0;
+}
 
 inexorable void * concat₋forest(struct forest * forest, 
- __builtin_int_t length, struct two₋memory dynmem)
+ __builtin_int_t length, Two₋memory dynmem)
 { void * opaque; __builtin_int_t sum=0;
    for (__builtin_int_t i=0; sum!=length; i+=1) {
      if (forest[i].opaque) {
@@ -167,7 +136,7 @@ inexorable void * concat₋forest(struct forest * forest,
    return opaque;
 }
 
-void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
+void balance₋rope(void ᶿ﹡* opaque, Two₋memory dynmem)
 {
   __builtin_int_t max₋len = length₋rope(opaque,dynmem), max₋depth=100;
   struct forest theforest[max₋depth];
@@ -197,21 +166,20 @@ void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem)
  0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765
  */
 
-#define MAX₋NONLEAFS 10
-
-inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t index, 
+inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, 
+ __builtin_int_t index /* ⬷ a․𝘬․a in-left∈[0,count] */, 
  void ᶿ﹡* left, void ᶿ﹡* right, __builtin_int_t max₋nonleafs, 
- struct two₋memory dynmem)
-{ typedef struct node * noderef; *right=ΨΛΩ;
+ Two₋memory dynmem)
+{
    if (opaque == ΨΛΩ) { return -1; }
    if (index > rope₋symbols(opaque)) { return -2; }
-   noderef path[max₋nonleafs], *trace=path; /* rope₋nonleafs(opaque) requires 
-    caching alternatively linear time */
+   noderef path[max₋nonleafs], *trace=path;
     __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 nonleaf₋count=0;
    typedef int (^Inner)(noderef,__builtin_int_t);
    Inner helper = ^(noderef node, __builtin_int_t idx)
    { typedef void (^Push)();
-     Push push = ^{ trace[nonleaf₋count]=node; nonleaf₋count += 1; };
+     if (nonleaf₋count >= max₋nonleafs) { return -1; }
+     Push push = ^{ trace[nonleaf₋count]=node, nonleaf₋count+=1; };
      __builtin_int_t weight = node->payload.keyvalue.key;
      if (weight <= idx && node->right != ΨΛΩ) { push(); 
        return helper(node->right,idx - weight);
@@ -221,7 +189,8 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t inde
      __builtin_int_t symbols = dynmem.text₋bytesize(text);
      int node₋size = sizeof(struct node);
      𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 struct node *l,*r;
-     if (idx != symbols) {
+     int idx₋encased = idx != 0 && idx == symbols;
+     if (idx₋encased) {
        typedef void (^Textsplit)(__builtin_int_t,noderef *,__builtin_int_t);
        Textsplit in₋fresh = ^(__builtin_int_t start, noderef * child, __builtin_int_t count) {
          unicode₋shatter duptext = dynmem.text₋alloc(count);
@@ -244,7 +213,7 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t inde
      }
      /* && previous->right == node */
      
-     if (idx == symbols) {
+     if (idx₋encased) {
         noderef ground = dynmem.node₋alloc(node₋size);
         ground->left=r; ground->right=right;
         ground->payload.keyvalue.key = ground->left->payload.keyvalue.key; /* ⬷ a․𝘬․a idx. */
@@ -273,9 +242,9 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, __builtin_int_t inde
  characters to the right of index. */
 
 inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx, 
- void ᶿ﹡* lhs, void ᶿ﹡* rhs, struct two₋memory dynmem)
+ void ᶿ﹡* lhs, void ᶿ﹡* rhs, Two₋memory dynmem)
 {
-  struct node *out₋lhs=(struct node *)ΨΛΩ, *out₋rhs=(struct node *)ΨΛΩ, 
+  struct node *out₋lhs=(noderef)ΨΛΩ, *out₋rhs=(noderef)ΨΛΩ, 
     *root₋node=(struct node *)opaque;
    if (idx > rope₋symbols(opaque)) { return -1; }
    typedef void (^Ground)(unicode₋shatter, struct node *, struct two₋memory);
@@ -321,9 +290,10 @@ error₋and₋dealloc:
 }
 
 #define rope₋split iterative₋rope₋split
+#define MAX₋NONLEAFS 10 /* ⬷ propotional to the number of edits since rebalancing. */
 
 int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge, 
- struct two₋memory dynmem)
+ Two₋memory dynmem)
 { void *left,*right;
    if (rope₋split(*opaque,idx,&left,&right,dynmem)) { return -1; }
    if (rope₋append₋rope(&left,wedge,dynmem)) { return -2; }
@@ -333,8 +303,8 @@ int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge,
 } /* ⬷ this function is propotional to the depth of the node to insert. */
 
 int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len, 
- struct two₋memory dynmem)
-{ void *left,*rhs1,*lhs2,*right; __builtin_int_t edits₋until₋balancing=10;
+ Two₋memory dynmem)
+{ void *left,*rhs1,*lhs2,*right; __builtin_int_t splits₋since₋balanced=10;
     __builtin_int_t count = rope₋symbols(*opaque);
    if (count < idx || count < idx + len) { return -1; }
    if (rope₋split(opaque,idx,&left,&rhs1,dynmem)) { return -2; }
@@ -346,7 +316,7 @@ int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len,
 }
 
 __builtin_int_t rope₋symbols(void ᶿ﹡ opaque)
-{ struct node *node = (struct node *)opaque;
+{ struct node *node = (noderef)opaque;
    __builtin_int_t weight=0;
    if (opaque == ΨΛΩ) { return 0; }
    if (is₋leaf₋node(node)) {
@@ -359,7 +329,7 @@ __builtin_int_t rope₋symbols(void ᶿ﹡ opaque)
 }
 
 char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
-{ struct node *node = (struct node *)opaque;
+{ struct node *node = (noderef)opaque;
    if (opaque == ΨΛΩ) { return U'\x0'; }
    __builtin_int_t weight = node->payload.keyvalue.val;
    if (weight <= idx && node->right != ΨΛΩ) { return rope₋index(node->right,idx-weight); }
