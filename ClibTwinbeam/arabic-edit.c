@@ -48,13 +48,8 @@ inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, Two₋memory dynmem
    }
 } /* ⬷ the 'length' of a rope is string 'weight' + number of nodes to root. */
 
-__builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
-  __builtin_int_t to, void (^segment)(unicode₋shatter))
-{
-   if (opaque == ΨΛΩ) { return -1; }
-
-   return 0;
-}
+/* __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
+  __builtin_int_t to, void (^segment)(unicode₋shatter)) { } */
 
 void unalloc₋rope(void ᶿ﹡ opaque, Two₋memory dynmem)
 { struct node *node = (noderef)opaque;
