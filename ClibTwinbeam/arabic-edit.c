@@ -22,7 +22,7 @@ inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
 
 inexorable __builtin_int_t depth₋rope(void ᶿ﹡ opaque)
 { struct node *node=(struct node *)opaque;
-   /* if (opaque == ΨΛΩ) { return TriboolUnknown; } */
+   if (opaque == ΨΛΩ) { return 0; }
    return is₋leaf₋node(opaque) ? 0 : 
     1 + max(depth₋rope(node->left),depth₋rope(node->right));
 }
@@ -43,9 +43,11 @@ inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, struct two₋memory
    }
 } /* ⬷ length is string weight + number of nodes to root. */
 
-__builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t idx, 
-  __builtin_int_t length, void (^segment)(unicode₋shatter))
+__builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
+  __builtin_int_t to, void (^segment)(unicode₋shatter))
 {
+   if (opaque == ΨΛΩ) { return -1; }
+
    return 0;
 }
 
@@ -332,13 +334,13 @@ int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge,
 
 int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len, 
  struct two₋memory dynmem)
-{ void *left,*rhs1,*lhs2,*right;
+{ void *left,*rhs1,*lhs2,*right; __builtin_int_t edits₋until₋balancing=10;
     __builtin_int_t count = rope₋symbols(*opaque);
    if (count < idx || count < idx + len) { return -1; }
    if (rope₋split(opaque,idx,&left,&rhs1,dynmem)) { return -2; }
    if (rope₋split(opaque,idx+len-1,&lhs2,&right,dynmem)) { return -3; }
    void * merge = concat₋rope(left,right,dynmem);
-   if (merge == 0) { return -4; } /* unalloc-rope(opaque); */
+   if (merge==0) { return -4; }
    *opaque=merge; unalloc₋rope(rhs1,dynmem); unalloc₋rope(lhs2,dynmem);
    return 0;
 }
@@ -351,8 +353,8 @@ __builtin_int_t rope₋symbols(void ᶿ﹡ opaque)
      weight = node->payload.keyvalue.key;
      return weight;
    }
-   if (node->left) { weight += node->left->payload.keyvalue.key; }
-   if (node->right) { weight += node->right->payload.keyvalue.key; }
+   if (node->left) { weight += node->payload.keyvalue.key; }
+   if (node->right) { weight += rope₋symbols(node->right); }
    return weight;
 }
 
