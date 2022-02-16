@@ -4,7 +4,8 @@ import ClibTwinbeam;
 
 /* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
-  -g -std=c++20 -msse4.1 -lc++ entry-main.cpp unittests/ᛟ-test-utf8.cpp        \
+  -g -std=c++20 -msse4.1 -lc++ -target x86_64-apple-darwin21.3.0               \
+  -Wno-nullability-completeness entry-main.cpp unittests/ᛟ-test-utf8.cpp       \
    unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                       \
    unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                  \
    account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o          \
@@ -16,21 +17,23 @@ import ClibTwinbeam;
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
-  -g -std=c2x -msse4.1 account-italian-1.c account-italian-2.c amend-tape.c    \
-   arabic-edit.c built-altern.c chrono-logy.c cipher-rhode.c eight-utf.c       \
-   endian-base.c float-short.c gnostic-codex.c lock-attempt.c o-binary.c       \
-   present-print.c queue-invent.c regular-pool.c round-fixed.c search-symbol.c \
-   semantic-block.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c   \
-   x-partial-referen.c */
+  -g -std=c2x -target x86_64-apple-darwin21.3.0 -msse4.1                       \
+  -Wno-nullability-completeness account-italian-1.c account-italian-2.c        \
+   amend-tape.c arabic-edit.c built-altern.c chrono-logy.c cipher-rhode.c      \
+   eight-utf.c endian-base.c float-short.c gnostic-codex.c lock-attempt.c      \
+   o-binary.c present-print.c queue-invent.c regular-pool.c round-fixed.c      \
+   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c   \
+   x-error-stack.c x-partial-referen.c */
 
-/* $(CC) main.c -o arm_app -target arm64-apple-macos11
-   $(CC) main.c -o x86_app -target x86_64-apple-macos10.12
+/* $(CC) main-entry.c -o arm-mac_app -target arm64-apple-macos11
+   $(CC) main-entry.c -o x86-mac_app -target x86_64-apple-macos10.12
+   $(CC) main-entry.c -0 ios-arm_app -target arm64-apple-ios9.0
    lipo -create -output confidence x86_confidence arm_confidence
    lipo -archs confidence */
 
 /* clang -o arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
   -D__armv8a__ -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap \
-  -g -std=c++20 -lc++ -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc \
+  -g -std=c++20 -lc++ -target arm64-apple-macos11 -Wno-nullability-completeness \
    entry-main.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp         \
    unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
    unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
@@ -42,13 +45,29 @@ import ClibTwinbeam;
 
 /* clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__      \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
-  -g -std=c2x -target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc   \
+  -g -std=c2x -target arm64-apple-macos11 -Wno-nullability-completeness       \
    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
    built-altern.c chrono-logy.c cipher-rhode.c eight-utf.c endian-base.c      \
    float-short.c gnostic-codex.c lock-attempt.c o-binary.c present-print.c    \
    queue-invent.c regular-pool.c round-fixed.c search-symbol.c                \
    semantic-block.c symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c  \
    x-partial-referen.c */
+
+/* On 'target' and 'march' details, see the llvm files:
+  
+  --<clang>--<lib>--<Driver>--<ToolChains>--<Arch>--<AArch64.cpp>
+  --<clang>--<test>--<Driver>--<aarch64-cpus.c>
+  --<clang>--<test>--<Preprocessor>--<aarch-target-features.c>
+  --<llvm>--<include>--<llvm>--<Support>--<AArch64TargetParser.def>
+  --<llvm>--<lib>--<Target>--<AArch64>--<AArch64Subtarget.cpp|h>
+  
+ An update (15'th nov 2019) 'mcpu' may be set to 'apple-a13' and 'apple-s5' 
+ alternatively '-target aarch64 -mcpu=+v8.4a+fp-armv8+neon+crc+crypto
+ +dotprod+fullfp16+ras+lse+rdm+rcpc+zcm+zcz+fp16fml+sm4+sha3+sha2+aes' alternatively
+ '-target arm64-apple-macos11 -march=armv8-a+fp+simd+crypto+crc'
+ 
+ for further investigations run 'clang --version' and 'clang -print-targets' 
+ and clang -march=dont-know eight-utf.c'. */
 
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"      \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
