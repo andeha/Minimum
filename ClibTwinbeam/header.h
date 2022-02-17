@@ -150,8 +150,8 @@ struct utf8₋text { __builtin_int_t bytes; char8₋t * u8s; };
 struct Unicodes { __builtin_int_t tetras; char32̄_t * unicodes; };
 
 #define KEYPUTS(x) ((signed char *)(x))
-#define UC(x) ((char32̄_t *)(U##x))
-#define U8(x) ((char8₋t *)(u8##x))
+#define UNICODES(x) ((char32̄_t *)(U##x))
+#define UTF8TEXT(x) ((char8₋t *)(u8##x))
 
 EXT₋C char32̄_t Utf8ToUnicode(char8₋t *ξ, __builtin_int_t bytes);
 EXT₋C int UnicodeToUtf8(char32̄_t Ξ, void (^sometime₋valid)(char8₋t *u8s, short bytes));
@@ -520,15 +520,16 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
  as @convention(block) (__builtin_uint_t) -> Void */
 typedef struct structa Structa;
 
-#define UNICODES(s) ᵊ(UC(s))
+#define UC(s) TraverseForUnicodes(UNICODES(s))
+/* #define U8(s) TraverseForUtf8text(UTF8TEXT(s))
+#define U7(s) TraverseForKeyputs(KEYPUTS(s)) */
 
-MACRO struct Unicodes ᵊ(const char32̄_t * literal) {
- char32̄_t * ucs = (char32̄_t *)literal; 
- __builtin_int_t count = TetrasUntilNull(ucs, BUILTIN₋INT₋MAX);
- struct Unicodes y = { count, ucs };
- return y; }
-
-typedef void * (*Text₋alloc)(__builtin_int_t bytes);
+struct Unicodes TraverseForUnicodes(const char32̄_t * literal);
+/* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
+int Utf8AsUnicode(utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
+ void (^out)(__builtin_int_t tetras, char32̄_t * ucs, __builtin_int_t u8bytes));
+int UnicodesAsUtf8(Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
+ void (^out)(__builtin_int_t u8bytes, char8₋t *u8s, __builtin_int_t tetras));
 
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
 
@@ -536,7 +537,7 @@ struct two₋memory {
   void (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋dealloc)(void *);
   void (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 node₋dealloc)(void *);
   void * (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 node₋alloc)(__builtin_int_t bytes);
-  Text₋alloc 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋alloc;
+  void * (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋alloc)(__builtin_int_t bytes);
   __builtin_int_t (* 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 text₋bytesize)(void *);
 };
 
@@ -554,6 +555,10 @@ EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
 EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
 EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
+EXT₋C int rope₋read₋persisted₋utf8(Unicodes primary𝘖𝘳𝑆econd, struct 
+ two₋memory dynmem, void ᶿ﹡* opaque₋out);
+EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, 
+ __builtin_int_t from, __builtin_int_t to, void (^segment)(unicode₋shatter));
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
