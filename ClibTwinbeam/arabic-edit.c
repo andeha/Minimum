@@ -330,13 +330,44 @@ char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
 
 __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t 
   from, __builtin_int_t to, void (^segment)(unicode₋shatter))
-{
-   
+{ struct node *node = (noderef)opaque;
+  typedef __builtin_int_t (^Inner)(void ᶿ﹡ opaque, __builtin_int_t from, 
+   __builtin_int_t to, void (^segment)(unicode₋shatter), noderef previous);
 }
 
-int persisted₋utf8₋into₋branch(Unicodes primary𝘖rSecond, void ᶿ﹡* opaque) 
-{
-   let raw: Mutable<Any> = mapfileʳᵚ()
+int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖rSecond, Two₋memory 
+ dynmem, void ᶿ﹡* opaque₋out)
+{ char8₋t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 *utf8₋text, *leadOr8Bit; char32̄_t *text,uc, buffer[4096];
+   __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 filebytes,idx=0,tetras=0,followers,incr,bufidx=0;
+   if (UnicodeAsUtf8(primary𝘖rSecond, 0, 
+     ^(__builtin_int_t, char8₋t * u8s₋name, __builtin_int_t) {
+       utf8₋text = (char8₋t *)mapfileʳᵚ((const char *)u8s₋name,0,0,0,&filebytes);
+     }
+   )) { return -1; } /* unable to convert filename. */
+   if (utf8₋text == ΨΛΩ) { return -2; } /* unable to open file. */
+again:
+   if (idx > filebytes) { return -3; } /* first truncation error. */
+   if (idx == filebytes) { goto unagain; }
+   leadOr8Bit = utf8₋text + idx; 
+   followers = Utf8Followers(*leadOr8Bit);
+   if (followers < 0) { return -4; }
+   if (idx + followers > filebytes) { return -5; } /* last truncation error. */
+   incr = followers + 1;
+   uc = Utf8ToUnicode(leadOr8Bit,incr);
+   if (uc == 0xfffe || uc == 0xffff) { return -7; } /* unable to decode utf8. */
+   buffer[bufidx]=uc; bufidx+=1; idx+=incr;
+   if (bufidx>4096 || idx == filebytes) { 
+     struct Unicodes unicodes = { buffer, bufidx };
+     unicode₋shatter text = persist₋as₋shatter(unicodes);
+     if (rope₋append₋text(&opaque₋out,text,dynmem)) { return -8; } /* unable to append rope. */
+     bufidx=0;
+   }
+   tetras+=1; goto again;
+unagain:
+   return 0;
+rollback:
    return 0;
 }
+
+
 

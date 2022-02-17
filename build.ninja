@@ -88,6 +88,7 @@ build $objs/revision-print.o: c ClibTwinbeam/revision-print.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-symbol.o: c ClibTwinbeam/search-symbol.c
 build $objs/semantic-block.o: c ClibTwinbeam/semantic-block.c
+build $objs/code-text.o: c ClibTwinbeam/code-text.c
 build $objs/symbol-texts.o: c ClibTwinbeam/symbol-texts.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
@@ -96,8 +97,9 @@ build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build $appname: primary-compile-macswift main.swift histories.swift          $
  enriching.swift $objs/revision-print.o $objs/eight-utf.o                    $
  $objs/built-altern.o $objs/semantic-block.o $objs/present-print.o           $
- $objs/endian-base.o $objs/symbol-texts.o $objs/codex-system.o               $
- $objs/thread-fork.o $objs/arabic-edit.o $objs/x-error-stack.o
+ $objs/endian-base.o $objs/code-text.o $objs/symbol-texts.o                  $
+ $objs/codex-system.o $objs/thread-fork.o $objs/arabic-edit.o                $
+ $objs/x-error-stack.o
 build Minimum.app: assemble-macapp $appname
 default Minimum.app
 

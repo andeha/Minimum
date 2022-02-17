@@ -528,8 +528,8 @@ struct Unicodes TraverseForUnicodes(const char32̄_t * literal);
 /* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
 int Utf8AsUnicode(utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
  void (^out)(__builtin_int_t tetras, char32̄_t * ucs, __builtin_int_t u8bytes));
-int UnicodesAsUtf8(Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
- void (^out)(__builtin_int_t u8bytes, char8₋t *u8s, __builtin_int_t tetras));
+int UnicodeAsUtf8(Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
+ void (^out)(__builtin_int_t u8bytes, char8₋t * u8s, __builtin_int_t tetras));
 
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
 
@@ -543,7 +543,7 @@ struct two₋memory {
 
 typedef char32̄_t * 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 unicode₋shatter; /* and 'Heap₋object₋size' for length of text. */
 EXT₋C void unalloc₋shatter(unicode₋shatter text);
-EXT₋C unicode₋shatter persist₋as₋shatter(struct Unicodes ucs);
+EXT₋C unicode₋shatter persist₋as₋shatter(struct Unicodes unicodes);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
  struct two₋memory dynmem);
 EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
@@ -561,7 +561,7 @@ EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque,
  __builtin_int_t from, __builtin_int_t to, void (^segment)(unicode₋shatter));
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
-/* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and usb-planetary. * /
+/* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and 'usb-planetary'. * /
 struct two₋command₋queue { }; */
 
 union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
