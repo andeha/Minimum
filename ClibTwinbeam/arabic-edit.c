@@ -48,9 +48,6 @@ inexorable __builtin_int_t length₋rope(void ᶿ﹡ opaque, Two₋memory dynmem
    }
 } /* ⬷ the 'length' of a rope is string 'weight' + number of nodes to root. */
 
-/* __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
-  __builtin_int_t to, void (^segment)(unicode₋shatter)) { } */
-
 void unalloc₋rope(void ᶿ﹡ opaque, Two₋memory dynmem)
 { struct node *node = (noderef)opaque;
    if (opaque == ΨΛΩ) { return; }
@@ -134,17 +131,17 @@ inexorable void * concat₋forest(struct forest * forest,
 void balance₋rope(void ᶿ﹡* opaque, Two₋memory dynmem)
 {
   __builtin_int_t max₋len = length₋rope(opaque,dynmem), max₋depth=100;
-  struct forest theforest[max₋depth];
+  struct forest rabat[max₋depth];
   for (__builtin_int_t i=0; i<max₋depth; i+=1) {
-    theforest[i].opaque = ΨΛΩ;
-    if (i==0) { theforest[i].min₋len=1; }
-    else if (i==1) { theforest[i].min₋len=2; }
+    rabat[i].opaque = ΨΛΩ;
+    if (i==0) { rabat[i].min₋len=1; }
+    else if (i==1) { rabat[i].min₋len=2; }
     else {
-      theforest[i].min₋len = theforest[i-1].min₋len + theforest[i-2].min₋len;
+      rabat[i].min₋len = rabat[i-1].min₋len + rabat[i-2].min₋len;
     }
-    if (theforest[i].min₋len > max₋len) { break; }
+    if (rabat[i].min₋len > max₋len) { break; }
   }
-  *opaque = concat₋forest(theforest,max₋len,dynmem);
+  *opaque = concat₋forest(rabat,max₋len,dynmem);
 } /* ⬷ balancing reduces the depth of the tree. Traverse the rope
  from left to right and insert each leaf at the correct sequence 
  position. Invariants are:
@@ -162,19 +159,19 @@ void balance₋rope(void ᶿ﹡* opaque, Two₋memory dynmem)
  */
 
 inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, 
- __builtin_int_t index /* ⬷ a․𝘬․a in-left∈[0,count] */, 
+ __builtin_int_t index /* ⬷ a․𝘬․a in-right∈[0,count] */, 
  void ᶿ﹡* left, void ᶿ﹡* right, __builtin_int_t nonleafs₋max, 
  Two₋memory dynmem)
 {
    if (opaque == ΨΛΩ) { return -1; }
    if (index > rope₋symbols(opaque)) { return -2; }
    noderef path[nonleafs₋max], *trace=path;
-    __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 nonleaf₋count=0;
+    __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 inner₋count=0; /* ⬷ a․𝘬․a 'nonleaf₋count'. */
    typedef int (^Inner)(noderef,__builtin_int_t);
    Inner helper = ^(noderef node, __builtin_int_t idx)
    { typedef void (^Push)();
-     if (nonleaf₋count >= nonleafs₋max) { return -1; }
-     Push push = ^{ trace[nonleaf₋count]=node, nonleaf₋count+=1; };
+     if (inner₋count >= nonleafs₋max) { return -1; }
+     Push push = ^{ trace[inner₋count]=node, inner₋count+=1; };
      __builtin_int_t weight = node->payload.keyvalue.key;
      if (weight <= idx && node->right != ΨΛΩ) { push(); 
        return helper(node->right,idx - weight);
@@ -201,7 +198,7 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque,
        dynmem.text₋dealloc(text);
        dynmem.node₋dealloc(node);
      }
-     for (__builtin_int_t i=nonleaf₋count-1; i>=0; i -= 1) {
+     for (__builtin_int_t i=inner₋count-1; i>=0; i -= 1) {
        struct node * previous = trace[i];
        previous->right=ΨΛΩ; /* previous.leftAltRight = ΨΛΩ; */
        if (i>0) { trace[i-1]->payload.keyvalue.key -= idx; }
@@ -223,7 +220,7 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque,
    };
    return helper((noderef)opaque,index);
 } /* two recursive search-paths and one terminal case where 
- invariants are
+ invariants are 
   
   ∙ node is leaf
   ∙ split is in the middle of a L alternatively R leaf-node, 
@@ -330,4 +327,16 @@ char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
    unicode₋shatter text = (unicode₋shatter)node->payload.keyvalue.val;
    return *(idx+text);
 } /* ⬷ execution time is propotional to depth of tree. */
+
+__builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t 
+  from, __builtin_int_t to, void (^segment)(unicode₋shatter))
+{
+   
+}
+
+int persisted₋utf8₋into₋branch(Unicodes primary𝘖rSecond, void ᶿ﹡* opaque) 
+{
+   let raw: Mutable<Any> = mapfileʳᵚ()
+   return 0;
+}
 
