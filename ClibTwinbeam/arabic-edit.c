@@ -5,7 +5,7 @@ import ClibTwinbeam;
 unicode₋shatter persist₋as₋shatter(struct Unicodes ucs)
 {
    __builtin_int_t bytes = ucs.tetras*4;
-   void *storage = Heap₋alloc(bytes);
+   void * storage = Heap₋alloc(bytes);
    Copy8Memory(storage,(ByteAlignedRef)(ucs.unicodes),bytes);
    return (unicode₋shatter)storage;
 }
@@ -163,17 +163,17 @@ void balance₋rope(void ᶿ﹡* opaque, Two₋memory dynmem)
 
 inexorable int rope₋split₋recursive(void ᶿ﹡ opaque, 
  __builtin_int_t index /* ⬷ a․𝘬․a in-left∈[0,count] */, 
- void ᶿ﹡* left, void ᶿ﹡* right, __builtin_int_t max₋nonleafs, 
+ void ᶿ﹡* left, void ᶿ﹡* right, __builtin_int_t nonleafs₋max, 
  Two₋memory dynmem)
 {
    if (opaque == ΨΛΩ) { return -1; }
    if (index > rope₋symbols(opaque)) { return -2; }
-   noderef path[max₋nonleafs], *trace=path;
+   noderef path[nonleafs₋max], *trace=path;
     __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 nonleaf₋count=0;
    typedef int (^Inner)(noderef,__builtin_int_t);
    Inner helper = ^(noderef node, __builtin_int_t idx)
    { typedef void (^Push)();
-     if (nonleaf₋count >= max₋nonleafs) { return -1; }
+     if (nonleaf₋count >= nonleafs₋max) { return -1; }
      Push push = ^{ trace[nonleaf₋count]=node, nonleaf₋count+=1; };
      __builtin_int_t weight = node->payload.keyvalue.key;
      if (weight <= idx && node->right != ΨΛΩ) { push(); 
@@ -187,12 +187,13 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque,
      int idx₋encased = idx != 0 && idx == symbols;
      if (idx₋encased) {
        typedef void (^Textsplit)(__builtin_int_t,noderef *,__builtin_int_t);
-       Textsplit in₋fresh = ^(__builtin_int_t start, noderef * child, __builtin_int_t count) {
-         unicode₋shatter duptext = dynmem.text₋alloc(count);
+       Textsplit in₋fresh = ^(__builtin_int_t start, noderef * child, __builtin_int_t tetras) {
+         __builtin_int_t bytes = tetras<<2;
+         unicode₋shatter duptext = dynmem.text₋alloc(bytes);
          uint8_t * original = (uint8_t *)text;
-         Copy8Memory((ByteAlignedRef)duptext,start+original,count);
+         Copy8Memory((ByteAlignedRef)duptext,start+original,bytes);
          *child=dynmem.node₋alloc(node₋size);
-         (*child)->payload.keyvalue.key = count;
+         (*child)->payload.keyvalue.key = tetras;
          (*child)->payload.keyvalue.val = (__builtin_uint_t)duptext;
        }; /* ⬷ a․𝘬․a 'Duptext'. */
        __builtin_int_t residue = symbols - idx;
@@ -237,35 +238,33 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque,
  characters to the right of index. */
 
 inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx, 
- void ᶿ﹡* lhs, void ᶿ﹡* rhs, Two₋memory dynmem)
+ void ᶿ﹡* left, void ᶿ﹡* right, Two₋memory dynmem)
 {
   struct node *out₋lhs=(noderef)ΨΛΩ, *out₋rhs=(noderef)ΨΛΩ, 
     *root₋node=(struct node *)opaque;
    if (idx > rope₋symbols(opaque)) { return -1; }
-   typedef void (^Ground)(unicode₋shatter, struct node *, struct two₋memory);
-   Ground include = ^(unicode₋shatter text, struct node *out, struct two₋memory dynmem) {};
+   typedef void (^Ground)(unicode₋shatter, noderef, Two₋memory);
+   Ground include = ^(unicode₋shatter text, noderef out, Two₋memory dynmem) { };
    struct ¹stack node₋stack;
    if (init₋stack(&node₋stack, sizeof(struct node))) { return -2; }
    push(&node₋stack,(uint8_t *)&root₋node);
    __builtin_int_t current₋idx=0;
    while (!empty(&node₋stack)) {
-     struct node * elem = (struct node *)pop(&node₋stack);
+     struct node * elem = (noderef)pop(&node₋stack);
      if (is₋leaf₋node(elem)) {
        __builtin_int_t weight = elem->payload.keyvalue.key;
-       unicode₋shatter text = (char32̄_t *)elem->payload.keyvalue.val;
-       __builtin_int_t symbols = 1 + (dynmem.text₋bytesize(text)>>2);
+       unicode₋shatter text = (unicode₋shatter)elem->payload.keyvalue.val;
        if (idx > current₋idx + weight) { include(text,&out₋lhs,dynmem); }
        else if (idx <= current₋idx) { include(text,&out₋rhs,dynmem); }
        else {
+         __builtin_int_t symbols = dynmem.text₋bytesize(text)>>2;
          __builtin_int_t tetra₋offset = idx - current₋idx, 
           lhs₋symbol₋bytes=tetra₋offset<<2, 
           rhs₋symbol₋bytes=(symbols - tetra₋offset)<<2;
-         void * text₁ = dynmem.text₋alloc(4 + lhs₋symbol₋bytes);
-         void * text₂ = dynmem.text₋alloc(4 + rhs₋symbol₋bytes);
-         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)text₁)), 
-          (ByteAlignedRef)(uint8_t *)(1+text), lhs₋symbol₋bytes);
-         Copy8Memory(((ByteAlignedRef)(4+(uint8_t *)text₂)), 
-          (ByteAlignedRef)(uint8_t *)(1+text+tetra₋offset), rhs₋symbol₋bytes);
+         uint8_t * text₁ = (uint8_t *)dynmem.text₋alloc(lhs₋symbol₋bytes);
+         uint8_t * text₂ = (uint8_t *)dynmem.text₋alloc(rhs₋symbol₋bytes);
+         Copy8Memory(text₁,(ByteAlignedRef)text,lhs₋symbol₋bytes);
+         Copy8Memory(text₂,(ByteAlignedRef)(text+tetra₋offset),rhs₋symbol₋bytes);
          include(text₁,&out₋lhs,dynmem);
          include(text₂,&out₋rhs,dynmem);
        }
@@ -276,7 +275,7 @@ inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
        push(&node₋stack,(uint8_t *)&(elem->right));
      }
    }
-   *lhs=out₋lhs; *rhs=out₋rhs;
+   *left=out₋lhs; *right=out₋rhs;
    return 0;
 error₋and₋dealloc:
    unalloc₋rope(&out₋lhs,dynmem);
@@ -284,13 +283,12 @@ error₋and₋dealloc:
    return -3;
 }
 
-#define rope₋split iterative₋rope₋split
 #define MAX₋NONLEAFS 10 /* ⬷ propotional to the number of edits since rebalancing. */
 
 int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, void ᶿ﹡ wedge, 
  Two₋memory dynmem)
 { void *left,*right;
-   if (rope₋split(*opaque,idx,&left,&right,dynmem)) { return -1; }
+   if (rope₋split₋recursive(*opaque,idx,&left,&right,MAX₋NONLEAFS,dynmem)) { return -1; }
    if (rope₋append₋rope(&left,wedge,dynmem)) { return -2; }
    if (rope₋append₋rope(&left,right,dynmem)) { return -3; }
    *opaque = left;
@@ -302,8 +300,8 @@ int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, __builtin_int_t len,
 { void *left,*rhs1,*lhs2,*right; __builtin_int_t splits₋since₋balanced=10;
     __builtin_int_t count = rope₋symbols(*opaque);
    if (count < idx || count < idx + len) { return -1; }
-   if (rope₋split(opaque,idx,&left,&rhs1,dynmem)) { return -2; }
-   if (rope₋split(opaque,idx+len-1,&lhs2,&right,dynmem)) { return -3; }
+   if (rope₋split₋recursive(opaque,idx,&left,&rhs1,MAX₋NONLEAFS,dynmem)) { return -2; }
+   if (rope₋split₋recursive(opaque,idx+len-1,&lhs2,&right,MAX₋NONLEAFS,dynmem)) { return -3; }
    void * merge = concat₋rope(left,right,dynmem);
    if (merge==0) { return -4; }
    *opaque=merge; unalloc₋rope(rhs1,dynmem); unalloc₋rope(lhs2,dynmem);
