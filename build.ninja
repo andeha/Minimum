@@ -92,6 +92,7 @@ build $objs/code-text.o: c ClibTwinbeam/code-text.c
 build $objs/symbol-texts.o: c ClibTwinbeam/symbol-texts.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
+build $objs/assoc-symbol.o: c ClibTwinbeam/assoc-symbol.c
 build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
 build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
 build $appname: primary-compile-macswift main.swift histories.swift          $

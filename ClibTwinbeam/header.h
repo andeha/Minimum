@@ -589,35 +589,18 @@ inline notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int
 }
 #endif
 
+int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void ᶿ﹡* opaque);
+int dissociate₋isolate(struct Unicodes key, struct Unicodes val, void ᶿ﹡* opaque);
+int dissociate₋full(struct Unicodes key, void ᶿ﹡* opaque);
+int evidence₋related(struct Unicodes key, void (^right)(int count, 
+ struct Unicodes val[], unsigned distance[]), void ᶿ﹡* opaque);
+/* ⬷ a․𝘬․a 'thesaurus', company', 'association', liability₋alt₋indemnity 
+ and 'unicode₋map'. */
+
 /* EXT₋C int textual₋similar(struct symbolpool * 🅡, struct Unicodes uc₁, 
  Nonabsolute relative); */
 /* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and 'usb-planetary'. * /
 struct two₋command₋queue { }; */
-
-struct thesaurus { struct structa symbols; void ᶿ﹡ opaque; 
-  unsigned (*norm)(struct Unicodes alt₁, struct Unicodes alt₂);
-};
-int form₋ōnymon(struct Unicodes key, struct Unicodes value, int shares, 
- struct thesaurus * 🅓);
-int dissociate₋isolate(struct Unicodes key, struct Unicodes value);
-int evidence₋related(struct Unicodes key, void (^right)(int count, 
- struct Unicodes value[], unsigned distance[]), struct thesaurus * 🅓);
-int association₋init(struct thesaurus * 🅳);
-int uninit₋association(struct thesaurus * 🅳);
-/* ⬷ a․𝘬․a 'company', 'association', liability₋alt₋indemnity 
- and 'unicode₋map'. */
-
-struct remmingway {
-  struct structa keypresses₋unicodes;
-  struct structa nonabsolutes;
-  void ᶿ﹡ opaque₋rope;
-}; /* ⬷ a․𝘬․a 'getdelim' and 'getline'. */
-
-int init₋typewriter(struct remmingway * 🅡);
-int append₋characters(struct Unicodes text, struct remmingway * 🅡);
-int delete₋character(struct remmingway * 🅡);
-int insert₋character(struct remmingway * 🅡);
-int uninit₋typewriter(struct remmingway * 🅡);
 
 struct ¹stack { uint8_t * words; 
  __builtin_int_t size, elem₋bytesize, pos;

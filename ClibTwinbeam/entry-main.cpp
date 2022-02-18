@@ -13,7 +13,7 @@ import ClibTwinbeam;
    float-short.o gnostic-codex.o lock-attempt.o o-binary.o present-print.o     \
    queue-invent.o regular-pool.o round-fixed.o search-symbol.o                 \
    semantic-block.o code-text.o symbol-texts.o thread-fork.o tiles-map.o       \
-   x-error-stack.o x-partial-referen.o
+   x-error-stack.o x-partial-referen.o assoc-symbol.o
   
    clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
@@ -23,7 +23,7 @@ import ClibTwinbeam;
    eight-utf.c endian-base.c float-short.c gnostic-codex.c lock-attempt.c      \
    o-binary.c present-print.c queue-invent.c regular-pool.c round-fixed.c      \
    search-symbol.c semantic-block.c code-text.c symbol-texts.c                 \
-   thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c
+   thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c assoc-symbol.c
   
    $(CC) main-entry.c -o arm-mac_app -target arm64-apple-macos11
    $(CC) main-entry.c -o x86-mac_app -target x86_64-apple-macos10.12
@@ -41,7 +41,7 @@ import ClibTwinbeam;
    eight-utf.o endian-base.o float-short.o gnostic-codex.o lock-attempt.o     \
    o-binary.o present-print.o queue-invent.o regular-pool.o round-fixed.o     \
    search-symbol.o semantic-block.o code-text.o symbol-texts.o                \
-   thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o
+   thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o assoc-symbol.o
   
    clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__      \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
@@ -51,7 +51,7 @@ import ClibTwinbeam;
    float-short.c gnostic-codex.c lock-attempt.c o-binary.c present-print.c    \
    queue-invent.c regular-pool.c round-fixed.c search-symbol.c                \
    semantic-block.c code-text.c symbol-texts.c thread-fork.c tiles-map.c      \
-   x-error-stack.c x-partial-referen.c
+   x-error-stack.c x-partial-referen.c assoc-symbol.c
   
    On 'target' and 'march' details, see the llvm files:
   
