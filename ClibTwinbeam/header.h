@@ -526,9 +526,9 @@ typedef struct structa Structa;
 
 struct Unicodes TraverseForUnicodes(const char32̄_t * literal);
 /* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
-int Utf8AsUnicode(utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
+int Utf8AsUnicode(struct utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
  void (^out)(__builtin_int_t tetras, char32̄_t * ucs, __builtin_int_t u8bytes));
-int UnicodeAsUtf8(Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
+int UnicodeAsUtf8(struct Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
  void (^out)(__builtin_int_t u8bytes, char8₋t * u8s, __builtin_int_t tetras));
 
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
@@ -555,47 +555,44 @@ EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
 EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
 EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
-EXT₋C int rope₋read₋persisted₋utf8(Unicodes primary𝘖𝘳𝑆econd, struct 
+EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econd, struct 
  two₋memory dynmem, void ᶿ﹡* opaque₋out);
 EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, 
  __builtin_int_t from, __builtin_int_t to, void (^segment)(unicode₋shatter));
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
-/* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and 'usb-planetary'. * /
-struct two₋command₋queue { }; */
-
+typedef __builtin_int_t Nonabsolute; /* ⬷ index to Unicode (not impression) and in swift Array<UInt32>. */
 union Tetra𝘖rUnicode { int32_t count; char32̄_t uc; };
-typedef __builtin_int_t Nonabsolute; /* ⬷ index to symbols in swift Array<UInt32>. */
-
 EXT₋C int init₋regularpool(struct structa * 🅿, ALLOC alloc);
 EXT₋C int optional₋uninit₋regularpool(struct structa * 🅿, FALLOW fallow);
 EXT₋C int copy₋append₋onto₋regular(struct structa * 🅟, int32_t tetras, char32̄_t cs[], ALLOC alloc);
 EXT₋C int regularpool₋datum₋text(struct structa * 🅟, int32_t tetras, Nonabsolute * reference);
 EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute relative);
 /* ⬷ operating system do release allocated memory space and pages when 
- program ends. */
-/* ⬷ enough space to store all Unicode symbols in an utf-8 file may be found 
- from the file's byte length. */
+ program ends. Enough space to store all Unicode symbols in an utf-8 file may 
+ be found from the file's byte length. */
 
 #if defined 𝟷𝟸𝟾₋bit₋integers
-struct regularprint { void ᶿ﹡ opaque; };
-/* EXT₋C int textual₋similar(struct symbolpool * 🅡, struct Unicodes uc₁, 
- Nonabsolute relative); */
-EXT₋C void ᶿ﹡ store₋impression(struct regularprint * 🅡, __uint128_t fineprint, 
- ALLOC alloc);
-EXT₋C void ᶿ﹡ seek₋impression(struct regularprint * 🅡, __uint128_t fineprint);
-#if defined __cplusplus
-template <typename Note> Note * jot(Unicodes regular, struct regularprint * 🅡)
-{
-  __uint128_t fineprint=0; void ᶿ﹡ node;
-  node = seek₋impression(🅡,fineprint);
+EXT₋C __uint128_t FNV1b(int bytes, void * material);
+EXT₋C void * store₋impression(void ᶿ﹡* opaque, __uint128_t fineprint, ALLOC alloc);
+EXT₋C void * seek₋impression(void ᶿ﹡ opaque, __uint128_t fineprint);
+typedef void * notepointer;
+struct w₋node { __int128_t key; void * note; struct w₋node *left, *right; };
+inline notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t notebytes, ALLOC alloc)
+{ __uint128_t fineprint=FNV1b(token.tetras*4,token.unicodes);
+  struct w₋node * node = (struct w₋node *)seek₋impression(*opaque,fineprint);
   if (node == ΨΛΩ) {
-    ALLOC alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
-    void ᶿ﹡ node = store₋impression(🅡,fineprint,alloc);
-  } else { return node; }
+    node = store₋impression(opaque,fineprint,alloc);
+    node->note = alloc(notebytes);
+  }
+  return node->note;
 }
 #endif
-#endif
+
+/* EXT₋C int textual₋similar(struct symbolpool * 🅡, struct Unicodes uc₁, 
+ Nonabsolute relative); */
+/* struct geometrypaper { }; / * ⬷ a․𝘬․a 'bits₋on₋tiles' and 'usb-planetary'. * /
+struct two₋command₋queue { }; */
 
 struct thesaurus { struct structa symbols; void ᶿ﹡ opaque; 
   unsigned (*norm)(struct Unicodes alt₁, struct Unicodes alt₂);
