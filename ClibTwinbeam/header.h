@@ -407,7 +407,7 @@ EXT₋C int interact(unsigned retrospect₋rows, double framesync₋Hz,
 /* default state is 'print'. To toggle 'charcoal', 'markdown' and 
  'print' use the unicodes U+2FEF (e2 bf af), U+2FED (e2 bf ad), 
  U+2FEB (e2 bf ab). Interact is U+2fE7 (e2 bf a7). */
-EXT₋C int parse₋art₋system(int count, char32̄_t * text, int * width, int * height);
+EXT₋C int parse₋art₋system(struct Unicodes text, int * width, int * height);
 typedef void (^Linewidth)(double width);
 typedef void (^Color)(double c, double m, double y, double blk, double a);
 typedef void (^Begin)(); typedef void (^Move)(double x, double y);
@@ -415,11 +415,12 @@ typedef void (^Addcurve)(double x[], double y[]);
 typedef void (^Addstraight)(double x, double y);
 typedef void (^Closepath)();
 typedef void (^Stroke)();
-EXT₋C int draw₋art₋system(int count, char32̄_t * text, Color color, Linewidth 
+EXT₋C int draw₋art₋system(struct Unicodes text, Color color, Linewidth 
  linewidth, Begin begin, Move move, Addcurve curve, Addstraight straight, 
  Closepath closepath, Stroke stroke);
-typedef void (^Attributes)(char32̄_t * text, int offset, int range, int attribute);
-EXT₋C int format₋system(int count, char32̄_t * text, Attributes attrs);
+typedef void (^Attributes)(char32̄_t * text, __builtin_int_t offset, 
+ __builtin_int_t range, __builtin_int_t attribute);
+EXT₋C int format₋system(struct Unicodes text, Attributes attrs);
 EXT₋C int regional₋system(unsigned retrospect₋rows);
 
 #ifndef __cplusplus
@@ -572,28 +573,31 @@ EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute rela
  program ends. Enough space to store all Unicode symbols in an utf-8 file may 
  be found from the file's byte length. */
 
+typedef int (^INIT)(void * uninited);
+
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C __uint128_t FNV1b(int bytes, void * material);
 EXT₋C void * store₋impression(void ᶿ﹡* opaque, __uint128_t fineprint, ALLOC alloc);
 EXT₋C void * seek₋impression(void ᶿ﹡ opaque, __uint128_t fineprint);
 typedef void * notepointer;
 struct w₋node { __int128_t key; void * note; struct w₋node *left, *right; };
-inline notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t notebytes, ALLOC alloc)
+inline notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t notebytes, ALLOC alloc, INIT init)
 { __uint128_t fineprint=FNV1b(token.tetras*4,token.unicodes);
   struct w₋node * node = (struct w₋node *)seek₋impression(*opaque,fineprint);
   if (node == ΨΛΩ) {
     node = store₋impression(opaque,fineprint,alloc);
     node->note = alloc(notebytes);
+    if (init(node->note)) { return ΨΛΩ; }
   }
   return node->note;
 }
 #endif
 
-int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void ᶿ﹡* opaque);
-int dissociate₋isolate(struct Unicodes key, struct Unicodes val, void ᶿ﹡* opaque);
+int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void ᶿ﹡* opaque, ALLOC alloc);
+int dissociate₋isolate(struct Unicodes key, int idx, void ᶿ﹡* opaque);
 int dissociate₋full(struct Unicodes key, void ᶿ﹡* opaque);
 int evidence₋related(struct Unicodes key, void (^right)(int count, 
- struct Unicodes val[], unsigned distance[]), void ᶿ﹡* opaque);
+ struct Unicodes val[]), void ᶿ﹡* opaque);
 /* ⬷ a․𝘬․a 'thesaurus', company', 'association', liability₋alt₋indemnity 
  and 'unicode₋map'. */
 

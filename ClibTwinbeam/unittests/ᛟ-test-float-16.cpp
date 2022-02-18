@@ -1,11 +1,11 @@
-/*  test-half.cpp | ieee754-2008 16-bit floating points. */
+/*  test-float-16.cpp | ieee754-2008 16-bit floating points. */
 
 import ClibTwinbeam;
 import Stdio;
 
 extern "C" long write(int fd, const void * s, long unsigned nbyte);
 
-UNITTEST(half₋Presentᵧ)
+UNITTEST(float₋16₋Presentᵧ)
 {
    pythagorean_double x { .binary16 = { 3, 2, 1 } };
    double y = To₋doubleprecision(x.bits);
