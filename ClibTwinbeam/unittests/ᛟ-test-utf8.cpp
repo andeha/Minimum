@@ -1,4 +1,4 @@
-/*  test-utf8.cpp | unicodes/alphabete — roman, arabic and non-cyrillic. */
+/*  test-utf8.cpp | unicodes and alphabeth — roman, arabic and non-cyrillic. */
 
 import ClibTwinbeam;
 
@@ -35,10 +35,9 @@ again:
 UNITTEST(decoded₋print)
 {
 #if defined __cplusplus
-   const char32̄_t * text = (char32̄_t *)U"lorem ipsum";
-   /* const char32̄_t * text = U"lorem ipsum"_unicodes; */
+   const char32̄_t * text = UNICODES("lorem ipsum"); /* ⬷ passing char32_t. */
 #else
-   const char32̄_t * text = U"lorem ipsum";
+   const char32̄_t * text = UNICODES("lorem ipsum"); /* ⬷ passing 'unsigned int'. */
 #endif
    print₋unicodes(11,(char32̄_t *)text);
 }
