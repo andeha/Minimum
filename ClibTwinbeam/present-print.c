@@ -16,8 +16,8 @@ EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) a⃝ {
   __builtin_int_t tetras=TetrasUntilNull((char32̄_t *)zero₋terminated₋uc,BUILTIN₋INT₋MAX);
   Argᴾ y = { { .ucs={ tetras, (char32̄_t *)zero₋terminated₋uc } }, 5 };
   return y; }
-EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, const /* signed */ char * s) a⃝ {
- Argᴾ y = { { .text₁={ characters, (signed char *)s } }, 100 }; return y; }
+EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) a⃝ {
+ Argᴾ y = { { .text₁={ characters, keyput } }, 100 }; return y; }
 EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) a⃝ {
  Argᴾ y= { { .text₂={ bytes, (char8₋t *)u8s } }, 101 }; return y; }
 EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */ { Argᴾ y= { { .c=c }, 6 }; return y; }
@@ -270,5 +270,4 @@ NumberformatCatalogue₋Present(
    Present(out,(char32̄_t *)(ar->footnote));
    print(out,"\n\n");
 }
-
 

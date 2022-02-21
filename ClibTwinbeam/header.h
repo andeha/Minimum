@@ -76,21 +76,21 @@ int Details_in_C(uint64_t pid, int32_t cross);
 #define ArmDS1S2 asm {
 #endif
 
-MACRO __builtin_uint_t 🔎(__builtin_uint_t var) { return *((__builtin_uint_t 
- /* volatile */ *) var); }
-MACRO __builtin_uint_t TrailingZeros(__builtin_uint_t x) { if (x == 0) { return 
- sizeof(x)*8; } x=(x^(x-1))>>1; int c=0; for (; x; c++) { x >>= 1; } return c; }
-#if !defined(__cplusplus)
-MACRO __builtin_uint_t * 🔧(__builtin_uint_t var) { return (__builtin_uint_t *)var; }
-#else
-MACRO __builtin_uint_t 🎭(__builtin_uint_t * symbol, __builtin_uint_t mask, 
- void (^update)(__builtin_uint_t& shifted) = ^(__builtin_uint_t&) { } ) {
- __builtin_uint_t word = *symbol, shift=TrailingZeros(mask), orig = mask&word,
- shifted = orig>>shift; if (update) update(shifted); __builtin_uint_t fresh =
- (shifted<<shift)&mask; *symbol = (word & ~mask) | fresh; return orig>>shift; }
-MACRO __builtin_uint_t& 🔧(__builtin_uint_t var) { return (__builtin_uint_t&) 
- *(__builtin_uint_t /* volatile */ *)var; }
-#endif
+MACRO __builtin_uint_t 🔎(__builtin_uint_t reg₋mapped) { return *((__builtin_uint_t *)
+ reg₋mapped); }
+MACRO __builtin_uint_t * 🔧(__builtin_uint_t reg₋mapped) { return ((__builtin_uint_t *)
+ reg₋mapped); }
+MACRO __builtin_uint_t Trailingzeros(__builtin_uint_t word) { if (word==0) { return 
+ sizeof(word)*8; } __builtin_uint_t count=0; while (word) { word>>=1; count+=1; } 
+ return count; }
+MACRO __builtin_uint_t 🎭(__builtin_uint_t reg₋mapped, __builtin_uint_t mask, 
+ void (^update)(__builtin_uint_t * shifted)) {
+ __builtin_uint_t word = 🔎(reg₋mapped), shift=Trailingzeros(mask), 
+ orig=mask&word, shifted=orig>>shift, updated=shifted;
+ if (update) { update(&updated); } __builtin_uint_t fresh = mask&(updated<<shift);
+ __builtin_uint_t * memory = 🔧(reg₋mapped); *memory = (word & ~mask) | fresh;
+ return shifted;
+}
 
 typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
  deactivates the unused c++ builtin type char8_t not found in llvm-c source. */
@@ -337,10 +337,10 @@ EXT₋C void * Realloc(void * p, __builtin_int_t to₋bytes);
  Alloc/Fallow/Realloc, but Heap-alloc et al. or ContigousAcquire, 
  and that one set of functions is called by Alloc/Fallow/Realloc. */
 
-typedef void * (^ALLOC)(__builtin_int_t);
-typedef void (^FALLOW)(void *);
-typedef void * (^REALLOC)(void *, __builtin_int_t);
-typedef __builtin_int_t (^DIDALLOC)(void *);
+typedef void * (*ALLOC)(__builtin_int_t);
+typedef void (*FALLOW)(void *);
+typedef void * (*REALLOC)(void *, __builtin_int_t);
+typedef __builtin_int_t (*DIDALLOC)(void *);
 
 /* __builtin_int_t 𝟺𝟶𝟿𝟼₋aligned₋frame(__builtin_int_t byte₋number, __builtin_int_t * modulo); */
 struct 𝟺kbframes { __builtin_int_t page₋count; __builtin_uint_t *pages₋base, * idx₋avails; };
@@ -410,7 +410,8 @@ EXT₋C int interact(unsigned retrospect₋rows, double framesync₋Hz,
 EXT₋C int parse₋art₋system(struct Unicodes text, int * width, int * height);
 typedef void (^Linewidth)(double width);
 typedef void (^Color)(double c, double m, double y, double blk, double a);
-typedef void (^Begin)(); typedef void (^Move)(double x, double y);
+typedef void (^Move)(double x, double y);
+typedef void (^Begin)();
 typedef void (^Addcurve)(double x[], double y[]);
 typedef void (^Addstraight)(double x, double y);
 typedef void (^Closepath)();
@@ -472,7 +473,7 @@ EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) a⃝;
 EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) a⃝;
 EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝;
 EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, const /* signed */ char * s) a⃝;
+EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) a⃝;
 EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) a⃝;
 EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */;
 EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */;
@@ -525,11 +526,11 @@ typedef struct structa Structa;
 /* #define U8(s) TraverseForUtf8text(UTF8TEXT(s))
 #define U7(s) TraverseForKeyputs(KEYPUTS(s)) */
 
-struct Unicodes TraverseForUnicodes(const char32̄_t * literal);
+EXT₋C struct Unicodes TraverseForUnicodes(char32̄_t * literal);
 /* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
-int Utf8AsUnicode(struct utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
+EXT₋C int Utf8AsUnicode(struct utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
  void (^out)(__builtin_int_t tetras, char32̄_t * ucs, __builtin_int_t u8bytes));
-int UnicodeAsUtf8(struct Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
+EXT₋C int UnicodeAsUtf8(struct Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
  void (^out)(__builtin_int_t u8bytes, char8₋t * u8s, __builtin_int_t tetras));
 
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
@@ -556,10 +557,15 @@ EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
 EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
 EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
-EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econd, struct 
- two₋memory dynmem, void ᶿ﹡* opaque₋out);
-EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, 
- __builtin_int_t from, __builtin_int_t to, void (^segment)(unicode₋shatter));
+EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econdary, struct 
+ two₋memory dynmem, void ᶿ﹡* opaque₋out, void (^completion)());
+typedef void (^Rope₋text)(char32̄_t *, __builtin_int_t);
+EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
+ __builtin_int_t to, Rope₋text out, int inner₋print);
+/* EXT₋C int rope₋branch₋into₋identical(void ᶿ﹡ opaque, void ᶿ﹡* identical);
+EXT₋C int rope₋reconcile₋as₋reflecting(struct Unicodes primary𝘖rSecondary, 
+ void (^branch₋alters)(int64_t offset, int64_t bytes, uint8_t * material, int * stop),
+ void (^complete)(int * rollback)); see also 'fsetpos'/'fwrite'/'pwrite'. */
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
 
 typedef __builtin_int_t Nonabsolute; /* ⬷ index to Unicode (not impression) and in swift Array<UInt32>. */
@@ -576,27 +582,20 @@ EXT₋C struct Unicodes regularpool₋at(struct structa * 🅟, Nonabsolute rela
 typedef int (^INIT)(void * uninited);
 
 #if defined 𝟷𝟸𝟾₋bit₋integers
-EXT₋C __uint128_t FNV1b(int bytes, void * material);
-EXT₋C void * store₋impression(void ᶿ﹡* opaque, __uint128_t fineprint, ALLOC alloc);
-EXT₋C void * seek₋impression(void ᶿ﹡ opaque, __uint128_t fineprint);
-typedef void * notepointer;
+EXT₋C __uint128_t FNV1b(__builtin_int_t bytes, void * material);
 struct w₋node { __int128_t key; void * note; struct w₋node *left, *right; };
-inline notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t notebytes, ALLOC alloc, INIT init)
-{ __uint128_t fineprint=FNV1b(token.tetras*4,token.unicodes);
-  struct w₋node * node = (struct w₋node *)seek₋impression(*opaque,fineprint);
-  if (node == ΨΛΩ) {
-    node = store₋impression(opaque,fineprint,alloc);
-    node->note = alloc(notebytes);
-    if (init(node->note)) { return ΨΛΩ; }
-  }
-  return node->note;
-}
+EXT₋C void * impression₋store(void ᶿ﹡ opaque, __uint128_t fineprint, ALLOC alloc);
+EXT₋C void * impression₋seek(void ᶿ﹡ opaque, __uint128_t fineprint);
+typedef void * notepointer;
+EXT₋C notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t 
+ notebytes, ALLOC alloc, INIT init);
 #endif
 
-int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void ᶿ﹡* opaque, ALLOC alloc);
-int dissociate₋isolate(struct Unicodes key, int idx, void ᶿ﹡* opaque);
-int dissociate₋full(struct Unicodes key, void ᶿ﹡* opaque);
-int evidence₋related(struct Unicodes key, void (^right)(int count, 
+EXT₋C int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void 
+ ᶿ﹡* opaque, ALLOC alloc);
+EXT₋C int dissociate₋isolate(struct Unicodes key, int idx, void ᶿ﹡* opaque);
+EXT₋C int dissociate₋all(struct Unicodes key, void ᶿ﹡* opaque);
+EXT₋C int evidence₋related(struct Unicodes key, void (^right)(int count, 
  struct Unicodes val[]), void ᶿ﹡* opaque);
 /* ⬷ a․𝘬․a 'thesaurus', company', 'association', liability₋alt₋indemnity 
  and 'unicode₋map'. */
@@ -725,14 +724,17 @@ EXT₋C void Present₋timeserie₋transacts(struct timeserie * 🅙, int incl�
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
 int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes, 
- struct structa * pool, struct structa * words);
-int steganography₋hide(Nonabsolute word, Nonabsolute * code);
-int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
+ struct structa * pool, struct structa * words, ALLOC alloc);
+EXT₋C int steganography₋hide(Nonabsolute word, Nonabsolute * code);
+EXT₋C int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
 
 EXT₋C void Gitidentity(const char ** text);
 
 typedef int (*Keydown₋Incident)(struct Unicodes text);
+typedef int (*Touchpad₋Incident)(double deltax, double deltay, 
+ double pressure);
 EXT₋C int Register₋Keydown(Keydown₋Incident occurred);
+EXT₋C int Register₋Touchpad(Touchpad₋Incident occurred);
 
 #if defined __mips__ && !defined NON₋SIMD
 extern v2f64 __builtin_msa_cast_to_vector_double(double);

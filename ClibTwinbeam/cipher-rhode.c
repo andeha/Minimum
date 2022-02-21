@@ -6,7 +6,7 @@ inexorable int token₋separator(char32̄_t uc) { return uc == ' ' ||
  uc == '\t' || uc == '\xa' || uc == '\xd'; }
 
 int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes, 
- struct structa * pool, struct structa * words)
+ struct structa * pool, struct structa * words, ALLOC alloc)
 { char8₋t * leadOr8Bit; char32̄_t uc;
    int32_t tetras=0; char32̄_t cs[1024]; __builtin_int_t i=0,j=0, bytes;
 again:
@@ -17,7 +17,7 @@ again:
    if (token₋separator(uc)) {
      if (cs[j-1] != '-') {
       for (short x=0; x<j; x+=1) {
-       if (copy₋append₋onto₋regular(pool,tetras,cs,^(__builtin_int_t bytes) { return Heap₋alloc(bytes); } )) { return -2; }
+       if (copy₋append₋onto₋regular(pool,tetras,cs,alloc)) { return -2; }
       }
       Nonabsolute ref; if (regularpool₋datum₋text(pool,tetras,&ref)) { return -3; }
      }

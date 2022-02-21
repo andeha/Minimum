@@ -179,13 +179,15 @@ func Render₋art(unicodes: Array<UInt32>, first₋unicode: Int, last₋unicode:
 { var width: CInt=0, height: CInt=0
   
   unicodes.withUnsafeBytes { /* UnsafeRawBufferPointer */
-    let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
-    guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+    let sequence: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+    guard let start: UnsafePointer<char32̄_t> = sequence.baseAddress else { return }
     let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
-    let count = CInt(last₋unicode - first₋unicode)
-    let y = parse₋art₋system(count,mutable₋start.advanced(by: first₋unicode),&width,&height)
+    let count = Int64(last₋unicode - first₋unicode)
+    let text = Unicodes(tetras: count, unicodes: mutable₋start.advanced(by: first₋unicode))
+    let y = parse₋art₋system(text,&width,&height)
     if y != 0 { fatalError("error in parse₋art₋system") }
   }
+
   
   let drawing = { (ctxt: NSGraphicsContext) -> Void in 
       
@@ -212,12 +214,13 @@ func Render₋art(unicodes: Array<UInt32>, first₋unicode: Int, last₋unicode:
      /* setLineJoin, setMiterLimit, setLineCap, setLineDash */
       
      unicodes.withUnsafeBytes { /* UnsafeRawBufferPointer */
-       let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
-       guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+       let sequence: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+       guard let start: UnsafePointer<char32̄_t> = sequence.baseAddress else { return }
        let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
-       let count = CInt(last₋unicode - first₋unicode)
-       let y = draw₋art₋system(count,mutable₋start.advanced(by: first₋unicode),selectcolor,
-        linewith,begin,move,curve,straight,closepath,stroke)
+       let count = Int64(last₋unicode - first₋unicode)
+       let text = Unicodes(tetras: count, unicodes: mutable₋start.advanced(by: first₋unicode))
+       let y = draw₋art₋system(text,selectcolor,linewith,begin,move,curve,
+        straight,closepath,stroke)
        if y != 0 { fatalError("error in draw₋art₋system") }
      }
   }
@@ -230,8 +233,8 @@ func Render₋format(unicodes: Array<UInt32>, first₋unicode: Int,
   guard let boldfont = NSFont(name: "SF Mono Bold", size: 11) else { return nil }
   let formatted = NSMutableAttributedString(string: "")
   
-  let attributes = { (text: UnsafeMutablePointer<char32̄_t>?, offset: CInt, 
-   range: CInt, attribute: CInt) -> Void in 
+  let attributes = { (text: UnsafeMutablePointer<char32̄_t>?, offset: Int64, 
+   range: Int64, attribute: Int64) -> Void in 
     if attribute == 1 {
       let raw = UnsafeMutableRawPointer(mutating: text!)
       guard let text = String(bytesNoCopy: raw, length: Int(range), 
@@ -244,11 +247,12 @@ func Render₋format(unicodes: Array<UInt32>, first₋unicode: Int,
   }
   
   unicodes.withUnsafeBytes {
-    let text: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
-    guard let start: UnsafePointer<char32̄_t> = text.baseAddress else { return }
+    let sequence: UnsafeBufferPointer<char32̄_t> = $0.bindMemory(to: char32̄_t.self)
+    guard let start: UnsafePointer<char32̄_t> = sequence.baseAddress else { return }
     let mutable₋start = UnsafeMutablePointer<char32̄_t>(mutating: start)
-    let count = CInt(last₋unicode - first₋unicode)
-    let y = format₋system(count,mutable₋start.advanced(by: first₋unicode),attributes)
+    let count = Int64(last₋unicode - first₋unicode)
+    let text = Unicodes(tetras: count, unicodes: mutable₋start.advanced(by: first₋unicode))
+    let y = format₋system(text,attributes)
     if y == 0 { formatted.draw(in: CGRect(x: 0, y: 0, width: 100, height: 100)) }
     else { fatalError("error in render-format") }
   }
@@ -400,7 +404,7 @@ extension Minimumview { /* ⬷ text drawing. */
    
    func watermark()
    {
-      if let url = Bundle.main.url(forResource: "watermark-coa", withExtension: "png") {
+      if let url = Bundle.main.url(forResource: "Valletta-coa", withExtension: "png") {
        let material = try! Data(contentsOf: url)
        if let image = NSImage(data: material) {
          let dst = NSRect(x: bounds.width - 68, y: 4, width: 64, height: 100)
@@ -678,7 +682,8 @@ extension Windowcontroller { /* ⬷ keyboard input. */
      self.rendition.unicodes.append(uc); shell.slow₋write₋to₋child(uc)
      self.rendition.refresh₋cursor₋position(uc₋delta: 1 + Int(count), index: self.rendition.cursor₋index)
      self.minimumview.setNeedsDisplay(self.minimumview.frame)
-   }
+   } /* let raw: UnsafeMutableRawPointer = mapfileʳᵚ(u8s,0,0,0,&actualbytes)
+ let utf8: UInt8 = raw.load(as: UInt8.self) */
    func delete() {
      let idx: Machine=self.rendition.cursor₋index
      let y = rope₋delete(&self.rendition.artstate,idx,1,self.rendition.rope₋memory)

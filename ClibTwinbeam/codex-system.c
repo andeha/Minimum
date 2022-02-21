@@ -6,9 +6,9 @@ import ClibTwinbeam;
 
 int format₋system(struct Unicodes text, Attributes attrs)
 {
-   char32̄_t * header = UC("The header");
+   char32̄_t * header = UNICODES("The header");
    __builtin_int_t offset₁=0, count₁=5, attribute₁=1;
-   char32̄_t * copy = UC("Here we may want to present additional details");
+   char32̄_t * copy = UNICODES("Here we may want to present additional details");
    __builtin_int_t offset₂=0, count₂=30, attribute₂=2;
    attrs(header,offset₁,count₁,attribute₁);
    attrs(copy,offset₂,count₂,attribute₂);

@@ -5,11 +5,11 @@ import ClibTwinbeam;
 inexorable void print(Sequenta figure)
 {
    print₋sequent(figure, 
-   	 ^(int neg, struct 𝟽bit₋text integers, struct 𝟽bit₋text fracts) {
-   	   if (neg) { mfprint("-"); }
-   	   mfprint("⬚", ﹟s7(integers.count,integers.keyputs));
-   	   mfprint(".");
-   	   mfprint("⬚", ﹟s7(fracts.count,fracts.keyputs));
+     ^(int neg, struct 𝟽bit₋text integers, struct 𝟽bit₋text fracts) {
+       if (neg) { mfprint("-"); }
+       mfprint("⬚", ﹟s7(integers.count,integers.keyputs));
+       mfprint(".");
+       mfprint("⬚", ﹟s7(fracts.count,fracts.keyputs));
    }, ^{ mfprint("zero₋alt₋nonused "); }, ^{ mfprint("nonvalid "); });
 }
 
@@ -29,7 +29,7 @@ UNITTEST(sequent₋add)
    z = __builtin_fixpoint_add(x,y); print(z); mfprint("\n");
    z = __builtin_fixpoint_sub(z,x); print(z); mfprint("\n");
    z = __builtin_fixpoint_mul(z,x); print(z); mfprint("\n");
-   z = __builtin_fixpoint_div(z,x); print(z); mfprint("\n");
+   z = __builtin_fixpoint_div(z,x,0); print(z); mfprint("\n");
    z = __builtin_fixpoint_negate(z); print(z); mfprint("\n");
    z = __builtin_fixpoint_modulo(z,x); print(z); mfprint("\n");
    z = __builtin_fixpoint_floor(z); print(z); mfprint("\n");

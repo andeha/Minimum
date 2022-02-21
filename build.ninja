@@ -72,13 +72,14 @@ build $objs/arabic-edit.o: c ClibTwinbeam/arabic-edit.c
 build $objs/built-altern.o: c ClibTwinbeam/built-altern.c
 build $objs/chrono-logy.o: c ClibTwinbeam/chrono-logy.c
 build $objs/chipher-rhode.o: c ClibTwinbeam/cipher-rhode.c
+build $objs/code-text.o: c ClibTwinbeam/code-text.c
 build $objs/codex-system.o: c ClibTwinbeam/codex-system.c
-build $objs/down-format.o: c ClibTwinbeam/down-format.c
-build $objs/draw-format.o: c ClibTwinbeam/draw-format.c
 build $objs/eight-utf.o: c ClibTwinbeam/eight-utf.c
 build $objs/endian-base.o: c ClibTwinbeam/endian-base.c
 build $objs/float-short.o: c ClibTwinbeam/float-short.c
-build $objs/codex-ionist.o: c ClibTwinbeam/codex-ionist.c
+build $objs/gnostic-codex.o: c ClibTwinbeam/gnostic-codex.c
+build $objs/ketter-bowler.o: c ClibTwinbeam/ketter-bowler.c
+build $objs/big-concrete.o: c ClibTwinbeam/big-concrete.c
 build $objs/lock-attempt.o: c ClibTwinbeam/lock-attempt.c
 build $objs/o-binary.o: c ClibTwinbeam/o-binary.c
 build $objs/present-print.o: c ClibTwinbeam/present-print.c
@@ -88,19 +89,17 @@ build $objs/revision-print.o: c ClibTwinbeam/revision-print.c
 build $objs/round-fixed.o: c ClibTwinbeam/round-fixed.c
 build $objs/search-symbol.o: c ClibTwinbeam/search-symbol.c
 build $objs/semantic-block.o: c ClibTwinbeam/semantic-block.c
-build $objs/code-text.o: c ClibTwinbeam/code-text.c
 build $objs/symbol-texts.o: c ClibTwinbeam/symbol-texts.c
 build $objs/thread-fork.o: c ClibTwinbeam/thread-fork.c
 build $objs/tiles-map.o: c ClibTwinbeam/tiles-map.c
-build $objs/assoc-symbol.o: c ClibTwinbeam/assoc-symbol.c
 build $objs/x-error-stack.o: c ClibTwinbeam/x-error-stack.c
-build $objs/x-partial-referen.o: c ClibTwinbeam/x-partial-referen.c
+build $objs/partial-referen.o: c ClibTwinbeam/partial-referen.c
 build $appname: primary-compile-macswift main.swift histories.swift          $
  enriching.swift $objs/revision-print.o $objs/eight-utf.o                    $
  $objs/built-altern.o $objs/semantic-block.o $objs/present-print.o           $
  $objs/endian-base.o $objs/code-text.o $objs/symbol-texts.o                  $
  $objs/codex-system.o $objs/thread-fork.o $objs/arabic-edit.o                $
- $objs/x-error-stack.o
+ $objs/x-error-stack.o $objs/tiles-map.o
 build Minimum.app: assemble-macapp $appname
 default Minimum.app
 

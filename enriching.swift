@@ -29,14 +29,14 @@ extension NSBezierPath {
   convenience init(anfang: String, font: NSFont, origin point: NSPoint)
   {
     self.init()
-    let textStorage = NSTextStorage(string: anfang)
-    let layoutManager = NSLayoutManager()
-    textStorage.addLayoutManager(layoutManager)
-    let glyphRange = layoutManager.glyphRange(forCharacterRange: NSMakeRange(0, 
+    let textstorage = NSTextStorage(string: anfang)
+    let layoutmanager = NSLayoutManager()
+    textstorage.addLayoutManager(layoutmanager)
+    let glyphrange = layoutmanager.glyphRange(forCharacterRange: NSMakeRange(0, 
      anfang.count), actualCharacterRange: nil)
     move(to: point)
-    for i in glyphRange.location..<glyphRange.location + glyphRange.length {
-      let g = layoutManager.cgGlyph(at: i, isValidIndex: nil)
+    for i in glyphrange.location..<glyphrange.location + glyphrange.length {
+      let g = layoutmanager.cgGlyph(at: i, isValidIndex: nil)
       self.append(withCGGlyph: CGGlyph(g), in: font)
     }
   } /* ⬷ for bear from 'anfang: Character'. */

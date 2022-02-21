@@ -2,28 +2,31 @@
 
 import ClibTwinbeam;
 
-/* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
-  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
-  -g -std=c++20 -msse4.1 -lc++ -target x86_64-apple-darwin21.3.0               \
-  -Wno-nullability-completeness entry-main.cpp unittests/ᛟ-test-utf8.cpp       \
-   unittests/ᛟ-test-half.cpp unittests/ᛟ-test-chrono.cpp                       \
-   unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-timeserie.cpp                  \
-   account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o          \
-   built-altern.o chrono-logy.o cipher-rhode.o eight-utf.o endian-base.o       \
-   float-short.o gnostic-codex.o lock-attempt.o o-binary.o present-print.o     \
-   queue-invent.o regular-pool.o round-fixed.o search-symbol.o                 \
-   semantic-block.o code-text.o symbol-texts.o thread-fork.o tiles-map.o       \
-   x-error-stack.o x-partial-referen.o assoc-symbol.o
+/* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"    \
+  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
+  -g -std=c++20 -msse4.1 -lc++ -target x86_64-apple-darwin21.3.0              \
+  -Wno-nullability-completeness entry-main.cpp unittests/ᛟ-test-accuve.cpp    \
+   unittests/ᛟ-test-charcoal.cpp unittests/ᛟ-test-chrono.cpp                  \
+   unittests/ᛟ-test-float-16.cpp unittests/ᛟ-test-keying.cpp                  \
+   unittests/ᛟ-test-markdown.cpp unittests/ᛟ-test-sequent.cpp                 \
+   unittests/ᛟ-test-timeserie.cpp unittests/ᛟ-test-utf8.cpp                   \
+   account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
+   built-altern.o big-concrete.o chrono-logy.o cipher-rhode.o code-text.o     \
+   codex-system.o eight-utf.o endian-base.o float-short.o gnostic-codex.o     \
+   ketter-bowler.o lock-attempt.o o-binary.o present-print.o queue-invent.o   \
+   regular-pool.o round-fixed.o search-symbol.o semantic-block.o              \
+   symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o partial-referen.o
   
-   clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                    \
-  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap         \
-  -g -std=c2x -target x86_64-apple-darwin21.3.0 -msse4.1                       \
-  -Wno-nullability-completeness account-italian-1.c account-italian-2.c        \
-   amend-tape.c arabic-edit.c built-altern.c chrono-logy.c cipher-rhode.c      \
-   eight-utf.c endian-base.c float-short.c gnostic-codex.c lock-attempt.c      \
-   o-binary.c present-print.c queue-invent.c regular-pool.c round-fixed.c      \
-   search-symbol.c semantic-block.c code-text.c symbol-texts.c                 \
-   thread-fork.c tiles-map.c x-error-stack.c x-partial-referen.c assoc-symbol.c
+   clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"                   \
+  -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
+  -g -std=c2x -target x86_64-apple-darwin21.3.0 -msse4.1                      \
+  -Wno-nullability-completeness account-italian-1.c account-italian-2.c       \
+   amend-tape.c arabic-edit.c big-concrete.c built-altern.c chrono-logy.c     \
+   cipher-rhode.c code-text.c codex-system.c eight-utf.c endian-base.c        \
+   float-short.c gnostic-codex.c ketter-bowler.c lock-attempt.c o-binary.c    \
+   present-print.c queue-invent.c regular-pool.c round-fixed.c                \
+   search-symbol.c semantic-block.c symbol-texts.c thread-fork.c tiles-map.c  \
+   x-error-stack.c partial-referen.c
   
    $(CC) main-entry.c -o arm-mac_app -target arm64-apple-macos11
    $(CC) main-entry.c -o x86-mac_app -target x86_64-apple-macos10.12
@@ -34,24 +37,27 @@ import ClibTwinbeam;
    clang -o arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"     \
   -D__armv8a__ -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap \
   -g -std=c++20 -lc++ -target arm64-apple-macos11 -Wno-nullability-completeness \
-   entry-main.cpp unittests/ᛟ-test-utf8.cpp unittests/ᛟ-test-half.cpp         \
-   unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-keying.cpp                    \
-   unittests/ᛟ-test-timeserie.cpp account-italian-1.o account-italian-2.o     \
-   amend-tape.o arabic-edit.o built-altern.o chrono-logy.o cipher-rhode.o     \
-   eight-utf.o endian-base.o float-short.o gnostic-codex.o lock-attempt.o     \
-   o-binary.o present-print.o queue-invent.o regular-pool.o round-fixed.o     \
-   search-symbol.o semantic-block.o code-text.o symbol-texts.o                \
-   thread-fork.o tiles-map.o x-error-stack.o x-partial-referen.o assoc-symbol.o
+   entry-main.cpp unittests/ᛟ-test-accuve.cpp unittests/ᛟ-test-charcoal.cpp   \
+   unittests/ᛟ-test-chrono.cpp unittests/ᛟ-test-float-16.cpp                  \
+   unittests/ᛟ-test-keying.cpp unittests/ᛟ-test-markdown.cpp                  \
+   unittests/ᛟ-test-sequent.cpp unittests/ᛟ-test-timeserie.cpp                \
+   unittests/ᛟ-test-utf8.cpp                                                  \
+   account-italian-1.o account-italian-2.o amend-tape.o arabic-edit.o         \
+   big-concrete.o built-altern.o chrono-logy.o cipher-rhode.o eight-utf.o     \
+   endian-base.o float-short.o gnostic-codex.o code-text.o codex-system.o     \
+   ketter-bowler.o lock-attempt.o o-binary.o present-print.o queue-invent.o   \
+   regular-pool.o round-fixed.o search-symbol.o semantic-block.o              \
+   symbol-texts.o thread-fork.o tiles-map.o x-error-stack.o partial-referen.o
   
    clang -c -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" -D__armv8a__      \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
   -g -std=c2x -target arm64-apple-macos11 -Wno-nullability-completeness       \
    account-italian-1.c account-italian-2.c amend-tape.c arabic-edit.c         \
-   built-altern.c chrono-logy.c cipher-rhode.c eight-utf.c endian-base.c      \
-   float-short.c gnostic-codex.c lock-attempt.c o-binary.c present-print.c    \
-   queue-invent.c regular-pool.c round-fixed.c search-symbol.c                \
-   semantic-block.c code-text.c symbol-texts.c thread-fork.c tiles-map.c      \
-   x-error-stack.c x-partial-referen.c assoc-symbol.c
+   big-concrete.c built-altern.c chrono-logy.c cipher-rhode.c code-text.c     \
+   codex-system.c eight-utf.c endian-base.c float-short.c gnostic-codex.c     \
+   ketter-bowler.c lock-attempt.c o-binary.c present-print.c queue-invent.c   \
+   regular-pool.c round-fixed.c search-symbol.c semantic-block.c              \
+   symbol-texts.c thread-fork.c tiles-map.c x-error-stack.c partial-referen.c
   
    On 'target' and 'march' details, see the llvm files:
   
@@ -73,8 +79,8 @@ import ClibTwinbeam;
 #define BUILDINFO_COPYRIGHT_MESSAGE "Copyright " PROGRESS_START_YEAR "—"      \
   PROGRESS_BUILD_YEAR " " BUILDINFO_BRAND
 #define BUILDINFO_BRAND "⚖️  sublimates experimentally"
-#define PROGRESS_START_YEAR QUOTE(2021)
-#define PROGRESS_BUILD_YEAR QUOTE(2021)
+#define PROGRESS_START_YEAR QUOTE(2016)
+#define PROGRESS_BUILD_YEAR QUOTE(2022)
 
 inexorable void printGreetings()
 {

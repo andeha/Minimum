@@ -23,11 +23,11 @@ struct pending₋change { enum timeserie₋operation op;
 #define pending₋changes₋count structa₋count
 #define checkpoints₋count structa₋count
 
-int append₋version(struct timeserie₋version₋row entry, struct structa * casette);
-int append₋temporal(struct timeserie₋temporal₋row entry, struct structa * casette);
-int append₋event(struct timeserie₋event₋row entry, struct structa * casette);
-int append₋checkpoint(struct timeserie₋checkpoint₋row entry, struct structa * casette);
-int append₋pending₋changes(struct pending₋change entry, struct structa * casette);
+int append₋version(struct timeserie₋version₋row entry, struct structa * casette, ALLOC alloc);
+int append₋temporal(struct timeserie₋temporal₋row entry, struct structa * casette, ALLOC alloc);
+int append₋event(struct timeserie₋event₋row entry, struct structa * casette, ALLOC alloc);
+int append₋checkpoint(struct timeserie₋checkpoint₋row entry, struct structa * casette, ALLOC alloc);
+int append₋pending₋changes(struct pending₋change entry, struct structa * casette, ALLOC alloc);
 
 #define events₋at (struct timeserie₋event₋row *)structa₋at
 #define pending₋changes₋at (struct pending₋change *)structa₋at

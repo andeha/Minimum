@@ -27,7 +27,7 @@ inexorable int is₋leaf₋node(void ᶿ﹡ opaque)
 inexorable __builtin_int_t depth₋rope(void ᶿ﹡ opaque)
 { struct node *node=(noderef)opaque;
    if (opaque == ΨΛΩ) { return 0; }
-   return is₋leaf₋node(opaque) ? 0 : 
+   return is₋leaf₋node(opaque) ? 1 : 
     1 + max(depth₋rope(node->left),depth₋rope(node->right));
 } /* ⬷ the 'depth' of a rope is the maximum number of arcs until the leafs 
  been covered. */
@@ -131,17 +131,17 @@ inexorable void * concat₋forest(struct forest * forest,
 void balance₋rope(void ᶿ﹡* opaque, Two₋memory dynmem)
 {
   __builtin_int_t max₋len = length₋rope(opaque,dynmem), max₋depth=100;
-  struct forest rabat[max₋depth];
+  struct forest crops[max₋depth];
   for (__builtin_int_t i=0; i<max₋depth; i+=1) {
-    rabat[i].opaque = ΨΛΩ;
-    if (i==0) { rabat[i].min₋len=1; }
-    else if (i==1) { rabat[i].min₋len=2; }
+    crops[i].opaque = ΨΛΩ;
+    if (i==0) { crops[i].min₋len=1; }
+    else if (i==1) { crops[i].min₋len=2; }
     else {
-      rabat[i].min₋len = rabat[i-1].min₋len + rabat[i-2].min₋len;
+      crops[i].min₋len = crops[i-1].min₋len + crops[i-2].min₋len;
     }
-    if (rabat[i].min₋len > max₋len) { break; }
+    if (crops[i].min₋len > max₋len) { break; }
   }
-  *opaque = concat₋forest(rabat,max₋len,dynmem);
+  *opaque = concat₋forest(crops,max₋len,dynmem);
 } /* ⬷ balancing reduces the depth of the tree. Traverse the rope
  from left to right and insert each leaf at the correct sequence 
  position. Invariants are:
@@ -218,7 +218,8 @@ inexorable int rope₋split₋recursive(void ᶿ﹡ opaque,
      *left=opaque;
      return 0;
    };
-   return helper((noderef)opaque,index);
+   int y = helper((noderef)opaque,index);
+   return y;
 } /* two recursive search-paths and one terminal case where 
  invariants are 
   
@@ -321,53 +322,33 @@ __builtin_int_t rope₋symbols(void ᶿ﹡ opaque)
 char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx)
 { struct node *node = (noderef)opaque;
    if (opaque == ΨΛΩ) { return U'\x0'; }
-   __builtin_int_t weight = node->payload.keyvalue.val;
+   __builtin_int_t weight = node->payload.keyvalue.key;
    if (weight <= idx && node->right != ΨΛΩ) { return rope₋index(node->right,idx-weight); }
    if (node->left != ΨΛΩ) { return rope₋index(node->left,idx); }
    unicode₋shatter text = (unicode₋shatter)node->payload.keyvalue.val;
    return *(idx+text);
 } /* ⬷ execution time is propotional to depth of tree. */
 
+typedef __builtin_int_t (^Inner)(noderef node, __builtin_int_t from, 
+   __builtin_int_t to, Rope₋text out, int inner₋print, int indent);
+
 __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t 
-  from, __builtin_int_t to, void (^segment)(unicode₋shatter))
-{ struct node *node = (noderef)opaque;
-  typedef __builtin_int_t (^Inner)(void ᶿ﹡ opaque, __builtin_int_t from, 
-   __builtin_int_t to, void (^segment)(unicode₋shatter), noderef previous);
+  from, __builtin_int_t to, Rope₋text out, int inner₋print)
+{
+  if (opaque == ΨΛΩ) { if (inner₋print) print("<empty>\n"); return 0; }
+  Inner detail = ^(noderef node, __builtin_int_t from, __builtin_int_t to, 
+    Rope₋text out, int inner₋print, int indent) {
+     __builtin_int_t weight = node->payload.keyvalue.key;
+     for (int i=0; i<indent; i+=1) { print(" "); }
+     if (inner₋print && !is₋leaf₋node(node)) { print("non-leaf: ⬚\n",﹟d(weight)); }
+     if (weight <= from && node->right != ΨΛΩ) { return detail(node->right,from-weight,to,out,inner₋print,indent+1); }
+     if (node->left != ΨΛΩ) { return detail(node->left,from,to,out,inner₋print,indent+1); }
+     char32̄_t * text = (unicode₋shatter)node->payload.keyvalue.val;
+     Argᴾ param = ﹟S(weight,(const char32̄_t *)text);
+     if (inner₋print && is₋leaf₋node(node)) { print("leaf: ⬚ and '⬚'\n",﹟d(weight),param); }
+     out(text,weight);
+     return weight;
+  };
+  return detail((noderef)opaque,from,to,out,inner₋print,0);
 }
-
-int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖rSecond, Two₋memory 
- dynmem, void ᶿ﹡* opaque₋out)
-{ char8₋t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 *utf8₋text, *leadOr8Bit; char32̄_t *text,uc, buffer[4096];
-   __builtin_int_t 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 filebytes,idx=0,tetras=0,followers,incr,bufidx=0;
-   if (UnicodeAsUtf8(primary𝘖rSecond, 0, 
-     ^(__builtin_int_t, char8₋t * u8s₋name, __builtin_int_t) {
-       utf8₋text = (char8₋t *)mapfileʳᵚ((const char *)u8s₋name,0,0,0,&filebytes);
-     }
-   )) { return -1; } /* unable to convert filename. */
-   if (utf8₋text == ΨΛΩ) { return -2; } /* unable to open file. */
-again:
-   if (idx > filebytes) { return -3; } /* first truncation error. */
-   if (idx == filebytes) { goto unagain; }
-   leadOr8Bit = utf8₋text + idx; 
-   followers = Utf8Followers(*leadOr8Bit);
-   if (followers < 0) { return -4; }
-   if (idx + followers > filebytes) { return -5; } /* last truncation error. */
-   incr = followers + 1;
-   uc = Utf8ToUnicode(leadOr8Bit,incr);
-   if (uc == 0xfffe || uc == 0xffff) { return -7; } /* unable to decode utf8. */
-   buffer[bufidx]=uc; bufidx+=1; idx+=incr;
-   if (bufidx>4096 || idx == filebytes) { 
-     struct Unicodes unicodes = { buffer, bufidx };
-     unicode₋shatter text = persist₋as₋shatter(unicodes);
-     if (rope₋append₋text(&opaque₋out,text,dynmem)) { return -8; } /* unable to append rope. */
-     bufidx=0;
-   }
-   tetras+=1; goto again;
-unagain:
-   return 0;
-rollback:
-   return 0;
-}
-
-
 

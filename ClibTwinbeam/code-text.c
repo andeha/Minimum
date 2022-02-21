@@ -2,7 +2,7 @@
 
 import ClibTwinbeam;
 
-struct Unicodes TraverseForUnicodes(const char32̄_t * literal)
+struct Unicodes TraverseForUnicodes(char32̄_t * literal)
 {
   char32̄_t * unicodes = (char32̄_t *)literal;
   __builtin_int_t symbols = TetrasUntilNull(unicodes,BUILTIN₋INT₋MAX);
