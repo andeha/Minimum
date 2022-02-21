@@ -614,11 +614,11 @@ struct ¹stack { uint8_t * words;
 
 EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) a⃝;
 EXT₋C void stack₋unalloc(struct ¹stack * 🆇) a⃝;
-EXT₋C int push(struct ¹stack * 🅧, uint8_t * item) a⃝;
-EXT₋C uint8_t * pop(struct ¹stack * 🅧) a⃝;
-EXT₋C __builtin_int_t count(struct ¹stack * 🅧) a⃝;
-EXT₋C int empty(struct ¹stack * 🅧) a⃝;
-EXT₋C uint8_t * top(struct ¹stack * 🅧) a⃝;
+EXT₋C int stack₋push(struct ¹stack * 🅧, uint8_t * item) a⃝;
+EXT₋C uint8_t * stack₋pop(struct ¹stack * 🅧) a⃝;
+EXT₋C __builtin_int_t stack₋count(struct ¹stack * 🅧) a⃝;
+EXT₋C int stack₋empty(struct ¹stack * 🅧) a⃝;
+EXT₋C uint8_t * stack₋top(struct ¹stack * 🅧) a⃝;
 typedef struct ¹stack Stack;
 
 typedef uint64_t chronology₋instant;

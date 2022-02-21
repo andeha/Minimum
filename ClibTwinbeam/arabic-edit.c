@@ -73,14 +73,12 @@ int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, Two₋memo
 { struct node *node = (noderef)opaque, *branch=ΨΛΩ, 
    *leaf=(noderef)dynmem.node₋alloc(sizeof(struct node));
    if (leaf == ΨΛΩ) { return -1; }
-   int32_t weight = dynmem.text₋bytesize(text);
+   int32_t weight = dynmem.text₋bytesize(text)>>2;
    leaf->payload.keyvalue.key = weight;
    leaf->payload.keyvalue.val = (__builtin_uint_t)text;
+   leaf->left=ΨΛΩ; leaf->right=ΨΛΩ;
    if (*opaque == ΨΛΩ) { *opaque=leaf; return 0; }
-   if (!is₋leaf₋node(opaque) && node->right == ΨΛΩ) {
-     node->right=leaf;
-     return 0;
-   }
+   if (!is₋leaf₋node(opaque) && node->right == ΨΛΩ) { node->right=leaf; return 0; }
    /* opaque is leaf-node alternatively fully-set inner node. */
    branch = (noderef)dynmem.node₋alloc(sizeof(struct node));
    if (branch == ΨΛΩ) { return -2; }
@@ -99,6 +97,7 @@ inexorable void * concat₋rope(void * left, void * right, Two₋memory dynmem)
     unicode₋shatter text = (unicode₋shatter)rhs->payload.keyvalue.val;
     int y = rope₋append₋text((void **)&opaque,text,dynmem);
     if (y) { return ΨΛΩ; }
+    dynmem.dealloc(right);
   }
   opaque = dynmem.node₋alloc(sizeof(struct node));
   if (opaque == ΨΛΩ) { return ΨΛΩ; }
@@ -245,10 +244,10 @@ inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
    Ground include = ^(unicode₋shatter text, noderef out, Two₋memory dynmem) { };
    struct ¹stack node₋stack;
    if (init₋stack(&node₋stack, sizeof(struct node))) { return -2; }
-   push(&node₋stack,(uint8_t *)&root₋node);
+   stack₋push(&node₋stack,(uint8_t *)&root₋node);
    __builtin_int_t current₋idx=0;
-   while (!empty(&node₋stack)) {
-     struct node * elem = (noderef)pop(&node₋stack);
+   while (!stack₋empty(&node₋stack)) {
+     struct node * elem = (noderef)stack₋pop(&node₋stack);
      if (is₋leaf₋node(elem)) {
        __builtin_int_t weight = elem->payload.keyvalue.key;
        unicode₋shatter text = (unicode₋shatter)elem->payload.keyvalue.val;
@@ -269,8 +268,8 @@ inexorable int iterative₋rope₋split(void ᶿ﹡ opaque, __builtin_int_t idx,
        current₋idx += weight;
      }
      else {
-       push(&node₋stack,(uint8_t *)&(elem->left));
-       push(&node₋stack,(uint8_t *)&(elem->right));
+       stack₋push(&node₋stack,(uint8_t *)&(elem->left));
+       stack₋push(&node₋stack,(uint8_t *)&(elem->right));
      }
    }
    *left=out₋lhs; *right=out₋rhs;
