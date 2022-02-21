@@ -97,7 +97,7 @@ inexorable void * concat₋rope(void * left, void * right, Two₋memory dynmem)
     unicode₋shatter text = (unicode₋shatter)rhs->payload.keyvalue.val;
     int y = rope₋append₋text((void **)&opaque,text,dynmem);
     if (y) { return ΨΛΩ; }
-    dynmem.dealloc(right);
+    dynmem.node₋dealloc(right);
   }
   opaque = dynmem.node₋alloc(sizeof(struct node));
   if (opaque == ΨΛΩ) { return ΨΛΩ; }
