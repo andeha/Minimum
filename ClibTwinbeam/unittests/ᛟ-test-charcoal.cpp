@@ -15,7 +15,7 @@ UNITTEST(charcoal₋grammar₋1)
    Addstraight addstraight = ^(double x, double y) { mfprint("addstraight "); };
    Closepath closepath = ^() { mfprint("closepath "); };
    Stroke stroke = ^() { mfprint("stroke "); };
-   if (draw₋art₋system(program,color,linewidth,begin,move,curve,straight,closepath,stroke)) 
+   if (draw₋art₋system(program,color,linewidth,begin,move,addcurve,addstraight,closepath,stroke)) 
    { ENSURE(false,"error in draw-art-system."); }
 }
 
