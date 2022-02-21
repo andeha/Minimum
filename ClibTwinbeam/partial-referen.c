@@ -1,4 +1,4 @@
-/*  􀧒 partial-referen.c | identic-sized first-fit leafs allocated. */
+/*  partial-referen.c | identic-sized first-fit leafs allocated. */
 
 import ClibTwinbeam;
 
