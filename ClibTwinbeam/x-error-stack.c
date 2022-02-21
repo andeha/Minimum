@@ -31,7 +31,7 @@ inexorable int expand₋stack(struct ¹stack * 🅧) a⃝
    return 0;
 }
 
-int push(struct ¹stack * 🅧, uint8_t * item) a⃝
+int stack₋push(struct ¹stack * 🅧, uint8_t * item) a⃝
 {
    if (🅧->pos == 🅧->size) {
      if (expand₋stack(🅧)) { return -1; }
@@ -44,19 +44,19 @@ int push(struct ¹stack * 🅧, uint8_t * item) a⃝
    return 0;
 }
 
-uint8_t * top(struct ¹stack * 🅧) a⃝
+uint8_t * stack₋top(struct ¹stack * 🅧) a⃝
 {
    return 🅧->pos == 0 ? ΨΛΩ : (🅧->pos - 1) + 🅧->words;
 }
 
-uint8_t * pop(struct ¹stack * 🅧) a⃝
+uint8_t * stack₋pop(struct ¹stack * 🅧) a⃝
 {
-   uint8_t * bytes = top(🅧);
+   uint8_t * bytes = stack₋top(🅧);
    if (🅧->pos > 0) { 🅧->pos--; }
    return bytes;
 }
 
-__builtin_int_t count(struct ¹stack * 🅧) a⃝ { return 🅧->pos; }
+__builtin_int_t stack₋count(struct ¹stack * 🅧) a⃝ { return 🅧->pos; }
 
-int empty(struct ¹stack * 🅧) a⃝ { return 🅧->pos == 0; }
+int stack₋empty(struct ¹stack * 🅧) a⃝ { return 🅧->pos == 0; }
 
