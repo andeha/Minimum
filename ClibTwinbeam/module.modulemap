@@ -12,15 +12,8 @@ module ClibTwinbeam { requires macos
   }
   
   header "header.h"
-  header "account-italian.h"
-
-}
-
-module ClibTwinbeam_and_Cpp {
-  requires cplusplus
-  header "header.h"
-  header "account-italian.h"
   header "after-nine.hpp"
+  header "account-italian.h"
 }
 
 module Types [system]

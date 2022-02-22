@@ -548,7 +548,7 @@ EXT₋C void unalloc₋shatter(unicode₋shatter text);
 EXT₋C unicode₋shatter persist₋as₋shatter(struct Unicodes unicodes);
 EXT₋C int rope₋append₋text(void ᶿ﹡* opaque, unicode₋shatter text, 
  struct two₋memory dynmem);
-EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t idx, 
+EXT₋C int rope₋insert(void ᶿ﹡* opaque, __builtin_int_t and₋later, 
  void ᶿ﹡ wedge, struct two₋memory dynmem);
 EXT₋C int rope₋delete(void ᶿ﹡* opaque, __builtin_int_t idx, 
  __builtin_int_t len, struct two₋memory dynmem);
@@ -560,8 +560,8 @@ EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
 EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econdary, struct 
  two₋memory dynmem, void ᶿ﹡* opaque₋out, void (^completion)());
 typedef void (^Rope₋text)(char32̄_t *, __builtin_int_t);
-EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t from, 
- __builtin_int_t to, Rope₋text out, int inner₋print);
+EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t 
+ from, __builtin_int_t to, Rope₋text out, int inner₋print);
 /* EXT₋C int rope₋branch₋into₋identical(void ᶿ﹡ opaque, void ᶿ﹡* identical);
 EXT₋C int rope₋reconcile₋as₋reflecting(struct Unicodes primary𝘖rSecondary, 
  void (^branch₋alters)(int64_t offset, int64_t bytes, uint8_t * material, int * stop),
@@ -690,7 +690,7 @@ struct timeserie { Structa pendings; void * currents, *uncommits;
 enum timeserie₋operation { ts₋create, ts₋update, ts₋delta, ts₋remove };
 union historypod {
   __uint128_t machineunsigned;
-  simd_tᵦ two₋real;
+  simd_tᵦ tworeal;
   union Q6364 fixed;
 };
 
@@ -713,15 +713,17 @@ EXT₋C int timeserie₋delta(struct timeserie₋entry * relative, union history
  current, struct timeserie * 🅙, Timeserie₋summation addition);
 EXT₋C int timeserie₋update(struct timeserie₋entry * absolute, struct timeserie * 🅙);
 EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(int count, struct timeserie₋entry row[], int permanent[]), 
- struct timeserie * 🅙, Timeserie₋summation addition);
+ (^search₋found)(int count, union historypod artstate[], struct Unicodes key[]), 
+ struct timeserie * 🅙);
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
- (^search₋found)(int count, struct timeserie₋entry row[], int permanent[]), 
- struct timeserie * 🅙, Timeserie₋summation addition);
-EXT₋C void Present₋timeserie₋overview(unsigned columns, struct timeserie * 🅙, 
- void (^out)(char8₋t * u8s, __builtin_int_t bytes));
-EXT₋C void Present₋timeserie₋transacts(struct timeserie * 🅙, int incl₋tables, 
- void (^out)(char8₋t * u8s, __builtin_int_t bytes));
+ (^search₋found)(int count, union historypod artstate[], struct Unicodes key[]), 
+ struct timeserie * 🅙);
+typedef struct timeserie₋entry Entry;
+typedef void (^Outrow)(int count, Entry row[], int permanent[]);
+typedef void (^Outpod)(int count, union historypod artstate[], struct Unicodes key[]);
+EXT₋C int Present₋timeserie₋overview(struct timeserie * 🅙, Outpod out);
+EXT₋C int Present₋timeserie₋transacts(__builtin_int_t retrospect₋offset, 
+ __builtin_int_t retrospect₋count, struct timeserie * 🅙, Outrow out);
 
 int read₋utf8₋exposition(int byte₋count, char8₋t * utf8₋bytes, 
  struct structa * pool, struct structa * words, ALLOC alloc);

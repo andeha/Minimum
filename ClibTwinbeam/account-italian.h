@@ -1,4 +1,4 @@
-/*  account-italian.h | non-contractuals. (REQUIRED₋AFTER₋COMPILATION.) */
+/*  account-italian.h | details on bookkeeping. */
 
 struct timeserie₋temporal₋row {
  struct Unicodes key; union historypod entry; version₋ts from,to; 
@@ -32,11 +32,19 @@ int append₋pending₋changes(struct pending₋change entry, struct structa * c
 #define events₋at (struct timeserie₋event₋row *)structa₋at
 #define pending₋changes₋at (struct pending₋change *)structa₋at
 #define versions₋at (struct timeserie₋version₋row *)structa₋at
-
-/* structures are normally passed by pushing the values of the structure on
- the stack. */
+#define temporal₋at (struct timeserie₋temporal₋row *)structa₋at
+#define checkpoint₋at (struct timeserie₋checkpoint₋row *)structa₋at
 
 /* structures are normally returned by arranging for the caller to pass the
  address of a memory area as a hidden first argument. The function then 
  stores the return value into that memory area. */
+
+int exists₋in₋currents(struct Unicodes key, void * currents);
+int exists₋in₋uncommits(struct Unicodes key, void * uncommits);
+union historypod * lookup₋in₋currents(struct Unicodes key, void * currents);
+union historypod * lookup₋in₋uncommits(struct Unicodes key, void * uncommits);
+int include₋in₋currents(struct Unicodes key, union historypod entry, void ** 
+ currents, ALLOC alloc);
+int include₋in₋uncommits(struct Unicodes key, union historypod entry, void ** 
+ uncommits, ALLOC alloc); /* ⬷ a․𝘬․a 'add₋alt₋update₋in₋uncommits'. */
 
