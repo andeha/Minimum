@@ -16,7 +16,7 @@ module ClibTwinbeam { requires macos
 
 }
 
-module ClibTwinbeam_with_Cpp {
+module ClibTwinbeam_and_Cpp {
   requires cplusplus
   header "header.h"
   header "account-italian.h"
