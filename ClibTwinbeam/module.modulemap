@@ -1,10 +1,4 @@
-/*  􀾟 module.modulemap | for later harmonization C++ and Swift. */
-
-module ClibTwinbeam_with_History {
-  header "header.h"
-  header "account-italian.h"
-  header "history.h"
-}
+/*  module.modulemap | for later harmonization C++ and Swift. */
 
 module ClibTwinbeam { requires macos 
   
@@ -19,59 +13,79 @@ module ClibTwinbeam { requires macos
   
   header "header.h"
   header "account-italian.h"
-  
+
 }
 
-module After_9 { requires cplusplus 
+module ClibTwinbeam_and_cpp {
+  requires cplusplus
   header "header.h"
-  header "after-nine.h"
+  header "account-italian.h"
+  header "after-nine.hpp"
 }
 
 module Types [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h"
+  }
 }
 
 module Stdio [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h"
+  }
 }
 
 module Unistd [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+  }
 }
 
 module CString [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h"
+  }
 }
 
 module Stdlib [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
+  }
 }
 
 module Mapfile [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/mman.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/malloc/malloc.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/mman.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/stat.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/fcntl.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/unistd.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/malloc/malloc.h"
+  }
 }
 
 module Setjmp [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/setjmp.h"
+{ 
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/setjmp.h"
+  }
 }
 
 module Mach_O_binary [system]
-{ requires macos
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach/machine.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"
-  header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/fat.h"
+{
+  module AAPL_big { requires macos
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach/machine.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/loader.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/nlist.h"
+    header "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/mach-o/fat.h"
+  }
+  module AAPL_small { requires ios
+  }
 }
 
