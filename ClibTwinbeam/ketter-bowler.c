@@ -1,4 +1,4 @@
-/*  ketter-bowler.c | thesarus a․𝘬․a associative map with right-hand array. */
+/*  ketter-bowler.c | thesarus a․𝘬․a 'associative map with right-hand array'. */
 
 import ClibTwinbeam;
 
