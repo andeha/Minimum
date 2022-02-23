@@ -21,7 +21,7 @@ Copy(__builtin_int_t 𝟹2₋alternatively₋64₋words,
  __builtin_uint_t * src, __builtin_uint_t * dst
 )
 {
-  Copy8Memory((ByteAlignedRef)dst,(ByteAlignedRef)src,𝟹𝟸₋alternatively₋64₋words);
+  Copy8Memory((ByteAlignedRef)dst,(ByteAlignedRef)src,𝟹2₋alternatively₋64₋words);
 }
 
 int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * Ɀ)
