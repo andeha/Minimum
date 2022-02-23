@@ -4,7 +4,8 @@ import ClibTwinbeam;
 
 int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, 
  void ᶿ﹡* opaque, ALLOC alloc)
-{ int size=sizeof(struct structa), szelem=sizeof(union Tetra𝘖rUnicode);
+{ int size=sizeof(struct structa), szelem₂=sizeof(union Tetra𝘖rUnicode), 
+    szelem=sizeof(void *);
    INIT init₋with₋structa = ^(void * uninited) { return structa₋init(szelem, 
     4096,uninited,alloc); }; /* ⬷ rope-pointers stored. */
    struct structa * list = jot(key,opaque,size,alloc,init₋with₋structa);
