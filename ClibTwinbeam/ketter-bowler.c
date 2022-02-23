@@ -1,25 +1,14 @@
-/*  ketter-bowler.c | thesarus a․𝘬․a associative map with right-hand array. */
+/*  ketter-bowler.c | thesarus a․𝘬․a associative map Unicode to array. */
 
 import ClibTwinbeam;
 
 int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, 
  void ᶿ﹡* opaque, ALLOC alloc)
-{ int size=sizeof(struct structa), szelem₂=sizeof(union Tetra𝘖rUnicode), 
-    szelem=sizeof(void *);
+{ int size=sizeof(struct structa), szelem=sizeof(void *);
    INIT init₋with₋structa = ^(void * uninited) { return structa₋init(szelem, 
     4096,uninited,alloc); }; /* ⬷ rope-pointers stored. */
    struct structa * list = jot(key,opaque,size,alloc,init₋with₋structa);
    if (list == ΨΛΩ) { return -1; }
-   return 0;
-}
-
-inexorable int cross₋item(int idx, void * opaque)
-{
-   return 0;
-}
-
-inexorable int item₋is₋crossed(int idx, void * opaque)
-{
    return 0;
 }
 
