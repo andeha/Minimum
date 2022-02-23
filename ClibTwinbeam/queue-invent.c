@@ -1,4 +1,4 @@
-/* 􀻸 ätstörning.c | biblic fold military projects measured. */
+/*  queue-invent.c | without 'pop' measuring and militant. */
 
 import ClibTwinbeam;
 
@@ -17,11 +17,11 @@ void 𝟷₋tile₋fifo₋pop(struct fifo * 🅵)
 }
 
 inexorable void 
-Copy(__builtin_int_t 𝟹𝟸or64₋words,
+Copy(__builtin_int_t 𝟹2₋alternatively₋64₋words,
  __builtin_uint_t * src, __builtin_uint_t * dst
 )
 {
-  Copy8Memory((ByteAlignedRef)dst, (ByteAlignedRef)src, Wordbytes * 𝟹𝟸or64₋words);
+  Copy8Memory((ByteAlignedRef)dst,(ByteAlignedRef)src,𝟹𝟸₋alternatively₋64₋words);
 }
 
 int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, __builtin_uint_t * Ɀ)
@@ -40,5 +40,4 @@ int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟, __buil
 
 int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words)
 { 🅵->count -= words; return 0; }
-
 
