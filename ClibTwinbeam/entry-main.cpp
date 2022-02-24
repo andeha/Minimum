@@ -2,7 +2,7 @@
 
 import ClibTwinbeam;
 
-/* clang -o x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"    \
+/* clang -o ../x86_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" \
   -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap        \
   -g -std=c++20 -msse4.1 -lc++ -target x86_64-apple-darwin21.3.0              \
   -Wno-nullability-completeness entry-main.cpp  ../exercise/ᛟ-accuve.cpp      \
@@ -34,7 +34,7 @@ import ClibTwinbeam;
    lipo -create -output confidence x86_confidence arm_confidence
    lipo -archs confidence
   
-   clang -o arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"    \
+   clang -o ../arm_confidence -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" \
   -D__armv8a__ -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap \
   -g -std=c++20 -lc++ -target arm64-apple-macos11 -Wno-nullability-completeness \
    entry-main.cpp ../exercise/ᛟ-accuve.cpp ../exercise/ᛟ-charcoal.cpp         \
