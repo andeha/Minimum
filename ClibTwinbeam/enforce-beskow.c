@@ -14,7 +14,7 @@ import CString;
    
    compile with:
    
-   clang -o x86_stegagraph -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"  \
+   clang -o ../x86_stegagraph -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\" \
      -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap   \
      -g -std=c2x -lc++ enforce-beskow.c built-altern.c cipher-rhode.c       \
      present-print.c amend-tape.c eight-utf.c semantic-block.c tiles-map.c  \

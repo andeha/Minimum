@@ -39,7 +39,7 @@ import Setjmp;
 
 /*
   
-  clang -o x86_epitom-7 -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"       \
+  clang -o ../x86_epitom-7 -DSHA1GIT=\"`git log -1 '--pretty=format:%h'`\"    \
     -fmodules-ts -fimplicit-modules -fmodule-map-file=./module.modulemap      \
     -g -std=c2x -lc++ lingustics-epi.c tiles-map.c present-print.c            \
     built-altern.c symbol-texts.c eight-utf.c round-fixed.c x-error-stack.c   \
