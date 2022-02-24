@@ -92,7 +92,7 @@ MACRO __builtin_uint_t 🎭(__builtin_uint_t reg₋mapped, __builtin_uint_t mask
  return shifted;
 }
 
-typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf-8 byte'. The flag -fno-char8_t 
+typedef uint8_t char8₋t; /* ⬷ a․𝘬․a 'utf8byte'. The flag -fno-char8_t 
  deactivates the unused c++ builtin type char8_t not found in llvm-c source. */
 typedef unsigned int char32̄_t; /* ⬷ from uchar.h and do-not-use-char32_t. */
 /* A C2x language U"abc" is of 'const unsigned int' width and a c++ language 
@@ -171,8 +171,6 @@ EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetr
 #define ENSURE(c,s) { if (!(c)) { Panic(Testlog,s); } }
 EXT₋C int atexit(void(*func)(void));
 EXT₋C void exit(int status);
-EXT₋C void Symbols(const char * utf8exepath, void (^each₋symbol)(const char * 
- sym, uint64_t addr, int * stop));
 
 /*  the 128-bits precision arithmetics. */
 
@@ -362,6 +360,7 @@ EXT₋C void * Heap₋alloc(__builtin_int_t bytes);
 EXT₋C __builtin_int_t Heap₋object₋size(void * p);
 EXT₋C void * Heap₋realloc(void * p, __builtin_int_t to₋bytes);
 EXT₋C void Heap₋unalloc(void * p);
+EXT₋C void * Heap₋valloc(__builtin_int_t bytes);
 
 typedef __builtin_uint_t * WordAlignedRef; typedef uint8_t * ByteAlignedRef;
 EXT₋C int Compare8Memory(ByteAlignedRef p₁, ByteAlignedRef p₂, __builtin_uint_t bytes);
@@ -533,6 +532,11 @@ EXT₋C int Utf8AsUnicode(struct utf8₋text u8s, __builtin_int_t maxu8bytes𝘖
 EXT₋C int UnicodeAsUtf8(struct Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
  void (^out)(__builtin_int_t u8bytes, char8₋t * u8s, __builtin_int_t tetras));
 
+EXT₋C int Utf8sToUnicode(__builtin_int_t count, char8₋t * encoded, char32̄_t * 
+ prealloc₋out, __builtin_int_t * tetras);
+EXT₋C int UnicodesToUtf8(__builtin_int_t count, char32̄_t * decoded, char8₋t * 
+ prealloc₋out, __builtin_int_t * u8bytes);
+
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
 
 struct two₋memory {
@@ -557,13 +561,14 @@ EXT₋C char32̄_t rope₋index(void ᶿ﹡ opaque, __builtin_int_t idx);
 EXT₋C void unalloc₋rope(void ᶿ﹡ opaque, struct two₋memory dynmem);
 EXT₋C void rope₋clear(void ᶿ﹡* opaque, struct two₋memory dynmen);
 EXT₋C void balance₋rope(void ᶿ﹡* opaque, struct two₋memory dynmem);
-EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econdary, struct 
- two₋memory dynmem, void ᶿ﹡* opaque₋out, void (^completion)());
 typedef void (^Rope₋text)(char32̄_t *, __builtin_int_t);
 EXT₋C __builtin_int_t depth₋first₋with₋interval(void ᶿ﹡ opaque, __builtin_int_t 
  from, __builtin_int_t to, Rope₋text out, int inner₋print);
-/* EXT₋C int rope₋branch₋into₋identical(void ᶿ﹡ opaque, void ᶿ﹡* identical);
-EXT₋C int rope₋reconcile₋as₋reflecting(struct Unicodes primary𝘖rSecondary, 
+EXT₋C int rope₋branch₋into₋identity(void ᶿ﹡ opaque, void ᶿ﹡* similar, 
+ struct two₋memory dynmem);
+EXT₋C int rope₋read₋persisted₋utf8(struct Unicodes primary𝘖𝘳𝑆econdary, struct 
+ two₋memory dynmem, void ᶿ﹡* opaque₋out, void (^completion)());
+/* EXT₋C int rope₋reconcile₋as₋reflecting(struct Unicodes primary𝘖rSecondary, void * opaque, 
  void (^branch₋alters)(int64_t offset, int64_t bytes, uint8_t * material, int * stop),
  void (^complete)(int * rollback)); see also 'fsetpos'/'fwrite'/'pwrite'. */
 /* ⬷ a․𝘬․a mutable₋string, radio₋editor, recollect₋transmit and Remmingway. */
@@ -681,7 +686,7 @@ EXT₋C int Twinbeam₋mmap(char8₋t * canonicalUtf8RegularOrLinkpath,
  uint8_t ** material);
 
 EXT₋C void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath, 
- __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *);
+ __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *, int);
 
 typedef __builtin_int_t version₋ts;
 struct timeserie { Structa pendings; void * currents, *uncommits; 
@@ -733,7 +738,7 @@ EXT₋C int steganography₋reveal(Nonabsolute code, Nonabsolute * word);
 EXT₋C void Gitidentity(const char ** text);
 
 typedef int (*Keydown₋Incident)(struct Unicodes text);
-typedef int (*Touchpad₋Incident)(double deltax, double deltay, 
+typedef int (*Touchpad₋Incident)(double delta₋x, double delta₋y, 
  double pressure);
 EXT₋C int Register₋Keydown(Keydown₋Incident occurred);
 EXT₋C int Register₋Touchpad(Touchpad₋Incident occurred);
