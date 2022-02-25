@@ -11,9 +11,10 @@ UNITTEST(charcoal₋grammar₋1)
     mfprint("color ⬚,⬚,⬚,⬚,⬚",﹟F(c,1),﹟F(m,1),﹟F(y,1),﹟F(blk,1),﹟F(a,1)); };
    Begin begin = ^{ mfprint("begin "); };
    Move move = ^(double x, double y) { mfprint("move ⬚,⬚", ﹟F(x,1),﹟F(y,1)); };
-   Addcurve addcurve = ^(double x[], double y[]) { mfprint("addcurve ["); 
-    for (int i=0; i<3; i+=1) { print("⬚,⬚; ",﹟F(x[i],1),﹟F(y[i],1)); } 
-    mfprint("] "); };
+   Addcurve addcurve = ^(double x[], double y[], double end₋x, double end₋y) { 
+    mfprint("addcurve ["); 
+    for (int i=0; i<2; i+=1) { print("⬚,⬚; ",﹟F(x[i],1),﹟F(y[i],1)); } 
+    mfprint(", ends ⬚, ⬚] ", ﹟F(end₋x,1), ﹟F(end₋y,1)); };
    Addstraight addstraight = ^(double x, double y) { 
     mfprint("addstraight ⬚,⬚", ﹟F(x,1),﹟F(y,1)); };
    Closepath closepath = ^{ mfprint("closepath "); };
