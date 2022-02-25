@@ -41,7 +41,7 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 #endif
 typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
 typedef unsigned short      uint16_t; /* 𝘊f․ Q16. */
-typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant', 'icke-lös' and 'embargo-₍im₎material'. */
+typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant' and 'embargo-₍im₎material'. */
 #define FOCAL /* ⬷ embossed inexorable. */
 #define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
@@ -76,10 +76,10 @@ int Details_in_C(uint64_t pid, int32_t cross);
 #define ArmDS1S2 asm {
 #endif
 
-MACRO __builtin_uint_t 🔎(__builtin_uint_t reg₋mapped) { return *((__builtin_uint_t *)
- reg₋mapped); }
-MACRO __builtin_uint_t * 🔧(__builtin_uint_t reg₋mapped) { return ((__builtin_uint_t *)
- reg₋mapped); }
+MACRO __builtin_uint_t 🔎(__builtin_uint_t reg₋mapped) { return *((__builtin_uint_t 
+ *) reg₋mapped); }
+MACRO __builtin_uint_t * 🔧(__builtin_uint_t reg₋mapped) { return ((__builtin_uint_t 
+ *) reg₋mapped); }
 MACRO __builtin_uint_t Trailingzeros(__builtin_uint_t word) { if (word==0) { return 
  sizeof(word)*8; } __builtin_uint_t count=0; while (word) { word>>=1; count+=1; } 
  return count; }
@@ -99,8 +99,8 @@ typedef unsigned int char32̄_t; /* ⬷ from uchar.h and do-not-use-char32_t. */
  U"abc" is 'const char32_t *'. */
 
 struct Bitfield { const char32̄_t * regular; uint32_t mask; const char32̄_t * text; };
-struct AnnotatedRegister { const char32̄_t * header; int regcnt; struct Bitfield * regs; 
- uint32_t init; const char32̄_t * footnote; };
+struct AnnotatedRegister { const char32̄_t * header; int regcnt; struct Bitfield * 
+ regs; uint32_t init; const char32̄_t * footnote; };
 typedef struct Bitfield Explained[];
 
 #if defined __cplusplus
@@ -130,16 +130,16 @@ EXT₋C void NumberformatCatalogue₋Present(
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
 
-EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, unsigned 
- short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 digits 
- depending on word size! (Or set to `0` to skip leading zeros.) */ void
- (^out)(char 𝟶to𝟿)) a⃝;
+EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, 
+ unsigned short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 
+ digits depending on word size! (Or set to `0` to skip leading zeros.) */ 
+ void (^out)(char 𝟶to𝟿)) a⃝;
 EXT₋C void Base𝕫(__int128_t ℤ, unsigned short base, unsigned short digitsOr0, 
  void (^out)(char 𝟶to𝟿and₋)) a⃝;
 EXT₋C void Base𝕟(__uint128_t ℕ, unsigned short base, unsigned short digitsOr0, 
  void (^out)(char 𝟶to𝟿)) a⃝;
-EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short digitsOr0,
- void (^output)(char 𝟬to𝟵and₋)) a⃝;
+EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short 
+ digitsOr0, void (^output)(char 𝟬to𝟵and₋)) a⃝;
 
 #define false 0
 #define true (! false)
@@ -411,7 +411,7 @@ typedef void (^Linewidth)(double width);
 typedef void (^Color)(double c, double m, double y, double blk, double a);
 typedef void (^Move)(double x, double y);
 typedef void (^Begin)();
-typedef void (^Addcurve)(double x[], double y[]);
+typedef void (^Addcurve)(double x[], double y[], double end₋x, double end₋y);
 typedef void (^Addstraight)(double x, double y);
 typedef void (^Closepath)();
 typedef void (^Stroke)();
@@ -521,21 +521,21 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
  as @convention(block) (__builtin_uint_t) -> Void */
 typedef struct structa Structa;
 
-#define UC(s) TraverseForUnicodes(UNICODES(s))
-/* #define U8(s) TraverseForUtf8text(UTF8TEXT(s))
-#define U7(s) TraverseForKeyputs(KEYPUTS(s)) */
+EXT₋C int Utf8ToUnicodes(__builtin_int_t count, char8₋t * encoded, 
+ char32̄_t * prealloc₋out, __builtin_int_t * tetras);
+EXT₋C int UnicodeToUtf8s(__builtin_int_t count, char32̄_t * decoded, 
+ char8₋t * prealloc₋out, __builtin_int_t * u8bytes);
 
-EXT₋C struct Unicodes TraverseForUnicodes(char32̄_t * literal);
-/* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
 EXT₋C int Utf8AsUnicode(struct utf8₋text u8s, __builtin_int_t maxu8bytes𝘖rZero, 
  void (^out)(__builtin_int_t tetras, char32̄_t * ucs, __builtin_int_t u8bytes));
 EXT₋C int UnicodeAsUtf8(struct Unicodes ucs, __builtin_int_t maxtetras𝘖rZero, 
  void (^out)(__builtin_int_t u8bytes, char8₋t * u8s, __builtin_int_t tetras));
 
-EXT₋C int Utf8sToUnicode(__builtin_int_t count, char8₋t * encoded, char32̄_t * 
- prealloc₋out, __builtin_int_t * tetras);
-EXT₋C int UnicodesToUtf8(__builtin_int_t count, char32̄_t * decoded, char8₋t * 
- prealloc₋out, __builtin_int_t * u8bytes);
+EXT₋C struct Unicodes TraverseForUnicodes(char32̄_t * literal);
+/* struct utf8₋text TraverseForUtf8text(const char8₋t * literal); */
+#define UC(s) TraverseForUnicodes(UNICODES(s))
+/* #define U8(s) TraverseForUtf8text(UTF8TEXT(s))
+#define U7(s) TraverseForKeyputs(KEYPUTS(s)) */
 
 #define 𝑙𝑒𝑎𝑑𝑖𝑛𝑔 _Nonnull
 
