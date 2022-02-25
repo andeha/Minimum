@@ -2,8 +2,6 @@
 
 #ifdef __cplusplus
 
-#define rt₋namespace namespace
-
 rt₋namespace after9₋variables { extern int vector₋init₋error; };
 
 template <typename E> struct vector { struct structa inner; 
@@ -18,5 +16,13 @@ template <typename E> struct vector { struct structa inner;
 
 typedef vector<char32̄_t> unicode₋string₁; /* ⬷ a․𝘬․a 'appendable unicode₋text'. */
 typedef void ᶿ﹡ unicode₋string₂; /* ⬷ a․𝘬․a 'editable₋unicode₋text'. */
+
+#define WHEN_COMPILING constexpr static
+#define 🥈ᵢ WHEN_COMPILING __attribute__ ((internal_linkage))
+#define 🥈 WHEN_COMPILING /* ⬷ must be assigned to a 'const' and no inline assembler. */
+#define NOT_EVERYTIME const static
+#define 🥇 NOT_EVERYTIME
+template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
+template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". */
 
 #endif

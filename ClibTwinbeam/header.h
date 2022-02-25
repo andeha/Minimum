@@ -425,18 +425,6 @@ EXT₋C int regional₋system(unsigned retrospect₋rows);
 
 #ifndef __cplusplus
 typedef int bool;
-#define Wordbytes (sizeof(__builtin_uint_t))
-static inline __builtin_int_t Syspagesize() { return 4096; }
-#else
-/* #define WHEN_COMPILING constexpr static
-#define 🥈ᵢ WHEN_COMPILING __attribute__ ((internal_linkage))
-#define 🥈 WHEN_COMPILING /‌* ⬷ must be assigned to a 'const' and no inline assembler. *‌/
-#define NOT_EVERYTIME const static
-#define 🥇 NOT_EVERYTIME
-template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
-template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /‌* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". *‌/
-__builtin_int_t 🥈 Wordbytes=sizeof(__builtin_uint_t);
-__builtin_int_t constexpr Syspagesize() { return 4096; } */
 #endif
 
 typedef void (*Argᴾ₋output₋p)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
