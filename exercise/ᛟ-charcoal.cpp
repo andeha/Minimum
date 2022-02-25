@@ -1,4 +1,4 @@
-/*  test-artistic.cpp | art drawing language. */
+/*  test-charcoal.cpp | art drawing language. */
 
 import ClibTwinbeam;
 
