@@ -1,4 +1,4 @@
-/*  􀪀 ClibTwinbeam.h | the Swift and Twinbeam bridge for Si and O₂. */
+/*  header.h | Swift and Twinbeam bridge to Si and O₂. */
 
 #if !defined __cplusplus
 #define MACRO static inline INLINED
@@ -680,10 +680,10 @@ typedef int pid_t;
 EXT₋C pid_t Twinbeam₋spawn(const char * pathandcommand₋u8s, const char * 
  command₋u8s, int * fd_p2c, int * fd_c2p /*, const char * NULLterminatedEnv */);
 
-EXT₋C int Twinbeam₋mmap(char8₋t * canonicalUtf8RegularOrLinkpath, 
+EXT₋C int layout₋persist(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t bytesOffset, __builtin_int_t pages𝘖rZero, 
  __builtin_int_t bytesAugment, __builtin_int_t * bytesActual, 
- uint8_t ** material);
+ int executable, uint8_t ** material); /* a․𝘬․a 'Twinbeam₋mmap'. */
 
 EXT₋C void * mapfileʳᵚ(const char * canonicalUtf8RegularOrLinkpath, 
  __builtin_int_t, __builtin_int_t , __builtin_int_t, __builtin_int_t *, int);
