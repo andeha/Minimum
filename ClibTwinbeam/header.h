@@ -1,16 +1,10 @@
 /*  header.h | Swift and Twinbeam bridge to Si and O₂. */
 
-#if !defined __cplusplus
-#define MACRO static inline INLINED
-#define unionᵢ union
-#define structᵢ struct
-#else
-#define MACRO inline INLINED
-#define unionᵢ union __attribute__ ((always_inline))
-#define structᵢ struct __attribute__((always_inline))
-#endif /* ⬷ see 'nm' for details. */
-#define inexorable static INLINED
-#define INLINED __attribute__((always_inline))
+#define MACRO inline __attribute__((always_inline))
+#define inexorable static __attribute__ ((internal_linkage))
+#define unionᵢ union /* __attribute__ ((internal_linkage)) */
+#define structᵢ struct /* __attribute__((internal_linkage)) */
+/* ⬷ see 'nm' for details. */
 typedef signed char         int8_t;
 typedef unsigned char       uint8_t;
 typedef unsigned long long  uint64_t;
