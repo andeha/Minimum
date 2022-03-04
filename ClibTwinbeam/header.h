@@ -36,7 +36,7 @@ typedef int64_t             __builtin_int_t; /* ⬷ a․𝘬․a 'sequenta'. */
 typedef short               int16_t; /* ≡ ᵐⁱᵖˢint. */
 typedef unsigned short      uint16_t; /* 𝘊f․ Q16. */
 typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant' and 'embargo-₍im₎material'. */
-#define FOCAL /* ⬷ embossed inexorable. */
+#define FOCAL /* ⬷ repoussé inexorable. */
 #define TROKADERO /* atomic calling convention. (Similar to Ieee754 Nan and Opt<double>.) */
 #define LEAF /* will at run-time be executed without non-atomicity and 'call' instructions. */
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
@@ -169,8 +169,7 @@ EXT₋C void exit(int status);
 /*  the 128-bits precision arithmetics. */
 
 union Q6364 { __uint128_t bits; __int128_t frac; };
-struct sequent { union Q6364 detail; int valid; };
-typedef struct sequent Sequenta;
+typedef struct sequent { union Q6364 detail; int valid; } Sequenta;
 typedef struct sequent (^computational)(struct sequent x);
 enum Newtoncontrol { Newton₋ok, Newton₋abort, Newton₋done };
 /* ⬷ for n₋root (non-0-1), sincos, log₃, lnΓ, 2ˣ, modulo, tanh, tanh⁻¹ and Erf. */
@@ -232,7 +231,7 @@ typedef struct intel₋sequent₋pair simd256_t;
                                                                              
 */
 
-typedef unsigned short half; /* ⬷ not 'typedef _Float16 half' and 
+typedef unsigned short float₋16; /* ⬷ not 'typedef _Float16 half' and 
  not 'typedef pythagorean_double half', in Swift already named Float16 and 
  made unavailable in macos. */
 
@@ -483,8 +482,6 @@ EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟
  __builtin_uint_t * words);
 EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
-struct middle₋index { uint8_t * tilerefs[8192]; };
-
 struct structa {
   struct middle₋index * middles[4096];
   __builtin_int_t item₋count, tile₋count;
@@ -501,6 +498,7 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
 /* ...the 'overloadable attribute in C-code is not yet found in Swift code. */
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
+struct middle₋index { uint8_t * tilerefs[8192]; };
 typedef struct structa Structa;
 
 EXT₋C int Utf8ToUnicodes(__builtin_int_t count, char8₋t * encoded, 
@@ -705,8 +703,7 @@ EXT₋C void state₋before(int count, struct Unicodes keys[], version₋ts ordi
 EXT₋C void state₋after(int count, struct Unicodes keys[], version₋ts ordin, void 
  (^search₋found)(int count, union historypod artstate[], struct Unicodes key[]), 
  struct timeserie * 🅙);
-typedef struct timeserie₋entry Entry;
-typedef void (^Outrow)(int count, Entry row[], int permanent[]);
+typedef void (^Outrow)(int count, struct timeserie₋entry row[], int permanent[]);
 typedef void (^Outpod)(int count, union historypod artstate[], struct Unicodes key[]);
 EXT₋C int Present₋timeserie₋overview(struct timeserie * 🅙, Outpod out);
 EXT₋C int Present₋timeserie₋transacts(__builtin_int_t retrospect₋offset, 
