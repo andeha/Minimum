@@ -1,6 +1,6 @@
 /*  after-nine.hpp | for .cpp-modelling. */
 
-#ifdef __cplusplus
+#if defined __cplusplus
 
 rt₋namespace after9₋variables { extern int vector₋init₋error; };
 
@@ -22,7 +22,6 @@ typedef void ᶿ﹡ unicode₋string₂; /* ⬷ a․𝘬․a 'editable₋unicode
 #define 🥈 WHEN_COMPILING /* ⬷ must be assigned to a 'const' and no inline assembler. */
 #define NOT_EVERYTIME const static
 #define 🥇 NOT_EVERYTIME
-template <typename T> T * Critic(const T * x) { return const_cast<T*>(x); }
-template <typename T> T& Critic(const T &x) { return const_cast<T&>(x); } /* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". */
-
+template <typename X> X * Critic(const X * x) { return const_cast<X*>(x); }
+template <typename Y> Y& Critic(const Y &x) { return (Y&)x; } /* ⬷ a․𝘬․a "away 𝙘𝙤𝙣𝙨𝙩 evil". */
 #endif

@@ -5,7 +5,7 @@ import ClibTwinbeam;
 struct Unicodes TraverseForUnicodes(char32̄_t * literal)
 {
   char32̄_t * unicodes = (char32̄_t *)literal;
-  __builtin_int_t symbols = TetrasUntilNull(unicodes,BUILTIN₋INT₋MAX);
+  __builtin_int_t symbols = TetrasUntilZero(unicodes,BUILTIN₋INT₋MAX);
   struct Unicodes y = { symbols, unicodes };
   return y;
 } /* const unsigned int alternatively const char32_t. */
@@ -58,7 +58,7 @@ int Utf8AsUnicode(struct utf8₋text text, __builtin_int_t maxu8bytes𝘖rZero,
 {
   if (text.bytes > maxu8bytes𝘖rZero && maxu8bytes𝘖rZero != 0) { return -1; }
   __builtin_int_t bytes = maxu8bytes𝘖rZero ? maxu8bytes𝘖rZero : 
-   Utf8BytesUntilNull(text.u8s,BUILTIN₋INT₋MAX);
+   Utf8BytesUntilZero(text.u8s,BUILTIN₋INT₋MAX);
   __builtin_int_t tetras=0, ⁸b=0; char32̄_t unicodes[1+bytes];
   typedef int (^Helper)(char32̄_t *, __builtin_int_t *, __builtin_int_t *, 
    char8₋t *, __builtin_int_t); ⁺⁼Utf8ToUnicode
@@ -73,7 +73,7 @@ int UnicodeAsUtf8(struct Unicodes text, __builtin_int_t maxtetras𝘖rZero,
 {
   if (text.tetras > maxtetras𝘖rZero && maxtetras𝘖rZero != 0) { return -1; }
   __builtin_int_t tetras = maxtetras𝘖rZero ? maxtetras𝘖rZero :
-   TetrasUntilNull(text.unicodes,BUILTIN₋INT₋MAX), ᵇu8s=4*tetras;
+   TetrasUntilZero(text.unicodes,BUILTIN₋INT₋MAX), ᵇu8s=4*tetras;
   char8₋t u8s[1+ᵇu8s]; __builtin_int_t ⁸idx=0, ³²idx=0;
   typedef int (^Helper)(char8₋t *,__builtin_int_t *,__builtin_int_t *,
    __builtin_int_t,char32̄_t *); ⁺⁼UnicodeToUtf8

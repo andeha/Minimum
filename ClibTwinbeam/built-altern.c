@@ -47,7 +47,7 @@ Acquire𝟷ᵈ(__builtin_int_t ﹟, struct 𝟺kbframes * one₋set,
  void (^every)(uint8_t * 𝟸ⁿ₋frame, int * stop)
 )
 { __builtin_int_t Bits=Wordbytes()<<3, Idxs=(one₋set->page₋count/Wordbytes())>>3, occupied;
-    if (﹟ <= 0) { return -1; } bool stop=false;
+    if (﹟ <= 0) { return -1; } int stop=false;
     for (int i=0; i<Idxs; i++) {
 again:
       occupied = ~(one₋set->idx₋avails[i]);
@@ -107,7 +107,7 @@ int CoalescingAcquire(unsigned expeditionary, void **𝟺kbframes, __builtin_int
      } return 0;
    };
    __builtin_uint_t * frms = (__builtin_uint_t *)𝟺kbframes; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __builtin_int_t brk=0;
-   if (Acquire𝟷ᵈ(﹟, &one₋set, ^(uint8_t * 𝟸ⁿ₋frame, bool * stop) { 
+   if (Acquire𝟷ᵈ(﹟, &one₋set, ^(uint8_t * 𝟸ⁿ₋frame, int * stop) { 
      *(frms + brk++) = (__builtin_uint_t)𝟸ⁿ₋frame;
    })) { if (rollback(brk,𝟺kbframes,&one₋set)) { return -2; } return -1; }
    return 0;

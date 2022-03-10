@@ -1,4 +1,4 @@
-/* 􀙢 amend-tape.c | equal-size tiles and often quickly wrapped in after-9 templates. */
+/*  amend-tape.c | equal-size tiles are often quickly wrapped in C++. */
 
 import ClibTwinbeam;
 

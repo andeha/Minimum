@@ -154,9 +154,9 @@ EXT₋C short Utf8Followers(char8₋t leadOr8Bit);
 
 EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * 𝟽alt𝟾₋bitprefix);
 /* ⬷ downward from 127 the ASCII table is del, ~, }, |, {, z, y, ... */
-EXT₋C __builtin_int_t TetrasUntilNull(char32̄_t * ucs, __builtin_int_t maxtetras);
-EXT₋C __builtin_int_t Utf8BytesUntilNull(char8₋t * u8s, __builtin_int_t maxutf8bytes);
-EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras);
+EXT₋C __builtin_int_t TetrasUntilZero(char32̄_t * ucs, __builtin_int_t maxtetras𝘖rZero);
+EXT₋C __builtin_int_t Utf8BytesUntilZero(char8₋t * u8s, __builtin_int_t maxbytes𝘖rZero);
+EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras𝘖rZero);
 
 #define UNITTEST(symbol) EXT₋C void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
@@ -247,7 +247,7 @@ typedef __attribute__ ((neon_vector_type(8))) __fp16 float16x8_t;
 typedef __attribute__ ((neon_vector_type(2))) double float64x2_t;
 typedef float64x2_t simd_tᵦ;
 #elif defined __x86_64__
-typedef half __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
+typedef float₋16 __attribute__ ((__vector_size__(16), __aligned__(16))) __v8hf;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __m128;
 typedef float __attribute__ ((__vector_size__(16), __aligned__(16))) __v44f;
 typedef __v8hf __m128h; typedef __m128h panko; /* ⬷ in Swift already named SIMD8. On Intel VCVTPH2PS and _m256 _mm256_cvtph_ps ( __m128i m1). */
@@ -280,7 +280,7 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
      unsigned sign     : 1;
    } bfloat16; /* ⬷ ubiquitous. ARMv8.6-A and 𝘦․𝘨 'BFCVT'. */
    unsigned short bits;
-   half location;
+   float₋16 location;
 } pythagorean_double;
 
 /* When 'typedef _Float16 two₋half;' them]n `two₋half x[] = { 1.2, 3.0, 3.e4 };` */
@@ -315,9 +315,9 @@ typedef union { /* Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻
 #define simd_scalar₈(x) _mm_cvtsh_h
 #endif
 
-EXT₋C double To₋doubleprecision(/* unsigned short */ half x);
+EXT₋C double To₋doubleprecision(/* unsigned short */ float₋16 x);
 
-EXT₋C void NumberformatCatalogue₋Presentᵧ(half val, 
+EXT₋C void NumberformatCatalogue₋Presentᵧ(float₋16 val, 
  /* void (^sometime)(int count, char32_t * terminated₋ucs) */ 
  void (^out)(char8₋t * u8s, __builtin_int_t bytes));
 
@@ -377,7 +377,7 @@ static inline uint32_t __dwt_cyccnt() { return *(volatile unsigned *)0xe0001004;
 #define rt₋namespace namespace /* ⬷ a library (an .a-file) consists of functions, not variables. */
 #define Pult💡(x) ++x
 
-struct distance { half length; int unit; };
+struct distance { float₋16 length; int unit; };
 enum Image₋kind { PNGrgba8 };
 struct PngRGBA8Pixel { uint8_t R,G,B,A; };
 union Image₋rectangle { struct PngRGBA8Pixel * pngRgba8; /* ⬷ c𝘧․ Scatter. */ };
@@ -415,10 +415,6 @@ typedef void (^Attributes)(char32̄_t * text, __builtin_int_t offset,
  __builtin_int_t range, __builtin_int_t attribute);
 EXT₋C int format₋system(struct Unicodes text, Attributes attrs);
 EXT₋C int regional₋system(unsigned retrospect₋rows);
-
-#ifndef __cplusplus
-typedef int bool;
-#endif
 
 typedef void (*Argᴾ₋output₋p)(struct Unicodes set, void * context); /* ⬷ C, C++ and Swift. */
 typedef void (^Argᴾ₋output₋b)(struct Unicodes set, void * context); /* ⬷ C and C++. */
@@ -483,7 +479,7 @@ EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟
 EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
 struct structa {
-  struct middle₋index * middles[4096];
+  struct middle₋index { uint8_t * tilerefs[8192]; } * middles[4096];
   __builtin_int_t item₋count, tile₋count;
   unsigned bytes₋per₋item, bytes₋per₋tile;
 }; /* ⬷ a․𝘬․a Tape. */
@@ -498,7 +494,6 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
 /* ...the 'overloadable attribute in C-code is not yet found in Swift code. */
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
-struct middle₋index { uint8_t * tilerefs[8192]; };
 typedef struct structa Structa;
 
 EXT₋C int Utf8ToUnicodes(__builtin_int_t count, char8₋t * encoded, 
