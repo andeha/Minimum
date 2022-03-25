@@ -42,7 +42,7 @@ typedef __builtin_uint_t Tribool; /* ⬷ c𝘧․ 'obekant' and 'embargo-₍im�
 #define ATOMIC /* will be executed without task switch and does not effect yield. */
 #define SELDOM /* long-running and will be executed without task switch and is uncontaining 'yield'. */
 #define QUOTE(str) #str
-#define ΨΛΩ ((void *)0)
+#define ΨΛΩ (0)
 #define ᶿ﹡ *
 /* #define ■ 1
 #define □ 0 */
@@ -120,20 +120,20 @@ EXT₋C void NumberformatCatalogue₋Present(
   Internals * impl_;
 #define 😐 APPEND_PIMPL }
 
-#define a⃝ __attribute__((overloadable))
+#define ⓣ __attribute__((overloadable))
 
 #define 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 __attribute__ ((__blocks__(byref))) /* ⬷ a․𝘬․a '__block'. */
 
 EXT₋C FOCAL void Base𝕟(/* TeX §64, §65 and §67 */ __builtin_uint_t ℕ, 
  unsigned short base, unsigned short digitsOr0, /* Not more than 32 alt. 64 
  digits depending on word size! (Or set to `0` to skip leading zeros.) */ 
- void (^out)(char 𝟶to𝟿)) a⃝;
+ void (^out)(char 𝟶to𝟿)) ⓣ;
 EXT₋C void Base𝕫(__int128_t ℤ, unsigned short base, unsigned short digitsOr0, 
- void (^out)(char 𝟶to𝟿and₋)) a⃝;
+ void (^out)(char 𝟶to𝟿and₋)) ⓣ;
 EXT₋C void Base𝕟(__uint128_t ℕ, unsigned short base, unsigned short digitsOr0, 
- void (^out)(char 𝟶to𝟿)) a⃝;
+ void (^out)(char 𝟶to𝟿)) ⓣ;
 EXT₋C void Base𝕫(__builtin_int_t ℤ, unsigned short base, unsigned short 
- digitsOr0, void (^output)(char 𝟬to𝟵and₋)) a⃝;
+ digitsOr0, void (^output)(char 𝟬to𝟵and₋)) ⓣ;
 
 #define false 0
 #define true (! false)
@@ -157,6 +157,7 @@ EXT₋C int IsPrefixOrEqual(const char * 𝟽alt𝟾₋bitstring, const char * �
 EXT₋C __builtin_int_t TetrasUntilZero(char32̄_t * ucs, __builtin_int_t maxtetras𝘖rZero);
 EXT₋C __builtin_int_t Utf8BytesUntilZero(char8₋t * u8s, __builtin_int_t maxbytes𝘖rZero);
 EXT₋C __builtin_int_t ExactUtf8bytes(char32̄_t * ucs, __builtin_int_t maxtetras𝘖rZero);
+EXT₋C char8₋t * Retranscript(char8₋t * u8s, __builtin_int_t maxu8bytes𝘖rZero) ⓣ;
 
 #define UNITTEST(symbol) EXT₋C void Unittest_##symbol()
 #define Panic(log,s) { print("\n\n'⬚'\nPanicking at ⬚ in ⬚:⬚\n",            \
@@ -232,7 +233,7 @@ typedef struct intel₋sequent₋pair simd256_t;
 */
 
 typedef unsigned short float₋16; /* ⬷ not 'typedef _Float16 half' and 
- not 'typedef pythagorean_double half', in Swift already named Float16 and 
+ not 'typedef pythagorean_double half', in Swift already named float-16 and 
  made unavailable in macos. */
 
 BITMASK (uint32_t /* and not 'unsigned short' */) {
@@ -390,9 +391,9 @@ EXT₋C int Release₋image(struct Image * image);
 
 EXT₋C int mfprint(const char * utf8format, ...);
 EXT₋C int print(void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
- const char * utf8format, ...) a⃝;
-EXT₋C int print(const char * utf8format, ...) a⃝;
-EXT₋C int markdown(const char * utf8format, ...); /* ⬷ eighty-three characters wide */
+ const char * utf8format, ...) ⓣ;
+EXT₋C int print(const char * utf8format, ...) ⓣ;
+EXT₋C int keyput(void * opaque₋notepointer, const char * utf8format, ...); /* ⬷ eighty-three characters wide */
 EXT₋C int charcoals(const char * utf8format, ...); /* ⬷ includes setting images. */
 EXT₋C int interact(unsigned retrospect₋rows, double framesync₋Hz, 
  int (*decree)(int64_t param));
@@ -445,14 +446,14 @@ typedef struct Arg₋𝓟 {
 EXT₋C Argᴾ ﹟d(__builtin_int_t d);
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x);
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b);
-EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) a⃝;
-EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) a⃝;
-EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) a⃝;
-EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) a⃝;
-EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) a⃝;
-EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */;
-EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */;
+EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) ⓣ;
+EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) ⓣ;
+EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) ⓣ;
+EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) ⓣ;
+EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) ⓣ;
+EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) ⓣ;
+EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* ⓣ */;
+EXT₋C Argᴾ ﹟c8(char8₋t c) /* ⓣ */;
 EXT₋C Argᴾ ﹟C(char32̄_t C);
 #if defined(𝟷𝟸𝟾₋bit₋integers)
 EXT₋C Argᴾ ﹟U(__uint128_t U);
@@ -479,13 +480,13 @@ EXT₋C int 𝟷₋tile₋copy₋include(struct fifo * 🅵, __builtin_int_t ﹟
 EXT₋C int 𝟷₋tile₋shiftout(struct fifo * 🅵, __builtin_int_t words);
 
 struct structa {
-  struct middle₋index { uint8_t * tilerefs[8192]; } * middles[4096];
+  struct middle { uint8_t * tilerefs[8192]; } * middles[4096];
   __builtin_int_t item₋count, tile₋count;
   unsigned bytes₋per₋item, bytes₋per₋tile;
 }; /* ⬷ a․𝘬․a Tape. */
 
 EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
- bytes₋per₋tile, struct structa * 🅰, ALLOC alloc);
+ bytes₋per₋tile, struct structa * 🅰);
 EXT₋C int copy₋append₋items(__builtin_int_t count₋not₋bytes, void * 
  bytesequence₋objects, struct structa * 🅐, ALLOC alloc);
 EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐);
@@ -495,6 +496,8 @@ EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow);
 /* let register₋reflect = { (mask: __builtin_uint_t) -> Void in print("") } 
  as @convention(block) (__builtin_uint_t) -> Void */
 typedef struct structa Structa;
+typedef struct structa Shatter;
+typedef struct structa structure;
 
 EXT₋C int Utf8ToUnicodes(__builtin_int_t count, char8₋t * encoded, 
  char32̄_t * prealloc₋out, __builtin_int_t * tetras);
@@ -564,8 +567,9 @@ typedef int (^INIT)(void * uninited);
 #if defined 𝟷𝟸𝟾₋bit₋integers
 EXT₋C __uint128_t FNV1b(__builtin_int_t bytes, void * material);
 struct w₋node { __int128_t key; void * note; struct w₋node *left, *right; };
-EXT₋C void * impression₋store(void ᶿ﹡ opaque, __uint128_t fineprint, ALLOC alloc);
-EXT₋C void * impression₋seek(void ᶿ﹡ opaque, __uint128_t fineprint);
+EXT₋C struct w₋node * impression₋store(void ᶿ﹡ opaque, __uint128_t fineprint, 
+ void * material, ALLOC alloc);
+EXT₋C struct w₋node * impression₋seek(void ᶿ﹡ opaque, __uint128_t fineprint);
 typedef void * notepointer;
 EXT₋C notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_int_t 
  notebytes, ALLOC alloc, INIT init);
@@ -592,13 +596,13 @@ struct ¹stack { uint8_t * words;
  void * (^area₋realloc)(void * p, __builtin_int_t to₋bytes); /* ⬷ push */
 }; /* ⬷ a․𝘬․a machinestack. */
 
-EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) a⃝;
-EXT₋C void stack₋unalloc(struct ¹stack * 🆇) a⃝;
-EXT₋C int stack₋push(struct ¹stack * 🅧, uint8_t * item) a⃝;
-EXT₋C uint8_t * stack₋pop(struct ¹stack * 🅧) a⃝;
-EXT₋C __builtin_int_t stack₋count(struct ¹stack * 🅧) a⃝;
-EXT₋C int stack₋empty(struct ¹stack * 🅧) a⃝;
-EXT₋C uint8_t * stack₋top(struct ¹stack * 🅧) a⃝;
+EXT₋C int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) ⓣ;
+EXT₋C void stack₋unalloc(struct ¹stack * 🆇) ⓣ;
+EXT₋C int stack₋push(struct ¹stack * 🅧, uint8_t * item) ⓣ;
+EXT₋C uint8_t * stack₋pop(struct ¹stack * 🅧) ⓣ;
+EXT₋C __builtin_int_t stack₋count(struct ¹stack * 🅧) ⓣ;
+EXT₋C int stack₋empty(struct ¹stack * 🅧) ⓣ;
+EXT₋C uint8_t * stack₋top(struct ¹stack * 🅧) ⓣ;
 typedef struct ¹stack Stack;
 
 typedef uint64_t chronology₋instant;
