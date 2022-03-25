@@ -575,12 +575,12 @@ EXT₋C notepointer jot(struct Unicodes token, void ᶿ﹡* opaque, __builtin_in
  notebytes, ALLOC alloc, INIT init);
 #endif
 
-EXT₋C int form₋ōnymon(struct Unicodes key, struct Unicodes val, int shares, void 
- ᶿ﹡* opaque, ALLOC alloc);
+EXT₋C int form₋ōnymon(struct Unicodes key₋copy, struct Unicodes value₋copy, 
+ int shares, void ᶿ﹡* opaque, ALLOC alloc);
 EXT₋C int dissociate₋isolate(struct Unicodes key, int idx, void ᶿ﹡* opaque);
 EXT₋C int dissociate₋all(struct Unicodes key, void ᶿ﹡* opaque);
 EXT₋C int evidence₋related(struct Unicodes key, void (^right)(int count, 
- struct Unicodes val[]), void ᶿ﹡* opaque);
+ struct Unicodes vals[]), void ᶿ﹡ opaque);
 /* ⬷ a․𝘬․a 'thesaurus', company', 'association', liability₋alt₋indemnity 
  and 'unicode₋map'. */
 
