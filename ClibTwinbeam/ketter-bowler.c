@@ -27,7 +27,7 @@ inexorable void cross₋item(unicode₋shatter * ref)
 
 inexorable int item₋is₋not₋crossed(unicode₋shatter entry)
 {
-   return entry != ΨΛΩ || entry != (unicode₋shatter)0x2425;
+   return entry != ΨΛΩ && entry != (unicode₋shatter)0x2425;
 }
 
 int dissociate₋isolate(struct Unicodes key, int idx, void ᶿ﹡* opaque)
