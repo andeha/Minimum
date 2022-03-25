@@ -2,7 +2,7 @@
 
 import ClibTwinbeam;
 
-int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) a⃝
+int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) ⓣ
 {
    🆇->initial₋area₋alloc = ^(__builtin_int_t bytes) { return Heap₋alloc(bytes); };
    🆇->area₋dealloc = ^(void * p) { Heap₋unalloc(p); };
@@ -15,13 +15,13 @@ int init₋stack(struct ¹stack * 🆇, short bytes₋per₋element) a⃝
    return 0;
 }
 
-void stack₋unalloc(struct ¹stack * 🆇) a⃝
+void stack₋unalloc(struct ¹stack * 🆇) ⓣ
 {
    if (🆇->words != ΨΛΩ) { 🆇->area₋dealloc(🆇->words); }
    🆇->pos=0; 🆇->size=0; 🆇->words=ΨΛΩ;
 }
 
-inexorable int expand₋stack(struct ¹stack * 🅧) a⃝
+inexorable int expand₋stack(struct ¹stack * 🅧) ⓣ
 {
    __builtin_uint_t new_size = 🅧->size << 1;
    __builtin_int_t new_bytes=new_size*🅧->elem₋bytesize;
@@ -31,7 +31,7 @@ inexorable int expand₋stack(struct ¹stack * 🅧) a⃝
    return 0;
 }
 
-int stack₋push(struct ¹stack * 🅧, uint8_t * item) a⃝
+int stack₋push(struct ¹stack * 🅧, uint8_t * item) ⓣ
 {
    if (🅧->pos == 🅧->size) {
      if (expand₋stack(🅧)) { return -1; }
@@ -44,19 +44,19 @@ int stack₋push(struct ¹stack * 🅧, uint8_t * item) a⃝
    return 0;
 }
 
-uint8_t * stack₋top(struct ¹stack * 🅧) a⃝
+uint8_t * stack₋top(struct ¹stack * 🅧) ⓣ
 {
    return 🅧->pos == 0 ? ΨΛΩ : (🅧->pos - 1) + 🅧->words;
 }
 
-uint8_t * stack₋pop(struct ¹stack * 🅧) a⃝
+uint8_t * stack₋pop(struct ¹stack * 🅧) ⓣ
 {
    uint8_t * bytes = stack₋top(🅧);
    if (🅧->pos > 0) { 🅧->pos--; }
    return bytes;
 }
 
-__builtin_int_t stack₋count(struct ¹stack * 🅧) a⃝ { return 🅧->pos; }
+__builtin_int_t stack₋count(struct ¹stack * 🅧) ⓣ { return 🅧->pos; }
 
-int stack₋empty(struct ¹stack * 🅧) a⃝ { return 🅧->pos == 0; }
+int stack₋empty(struct ¹stack * 🅧) ⓣ { return 🅧->pos == 0; }
 

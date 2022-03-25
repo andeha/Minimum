@@ -3,12 +3,12 @@
 module ClibTwinbeam { requires macos 
   
   module Arm_Simd { requires neon 
-    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/arm_neon.h"
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include/arm_neon.h"
   }
   
   module Intel_Simd { requires /* sse41, */ sse 
-    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/mmintrin.h"
-    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.0.0/include/xmmintrin.h"
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include/mmintrin.h"
+    header "/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include/xmmintrin.h"
   }
   
   header "header.h"

@@ -8,7 +8,7 @@ EXT₋C
 void Base𝕫(__int128_t ℤ, 
   unsigned short base, unsigned short digitsOr0, 
   void (^out)(char 𝟶to𝟿and₋)
-) a⃝
+) ⓣ
 {
   if (ℤ < +0) { out('-'); ℤ = -ℤ; }
   Base𝕟((__builtin_uint_t)ℤ, base, digitsOr0, out);
@@ -21,7 +21,7 @@ Base𝕟(
   unsigned short base, 
   unsigned short digitsOr0, 
   void (^out)(char 𝟶to𝟿)
-) a⃝
+) ⓣ
 {
    typedef void (^Out)(unsigned short r, void (^out)(char));
    Out 𝟶to𝖥 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
@@ -55,7 +55,7 @@ Base𝕟( /* TeX §64, §65 and §67. */
   unsigned short digitsOr0, /* ⬷ not more than 32 or 64 digits depending on 
     your machines' word size! (Or set to `0` to skip leading zeros.) */
   void (^output)(char 𝟬to𝟵)
-) a⃝
+) ⓣ
 {
    typedef void (^Out)(unsigned short r, void (^out)(char));
    Out 𝟬to𝗙 = ^(unsigned short r, void (^out)(char utf8)) { r < 10 ? 
@@ -81,7 +81,7 @@ Base𝕫(
   unsigned short base,
   unsigned short digitsOr0,
   void (^output)(char 𝟬to𝟵and₋)
-) a⃝
+) ⓣ
 {
    if (ℤ < 0) { output('-'); ℤ = -ℤ; }
    Base𝕟((__builtin_uint_t)ℤ, base, digitsOr0, output);
