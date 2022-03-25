@@ -2,8 +2,8 @@
 
 import ClibTwinbeam;
 
-EXT₋C int structa₋init(unsigned bytes₋per₋item, unsigned 
- bytes₋per₋tile, struct structa * 🅰, ALLOC alloc)
+int structa₋init(unsigned bytes₋per₋item, unsigned 
+ bytes₋per₋tile, struct structa * 🅰)
 {
   🅰->bytes₋per₋item = bytes₋per₋item;
   🅰->bytes₋per₋tile = bytes₋per₋tile;
@@ -24,7 +24,7 @@ inexorable int find₋tile(__builtin_int_t idx, uint8_t **tile,
    return 0;
 }
 
-EXT₋C uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐)
+uint8_t * structa₋at(__builtin_int_t idx, struct structa * 🅐)
 { __builtin_int_t offset; uint8_t * tile;
   if (find₋tile(idx,&tile,&offset,🅐)) { return ΨΛΩ; }
   return offset + tile;
@@ -72,7 +72,7 @@ inexorable int optionally₋inflate(__builtin_int_t requires₋bytes,
    return 0;
 }
 
-inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
+inexorable int copy₋amend₋one₋object(void * start, struct structa * 🅐)
 { uint8_t * tile; __builtin_int_t byte₋offset;
   if (find₋tile(🅐->item₋count,&tile,&byte₋offset,🅐)) { return -1; }
   ByteAlignedRef dst = byte₋offset + tile;
@@ -81,24 +81,24 @@ inexorable int copy₋append₋one₋object(void * start, struct structa * 🅐)
   return 0;
 }
 
-EXT₋C int copy₋append₋items(__builtin_int_t count, void * bytes₋objects, 
+int copy₋append₋items(__builtin_int_t count, void * bytes₋objects, 
  struct structa * 🅐, ALLOC alloc)
 {
   if (optionally₋inflate(count*🅐->bytes₋per₋item,🅐,alloc)) { return -1; }
   for (__builtin_int_t i=0; i<count; i += 1) {
     __builtin_int_t byte₋offset = i*🅐->bytes₋per₋item;
     void * start = byte₋offset + (uint8_t *)bytes₋objects;
-    if (copy₋append₋one₋object(start,🅐)) { return -2; }
+    if (copy₋amend₋one₋object(start,🅐)) { return -2; }
   }
   return 0;
 }
 
-EXT₋C __builtin_int_t structa₋count(struct structa * 🅐)
+__builtin_int_t structa₋count(struct structa * 🅐)
 {
   return 🅐->item₋count;
 }
 
-EXT₋C int deinit₋structa(struct structa * 🅰, FALLOW fallow)
+int deinit₋structa(struct structa * 🅰, FALLOW fallow)
 { __builtin_int_t idx=🅰->item₋count-1,byte₋idx₁,tile₋idx₁, 
   middle₋idx₁, byte₋idx₂,tile₋idx₂,middle₋idx₂;
 again:
