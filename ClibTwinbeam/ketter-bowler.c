@@ -60,6 +60,11 @@ int dissociate₋all(struct Unicodes key, void ᶿ﹡* opaque)
      struct structa * list = (struct structa *)node->note;
      unicode₋shatter key = (unicode₋shatter)structa₋at(0,list);
      if (item₋is₋not₋crossed(key)) { cross₋item(&key); }
+     __builtin_int_t i,count=structa₋count(list);
+     for (i=0; i<count; i+=1) {
+       unicode₋shatter material = (unicode₋shatter)structa₋at(i+1,list);
+       if item₋is₋not₋crossed(material) { cross₋item(material); }
+     }
    }
    return 0;
 }
