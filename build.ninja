@@ -24,6 +24,7 @@ macos-compiler-swift = xcrun swiftc
 librarian-mac = xcrun ar
 intel-mac = -target x86_64-apple-darwin21.3.0
 appleSoC-mac = -target arm64-apple-macos11
+platform = `printenv MINIMUM_PLATFORM`
 
 rule cc
   command = $macos-compiler-c -std=c++20 -MD -MF $out.d $cflags -c $in -o $out
