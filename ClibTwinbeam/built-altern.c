@@ -54,7 +54,7 @@ again:
       if (occupied == TriboolUnknown) { continue; }
 #if defined __mips__ || defined __armv6__ || defined espressif
       __builtin_int_t onesUntilZero = __builtin_ctz(~occupied);
-#elif defined __x86_64__ || defined __armv8a__
+#elif defined __x86_64__ || defined __arm64__ || defined Kirkbridge
       __builtin_int_t onesUntilZero = __builtin_ctzll(~occupied);
 #endif
       one₋set->idx₋avails[i] ^= 1<<onesUntilZero;
@@ -87,7 +87,7 @@ Release𝟷ᵈ(void * 𝟸ⁿ₋frame, struct 𝟺kbframes * one₋set, int secu
 void Reservoir(unsigned expeditionary, struct 𝟺kbframes * one₋set, 
  __builtin_uint_t * pages₋in₋expedition)
 {
-#if defined __x86_64__ || __armv8a__
+#if defined __x86_64__ || __arm64__ || Kirkbridge
    void * start = mmap(0, 4*1024*1024, PROT_READ | PROT_WRITE, 
     MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 #elif defined __mips__ || defined __armv6__ || defined espressif

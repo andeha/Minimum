@@ -8,7 +8,7 @@ __attribute__ ((target("f16c")))
 #endif
 half₋to₋float(half /* unsigned short */ 𝟷𝟼₋bits)
 {
-#if defined __armv8a__
+#if defined __arm64__
   float16x4_t a = { 𝟷𝟼₋bits, 0, 0, 0 };
   float32x4_t b = vcvt_f32_f16(a);
   return b[0];
@@ -36,7 +36,7 @@ struct AnnotatedRegister AR_Binary16 = {
   U"Encodes values between 2⁻¹⁴ to 2⁻¹⁵ or 3․1×10⁻⁵ to 6․5×10⁴."
 };
 
-void NumberformatCatalogue₋Presentᵧ(half val, /* void (^out)(char32_t uc) */ 
+void NumberformatCatalogue₋Presentᵧ(half val, /* void (^out)(char32_t uc) */
  void (^out)(char8₋t * u8s, __builtin_int_t bytes))
 {
   pythagorean_double dbl = { .location=val };
@@ -58,7 +58,7 @@ __attribute__ ((target("f16c")))
 #endif
 float₋to₋half(float 𝟹𝟸₋bits)
 {
-#if defined __armv8a__X
+#if defined __arm64__
   float16x8_t a = { 0, 0, 0, 0, 0, 0, 0, 0 };
   float32x4_t b = { 𝟹𝟸₋bits, 0, 0, 0 }, 
    c = __builtin_arm_mve_vcvttq_f16_f32(a,b); // __arm_vcvttq_f16_f32

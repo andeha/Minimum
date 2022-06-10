@@ -10,10 +10,11 @@ Utf8Followers(char8₋t leadOr8Bit)
     if (128 <= leadOr8Bit && leadOr8Bit < 192) return -1;
     if (248 <= leadOr8Bit) return -1;
     
-#if defined __mips__ || defined __armv6__ || defined __armv8a__
+#if defined __mips__ || defined __armv6__ || defined espressif
     /* Mips: clz $a0, $v0, Arm: clz r0, r14. */
     __builtin_int_t onesUntilZero = __builtin_clz(~((uint32_t)leadOr8Bit<<24));
-#elif defined __x86_64__ /* BSF, BSR, LZCNT, TZCNT, __lzcnt64 on Win64. */
+#elif defined __x86_64__ || defined __arm64__ || Kirkbridge
+    /* BSF, BSR, LZCNT, TZCNT, __lzcnt64 on Win64. */
     __builtin_int_t onesUntilZero = __builtin_clzll(~((uint64_t)leadOr8Bit<<56));
 #else
     auto clz = ^(uint8_t x) {

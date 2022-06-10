@@ -8,9 +8,10 @@ swift-flags = -g -D DEBUG -I .
 # 'module.modulemap' file and its c-only-functions to be used in Swift.
 # ...and do no add -lc++ to swift-flags.
 objs = ./.objs/7703a312-55A9-44da-A892-abbcf7f87654_$appname
-gencdflags = -fno-rtti -fblocks -fcoroutines-ts -fno-exceptions -Wno-format  $
- -fno-signed-char -fno-builtin -Wno-c++20-designator -Wno-c99-designator     $
- -Wincomplete-umbrella -Wmodule-conflict -Wno-nullability-completeness
+gencdflags = -fblocks -fno-rtti -fno-char8_t -fno-signed-char -fno-builtin   $
+ -fno-coroutines-ts -fno-exceptions -Wno-format -Wno-c++20-designator        $
+ -Wno-c99-designator -Wno-nullability-completeness -Wincomplete-umbrella     $
+ -Wmodule-conflict
 moduleflags = -fmodules-ts -fimplicit-modules                                $
  -fmodule-map-file=./ClibTwinbeam/module.modulemap
 commandline-sdkpath = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
@@ -22,9 +23,9 @@ cflags = $cpp-optflags -DSHA1GIT=\"$sha1git\" $macoscflags
 macos-compiler-c = xcrun clang $gencdflags $moduleflags
 macos-compiler-swift = xcrun swiftc
 librarian-mac = xcrun ar
-intel-mac = -target x86_64-apple-darwin21.3.0
-appleSoC-mac = -target arm64-apple-macos11
-platform = `printenv MINIMUM_PLATFORM`
+intel-mac = -target x86_64-apple-darwin21
+appleSoC-mac = -target arm64-apple-macos11 -D __armv8a__
+platform = {$MINIMUMPLATFORM}
 
 rule cc
   command = $macos-compiler-c -std=c++20 -MD -MF $out.d $cflags -c $in -o $out
@@ -40,7 +41,7 @@ rule ccms
   deps = gcc
 
 rule c
-  command = $macos-compiler-c -std=c2x -MD -MF $out.d $cflags -c $in -o $out
+  command = $macos-compiler-c -std=c2x -MD -MF $out.d $cflags $platform -c $in -o $out
   description = C2x $out
   depfile = $out.d
   deps = gcc
@@ -52,7 +53,7 @@ rule objc
   deps = gcc
 
 rule primary-compile-macswift
-  command = $macos-compiler-swift $swift-flags -o $out $in
+  command = $macos-compiler-swift $swift-flags $platform -o $out $in
 
 rule assemble-macapp
   command = rm -rf Minimum.app                                             ; $
@@ -63,7 +64,7 @@ rule assemble-macapp
    mkdir $appname.app/Contents/Resources                                   ; $
    cp macos-content/Info.plist $appname.app/Contents/                      ; $
    cp macos-content/PkgInfo $appname.app/Contents/                         ; $
-   cp macos-content/$appname.icns $appname.app/Contents/Resources/         ; $
+   cp macos-content/Minimum.icns $appname.app/Contents/Resources/          ; $
    mv Minimum $appname.app/Contents/MacOS/$appname
 
 build $objs/account-italian-1.o: c ClibTwinbeam/account-italian-1.c

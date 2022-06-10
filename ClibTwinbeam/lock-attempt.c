@@ -7,7 +7,7 @@ EXT₋C
 int
 #if defined __x86_64__
 __attribute__ ((target("rtm")))
-#elif defined __armv8a__
+#elif defined __arm64__
 __attribute__ ((target("tme")))
 #endif
 OptimisticSwap(
@@ -15,7 +15,7 @@ OptimisticSwap(
   enum Impediment it
 ) TROKADERO SELDOM
 {
-#if defined __armv8a__
+#if defined __arm64__
    uint64_t cause = __builtin_arm_tstart();
    if (cause) { return -1; }
 #elif defined __x86_64__
@@ -30,7 +30,7 @@ OptimisticSwap(
    *p₂ = *p₁ ^ *p₂;
    *p₁ = *p₁ ^ *p₂;
    if (it == MustBeOrdered && *p₁ > *p₂) {
-#if defined __armv8a__
+#if defined __arm64__
     __builtin_arm_tcancel(0xfd); /* CANCELLATION₋REASON 0x8000u 0x7fffu */
 #elif defined __x86_64__
     __builtin_ia32_xabort(0xfd);
@@ -39,7 +39,7 @@ OptimisticSwap(
 #endif
      return -1;
    }
-#if defined __armv8a__
+#if defined __arm64__
    __builtin_arm_tcommit();
 #elif defined __x86_64__
    __builtin_ia32_xend(); /* ⬷ see [Twinbeam]--<Source>--<System.cpp>. */

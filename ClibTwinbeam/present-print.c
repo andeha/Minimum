@@ -8,17 +8,17 @@ import Stdio;
 EXT₋C Argᴾ ﹟d(__builtin_int_t d) { Argᴾ y = { .value.d=d, .kind=1 }; return y; }
 EXT₋C Argᴾ ﹟x(__builtin_uint_t x) { Argᴾ y = { { .x=x }, 2 }; return y; }
 EXT₋C Argᴾ ﹟b(__builtin_uint_t b) { Argᴾ y = { { .b=b }, 3 }; return y; }
-EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) a⃝ { Argᴾ y = { { .u8s=(char8₋t *)u8s }, 4 }; return y; }
-EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) a⃝ { Argᴾ y = { { .u8s=(char8₋t *)s }, 4 }; return y; }
-EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) a⃝ { 
+EXT₋C Argᴾ ﹟s8(const char8₋t * u8s) ⓣ { Argᴾ y = { { .u8s=(char8₋t *)u8s }, 4 }; return y; }
+EXT₋C Argᴾ ﹟s7(const /* signed */ char * s) ⓣ { Argᴾ y = { { .u8s=(char8₋t *)s }, 4 }; return y; }
+EXT₋C Argᴾ ﹟S(__builtin_int_t tetras, const char32̄_t * unterminated₋uc) ⓣ { 
   Argᴾ y = { { .ucs={ tetras, (char32̄_t *)unterminated₋uc } }, 5 }; return y; }
-EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) a⃝ {
-  __builtin_int_t tetras=TetrasUntilNull((char32̄_t *)zero₋terminated₋uc,BUILTIN₋INT₋MAX);
+EXT₋C Argᴾ ﹟S(const char32̄_t * zero₋terminated₋uc) ⓣ {
+  __builtin_int_t tetras=TetrasUntilZero((char32̄_t *)zero₋terminated₋uc,BUILTIN₋INT₋MAX);
   Argᴾ y = { { .ucs={ tetras, (char32̄_t *)zero₋terminated₋uc } }, 5 };
   return y; }
-EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) a⃝ {
+EXT₋C Argᴾ ﹟s7(__builtin_int_t characters, signed char * keyput) ⓣ {
  Argᴾ y = { { .text₁={ characters, keyput } }, 100 }; return y; }
-EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) a⃝ {
+EXT₋C Argᴾ ﹟s8(__builtin_int_t bytes, const char8₋t * u8s) ⓣ {
  Argᴾ y= { { .text₂={ bytes, (char8₋t *)u8s } }, 101 }; return y; }
 EXT₋C Argᴾ ﹟c8(char8₋t c) /* a⃝ */ { Argᴾ y= { { .c=c }, 6 }; return y; }
 EXT₋C Argᴾ ﹟c7(/* signed */ char c) /* a⃝ */ { Argᴾ y= { { .c=(char8₋t)c }, 6 }; return y; }
@@ -30,18 +30,18 @@ EXT₋C Argᴾ ﹟I(__int128_t I) { Argᴾ y = { { .I=I }, 12 }; return y; }
 EXT₋C Argᴾ ﹟regs(__builtin_uint_t mask) { Argᴾ y = { { .x=mask }, 13 }; return y; }
 /* ⬷ Print between 0 and 31 non-high-volatile registers. */
 
-EXT₋C Argᴾ ﹟λ₋p(Argᴾ₋output₋p scalar, void * context) { Argᴾ y = { .λ₋p={ scalar, context }, .kind=10 }; return y; }
+EXT₋C Argᴾ ﹟λ(Argᴾ₋output₋p scalar, void * context) { Argᴾ y = { .λ₋p={ scalar, context }, .kind=10 }; return y; }
 
-EXT₋C Argᴾ ﹟chapter(struct Unicodes ingress, struct Plate * anfang)
+EXT₋C Argᴾ ﹟chapter(double multiple, struct Plate * anfang)
 {
-  Argᴾ y = { .chapter={ anfang, ingress }, .kind=88 }; return y;
+  Argᴾ y = { .chapter={ anfang, multiple }, .kind=88 }; return y;
 } /* ⬷ see --<🥢 𝙎𝙪𝙨𝙝𝙞 𝘾𝙝𝙚́𝙛.cpp> and --<Impressions.hpp> for details on PNG::IHDR. */
 
 void Register₋reflect(__builtin_uint_t /* mask */) { }
 
 inexorable void Present(void (^out)(char8₋t * u8s, __builtin_int_t bytes), char32̄_t * terminated₋ucs)
 {
-   __builtin_int_t tetras = TetrasUntilNull(terminated₋ucs,BUILTIN₋INT₋MAX);
+   __builtin_int_t tetras = TetrasUntilZero(terminated₋ucs,BUILTIN₋INT₋MAX);
    print(out, "⬚", ﹟S(tetras,terminated₋ucs));
 }
 
@@ -78,14 +78,14 @@ print﹟(
       out((char8₋t *)𝟽bit₋utf8, bytes); printedBytesExcept0 += bytes; };
     Out𝕫 out𝕫 = ^(__builtin_int_t x) { Base𝕫(x, 10, 0, ^(char s) { out₂(&s,1); }); };
     Out𝕟 out𝕟 = ^(__builtin_uint_t x) { Base𝕟(x, 16, 
-#if defined __x86_64__ || defined __armv8a__
+#if defined __x86_64__ || defined __arm64__ || Kirkbridge
       16
 #elif defined  __mips__ || defined __armv6__ || defined espressif
        8
 #endif
       , ^(char s) { out₂(&s,1); }); };
     Out₋𝟷𝟶𝟷𝟷𝟶 𝟷𝟶𝟷𝟷𝟶₋out = ^(__builtin_uint_t b) { Base𝕟(b, 2,
-#if defined __x86_64__ || defined __armv8a__
+#if defined __x86_64__ || defined __arm64__ || Kirkbridge
        64
 #elif defined  __mips__ || defined __armv6__ || defined espressif
        32
@@ -138,8 +138,8 @@ again:
       case 12: 𝟷𝟸𝟾₋out𝕫(a.value.I); break;
 #endif
       case 13: Register₋reflect(a.value.x); break;                              \
-      case 88: unicode₋stream(a.chapter.ingress.tetras,                         \
-       a.chapter.ingress.unicodes); break;                                      \
+      case 88: /* unicode₋stream(a.value.chapter.anfang,                        \
+       a.chapter.ingress.unicodes); */ break;                                   \
       default: /* if (a.kind >= 0) imprint[a.kind](a); else */                  \
         unicode₋symbol(U'?'); break; }
     }
@@ -158,8 +158,8 @@ mfprint(
 )
 { int y;
    typedef void (^Out)(char8₋t *, __builtin_int_t);
-#if defined __armv8a__ || defined __x86_64__
-   bool original = false; int descript = original ? 1 /* stdout */ : 2 /* stderr */;
+#if defined __arm64__ || defined __x86_64__ || Kirkbridge
+   int original = false; int descript = original ? 1 /* stdout */ : 2 /* stderr */;
    Out out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(descript, (const void *)u8s, bytes); };
 #elif defined __mips__ || defined espressif || defined __armv6__
    Out out = ^(char8₋t * u8s, __builtin_int_t bytes) { Trace₁(u8s,bytes); };
@@ -177,10 +177,10 @@ mfprint(
 FOCAL
 EXT₋C
 int
-print(const char * utf8format, ...) a⃝ /* Here all variable args are of the type `Argᴾ`. */
+print(const char * utf8format, ...) ⓣ /* Here all variable args are of the type `Argᴾ`. */
 { int y; va_prologue(utf8format);
    typedef void (^Out)(char8₋t *, __builtin_int_t);
-#if defined __armv8a__ || defined __x86_64__
+#if defined __arm64__ || defined __x86_64__ || defined Kirkbridge
    Out out = ^(char8₋t * u8s, __builtin_int_t bytes) { write(1, (const void *)u8s, bytes); };
 #elif  defined __mips__ || defined espressif || defined __armv6__
    Out out = ^(char8₋t * u8s, __builtin_int_t bytes) { Putₒ(u8s,bytes); };
@@ -196,7 +196,7 @@ print(
   void (^out)(char8₋t * u8s, __builtin_int_t bytes), 
   const char * utf8format, 
   ...
-) a⃝
+) ⓣ
 { int y; va_prologue(utf8format);
    y = print﹟(out,utf8format,__various);
    va_epilogue
@@ -221,16 +221,16 @@ Present₋Bitfield(struct Bitfield * field,
   void (^out)(char8₋t * u8s, __builtin_int_t bytes)
 )
 {
-   unsigned spaces = maxwidth - TetrasUntilNull((char32̄_t *)(field->regular), BUILTIN₋INT₋MAX);
+   unsigned spaces = maxwidth - TetrasUntilZero((char32̄_t *)(field->regular), BUILTIN₋INT₋MAX);
    while (spaces--) { print(out," "); }
    
    Present(out,(char32̄_t *)(field->regular)); print(out, " ");
    
-   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 bool masking=false; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned pos=31;
-   Base𝕟((__builtin_uint_t)(field->mask), 2, 32, ^(char 𝟶to𝟿) {
+   𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 int masking=false; 𝑓𝑙𝑢𝑐𝑡𝑢𝑎𝑛𝑡 unsigned pos=31;
+   Base𝕟((__builtin_uint_t)(field->mask), 2, 32, ^(char digit) {
      if (is₋𝟷𝟼₋bits && pos > 15) { print(out, "x"); } else {
-      if (𝟶to𝟿 == '1' && !masking) { masking = true; }
-      if (masking && 𝟶to𝟿 == '0') { masking = false; }
+      if (digit == '1' && !masking) { masking = true; }
+      if (masking && digit == '0') { masking = false; }
       if (masking) { print(out, numerics & (0b1<<pos) ? "1" : "0"); }
       if (!masking) { print(out, "␣"); } }
      if (pos % 4 == 0) print(out, "|"); --pos;
@@ -255,7 +255,7 @@ NumberformatCatalogue₋Present(
         uint32_t init) { __builtin_int_t maxwidth=0; 
       for (int i=0; i<count; ++i) {
          const struct Bitfield * reg = regs + i; maxwidth = max(maxwidth, 
-          TetrasUntilNull((char32̄_t *)(reg->regular), BUILTIN₋INT₋MAX));
+          TetrasUntilZero((char32̄_t *)(reg->regular), BUILTIN₋INT₋MAX));
       }
       for (int i=0; i<count; ++i) {
          Present₋Bitfield((regs + i), val, init, is₋𝟷𝟼₋bits, maxwidth, out);
