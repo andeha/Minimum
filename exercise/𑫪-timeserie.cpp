@@ -9,6 +9,7 @@ void Print(int count, struct timeserie₋entry row[], int permanent[]);
 void Output(int count, union historypod val[], struct Unicodes key[]);
 typedef void (^Out)(char8₋t * u8s, __builtin_int_t bytes);
 EXT₋C void Present₋timeserie₋intestinals(struct timeserie * 🅙, Out out);
+typedef struct timeserie₋entry Entry;
 
 UNITTEST(timeserie₋1)
 {

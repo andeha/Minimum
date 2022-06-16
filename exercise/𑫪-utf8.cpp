@@ -35,9 +35,9 @@ again:
 UNITTEST(decoded₋print)
 {
 #if defined __cplusplus
-   const char32̄_t * text = UNICODES("lorem ipsum"); /* ⬷ passing char32_t. */
+   const char32̄_t * text = UNICODES("lorem ipsum"); /*  passing char32_t. */
 #else
-   const char32̄_t * text = UNICODES("lorem ipsum"); /* ⬷ passing 'unsigned int'. */
+   const char32̄_t * text = UNICODES("lorem ipsum"); /*  passing 'unsigned int'. */
 #endif
    print₋unicodes(11,(char32̄_t *)text);
 }
